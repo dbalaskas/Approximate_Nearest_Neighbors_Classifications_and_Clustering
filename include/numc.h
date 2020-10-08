@@ -33,5 +33,4 @@ class NumC {
         static double dist(Vector v1, Vector v2, int d);
 };
 
-
 #endif
