@@ -1,22 +1,35 @@
+#ifndef NUMC_H
+#define NUMC_H
 
-
-typedef int* VectorType;
+typedef int VectorDataType;
+typedef struct {
+    VectorDataType* vector;
+    int size;
+} Vector;
 
 class NumC {
-    int numOfRows;
-    int numOfCols;
-    VectorType data;
 
     private:
+        int numOfRows;
+        int numOfCols;
+        VectorDataType* data;
 
     public:
-        NumC();
+        NumC(int numOfRows, int numOfCols);
         ~NumC();
+
         int getRows();
         int getCols();
-        VectorType getVector(int index);
-        void addVector(int *vector);
-        NumC* median();
 
-        static double dist(VectorType v1, VectorType v2, int d);
+        Vector getVector(int index);
+        void addElement(VectorDataType element, int row, int col);
+        void addVector(int *vector);
+
+        void print();
+
+        NumC* median();
+        static double dist(VectorDataType* v1, VectorDataType* v2, int d);
 };
+
+
+#endif
