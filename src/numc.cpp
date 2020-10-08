@@ -8,6 +8,15 @@
 
 using namespace std;
 
+NumC::NumC() {
+    // set matrix dimensions
+    this->numOfRows = 0;
+    this->numOfCols = 0;
+    this->size = 0;
+
+    // allocate memory for the 2d matrix
+    this->data = NULL;
+}
 
 NumC::NumC(int numOfRows, int numOfCols){
     // set matrix dimensions

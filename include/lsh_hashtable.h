@@ -2,15 +2,16 @@
 #define LSH_HASH_H
 
 #include <iostream>
-#include <list>
+#include <vector>
 #include "./numc.h"
 
 class LSH_HashFunction {
     private:
         int w;
-        int* sVector;
+        NumC sVector;
     public:
-        LSH_HashFunction(int w, int k);
+        LSH_HashFunction();
+        LSH_HashFunction(int w, int k, int d);
         ~LSH_HashFunction();
 
         int hash(Vector vector);
@@ -18,16 +19,17 @@ class LSH_HashFunction {
 
 class LSH_HashTable {
     private:
-        LSH_HashFunction* hashFunction;
-        std::list<Vector>* bucketList;
+        LSH_HashFunction hashFunction;
+        std::vector<std::vector<Vector>> bucketList;
         int numOfBuckets;
 
     public:
-        LSH_HashTable(int w, int numOfBucket, int k);
+        LSH_HashTable();
+        LSH_HashTable(int w, int numOfBucket, int k, int d);
         ~LSH_HashTable();
 
         int hash(Vector vector);
-        std::list<Vector> getBucket(Vector vector);
+        std::vector<Vector> getBucket(Vector vector);
         void fit(NumC* data);
 };
 

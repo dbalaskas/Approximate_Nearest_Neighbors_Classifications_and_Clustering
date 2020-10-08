@@ -16,6 +16,7 @@ class NumC {
         VectorDataType* data;
 
     public:
+        NumC();
         NumC(int numOfRows, int numOfCols);
         ~NumC();
 
