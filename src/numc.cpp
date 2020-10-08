@@ -115,6 +115,7 @@ double NumC::dist(Vector v1, Vector v2, int d){
 // int main(){
 
 //     NumC nn(6,1);
+//     NumC nn(6,33);
 //     for (int i = 0; i < nn.getRows(); i++){
 //         for (int j = 0; j < nn.getCols(); j++){
 //             nn.addElement(i, i, j);
@@ -130,4 +131,5 @@ double NumC::dist(Vector v1, Vector v2, int d){
 //     nn.print();
 
 //     cout << NumC::dist(nn.getVector(5),nn.getVector(4),2);
+//     cout << NumC::dist(nn.getVector(6),nn.getVector(4),2);
 // }
