@@ -112,19 +112,8 @@ double NumC::dist(Vector v1, Vector v2, int d){
 
 }
 
-// int main(){
+int main(){
 
-<<<<<<< HEAD
-//     NumC nn(4,33);
-//     for (int i = 0; i < nn.getRows(); i++){
-//         for (int j = 0; j < nn.getCols(); j++){
-//             nn.addElement(i, i, j);
-//         }
-        
-//     }
-//     nn.print();
-// }
-=======
     NumC nn(6,33);
     for (int i = 0; i < nn.getRows(); i++){
         for (int j = 0; j < nn.getCols(); j++){
@@ -142,4 +131,3 @@ double NumC::dist(Vector v1, Vector v2, int d){
 
     cout << NumC::dist(nn.getVector(6),nn.getVector(4),2);
 }
->>>>>>> 4aaa8d105fe11a45ba5905c75ae9d5f41f9ac0c4
