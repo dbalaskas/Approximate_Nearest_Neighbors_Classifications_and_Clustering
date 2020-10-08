@@ -1,25 +1,25 @@
 #include "./numc.h";
 
-class LSH_HashFunction {
+class HC_HashFunction {
     private:
         int w;
         int* sVector;
     public:
-        LSH_HashFunction(int w, int k);
-        ~LSH_HashFunction();
+        HC_HashFunction(int w, int k);
+        ~HC_HashFunction();
 
         int hash(Vector vector);
 };
 
-class LSH_HashTable {
+class HC_HashTable {
     private:
-        List* bucketList;
+        // List* bucketList;
         int numOfBuckets;
-        LSH_HashFunction* hashFunction;
+        HC_HashFunction* hashFunction;
 
     public:
-        LSH_HashTable(int w, int numOfBucket, int k);
-        ~LSH_HashTable();
+        HC_HashTable(int w, int numOfBucket, int k);
+        ~HC_HashTable();
 
         int hash(Vector vector);
         List getBucket(Vector vector);
