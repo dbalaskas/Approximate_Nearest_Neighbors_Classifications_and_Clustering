@@ -1,13 +1,24 @@
 {
     "files.associations": {
+<<<<<<< HEAD
         "*.html": "html",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
+=======
+        "*.ipynd": "jupyter",
+        "iostream": "cpp",
+        "array": "cpp",
+        "atomic": "cpp",
+>>>>>>> 4aaa8d105fe11a45ba5905c75ae9d5f41f9ac0c4
         "*.tcc": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
+<<<<<<< HEAD
+=======
+        "complex": "cpp",
+>>>>>>> 4aaa8d105fe11a45ba5905c75ae9d5f41f9ac0c4
         "cstdarg": "cpp",
         "cstddef": "cpp",
         "cstdint": "cpp",
@@ -17,7 +28,10 @@
         "cwchar": "cpp",
         "cwctype": "cpp",
         "deque": "cpp",
+<<<<<<< HEAD
         "list": "cpp",
+=======
+>>>>>>> 4aaa8d105fe11a45ba5905c75ae9d5f41f9ac0c4
         "unordered_map": "cpp",
         "vector": "cpp",
         "exception": "cpp",
@@ -38,7 +52,10 @@
         "fstream": "cpp",
         "initializer_list": "cpp",
         "iosfwd": "cpp",
+<<<<<<< HEAD
         "iostream": "cpp",
+=======
+>>>>>>> 4aaa8d105fe11a45ba5905c75ae9d5f41f9ac0c4
         "istream": "cpp",
         "limits": "cpp",
         "new": "cpp",

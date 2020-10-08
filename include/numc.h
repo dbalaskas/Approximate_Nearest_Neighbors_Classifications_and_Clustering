@@ -12,6 +12,7 @@ class NumC {
     private:
         int numOfRows;
         int numOfCols;
+        int size;
         VectorDataType* data;
 
     public:
@@ -23,12 +24,13 @@ class NumC {
 
         Vector getVector(int index);
         void addElement(VectorDataType element, int row, int col);
-        void addVector(int *vector);
+        void addVector(Vector vector);
 
         void print();
 
         NumC* median();
-        static double dist(VectorDataType* v1, VectorDataType* v2, int d);
+        static void print(Vector vector);
+        static double dist(Vector v1, Vector v2, int d);
 };
 
 
