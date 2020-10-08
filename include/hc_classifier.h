@@ -1,12 +1,12 @@
 #include "./numc.h";
-#include "./lsh_hashtable.h";
+#include "./hc_hashtable.h";
 
-class LSH {
+class HyperCube {
     private:
-        LSH_HashTable** hashTable;
+        HC_HashTable** hashTable;
     public:
-        LSH();
-        ~LSH();
+        HyperCube();
+        ~HyperCube();
 
         void fit(NumC* train_data);
         void transform();
