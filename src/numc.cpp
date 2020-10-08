@@ -59,14 +59,14 @@ void NumC::print(){
 
 }
 
-int main(){
+// int main(){
 
-    NumC nn(4,33);
-    for (int i = 0; i < nn.getRows(); i++){
-        for (int j = 0; j < nn.getCols(); j++){
-            nn.addElement(i, i, j);
-        }
+//     NumC nn(4,33);
+//     for (int i = 0; i < nn.getRows(); i++){
+//         for (int j = 0; j < nn.getCols(); j++){
+//             nn.addElement(i, i, j);
+//         }
         
-    }
-    nn.print();
-}
+//     }
+//     nn.print();
+// }

@@ -1,4 +1,9 @@
-#include "./numc.h";
+#ifndef LSH_HASH_H
+#define LSH_HASH_H
+
+#include <iostream>
+#include <list>
+#include "./numc.h"
 
 class LSH_HashFunction {
     private:
@@ -13,15 +18,17 @@ class LSH_HashFunction {
 
 class LSH_HashTable {
     private:
-        List* bucketList;
-        int numOfBuckets;
         LSH_HashFunction* hashFunction;
+        std::list<Vector>* bucketList;
+        int numOfBuckets;
 
     public:
         LSH_HashTable(int w, int numOfBucket, int k);
         ~LSH_HashTable();
 
         int hash(Vector vector);
-        List getBucket(Vector vector);
-        void fit(numC* data);
+        std::list<Vector> getBucket(Vector vector);
+        void fit(NumC* data);
 };
+
+#endif
