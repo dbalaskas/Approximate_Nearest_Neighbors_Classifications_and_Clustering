@@ -36,14 +36,14 @@ NumC* PandaC::fromMNIST(char *filePath) {
         cout << "Read " << n_rows << endl;
         cout << "Read " << n_cols << endl;
         NumC *data = new NumC(n_rows, n_cols);
-        int row[n_rows]; 
+        Vector row = {(int*)malloc(n_rows*sizeof(int)), n_rows}; 
         for(int i=0;i<number_of_images;++i) {
             for(int r=0;r<n_rows;++r) {
                 for(int c=0;c<n_cols;++c) {
                     // unsigned char temp=0;
                     // file.read((char*) &temp,sizeof(temp));
-                    row[c] = 0;
-                    file.read((char*) row+c, sizeof(int));
+                    row.vector[c] = 0;
+                    file.read((char*) row.vector+c, sizeof(int));
                 }
                 data->addVector(row);
             }
