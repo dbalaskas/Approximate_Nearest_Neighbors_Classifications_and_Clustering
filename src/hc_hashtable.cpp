@@ -33,14 +33,16 @@ int HC_HashTable::hash(Vector vector) {
 }
 
 Bucket HC_HashTable::getBucket(Vector vector) {
-    return this->bucketList[hash(vector)];
+    return bucketList[hash(vector)];
+}
+
+void HC_HashTable::fit(Vector vector) {
+    bucketList[hash(vector)].push_back(vector);
 }
 
 void HC_HashTable::fit(NumC* data) {
     int dataSize = data->getRows();
-    Vector vector;
     for (int i=0; i < dataSize; i++) {
-        vector = data->getVector(i);
-        this->bucketList[hash(vector)].push_back(vector);
+        fit(data->getVector(i));
     }
 }

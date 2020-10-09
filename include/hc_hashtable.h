@@ -52,6 +52,7 @@ class HC_HashTable {
         int hash(Vector vector);
         Bucket getBucket(Vector vector);
         void fit(NumC* data);
+        void fit(Vector vector);
 };
 
 #endif

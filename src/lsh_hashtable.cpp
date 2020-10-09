@@ -60,17 +60,16 @@ int LSH_HashTable::hash(Vector vector) {
 
 std::vector<Vector> LSH_HashTable::getBucket(Vector vector) {
     // return this->bucketList[this->hashFunction.hash(vector)];
-    return this->bucketList[hash(vector)];
+    return bucketList[hash(vector)];
+}
+
+void LSH_HashTable::fit(Vector vector) {
+    bucketList[hash(vector)].push_back(vector);
 }
 
 void LSH_HashTable::fit(NumC* data) {
     int dataSize = data->getRows();
-    int hashValue;
-    Vector vector;
     for (int i=0; i < dataSize; i++) {
-        vector = data->getVector(i);
-        // hashValue = this->hashFunction.hash(vector);
-        hashValue = hash(vector);
-        this->bucketList[i].push_back(vector);
+        fit(data->getVector(i));
     }
 }

@@ -27,6 +27,7 @@ class LSH_HashTable {
         int hash(Vector vector);
         std::vector<Vector> getBucket(Vector vector);
         void fit(NumC* data);
+        void fit(Vector data);
 };
 
 #endif
