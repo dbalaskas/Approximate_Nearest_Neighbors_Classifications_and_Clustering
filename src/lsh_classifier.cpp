@@ -43,21 +43,41 @@ void LSH::fit_transform(NumC* _data, int k, int _R, int _L, int _hashTableSize=0
     transform();
 }
 
-Result LSH::predict_knn(Vector vector, int k) {
-    Result result;
+Results LSH::predict_knn(Vector vector, int k) {
+    Results result = Results(k);
+    double dist;
+
+    clock_t start = clock();
     for (int i=0; i < L; i++) {
-    //    hashTableList[i].fit(data);
-        double dist;
         Bucket bucket = hashTableList[i].getBucket(vector);
         for (int j=0; j < bucket.size(); j++) {
             dist = NumC::dist(vector, bucket[j], 1);
         }
+        // results.add(index, dist);
     }
+    clock_t end = clock();
+
+    // result.setTime((double) (end - start) / CLOCKS_PER_SEC);
     return result;
 }
 
-Result LSH::predict_rs(Vector vector, int r) {
-    Result result;
+Results LSH::predict_rs(Vector vector, int r) {
+    Results result = Results();
+    double dist;
     
+    clock_t start = clock();
+    for (int i=0; i < L; i++) {
+        Bucket bucket = hashTableList[i].getBucket(vector);
+        for (int j=0; j < bucket.size(); j++) {
+            dist = NumC::dist(vector, bucket[j], 1);
+            if (dist <= r) {
+                // results.add(index, dist);
+            }
+        }
+    }
+    clock_t end = clock();
+
+    // result.setTime((double) (end - start) / CLOCKS_PER_SEC);
+    // result.time = (double)(end - start) / CLOCKS_PER_SEC;
     return result;
 }

@@ -28,7 +28,7 @@ void HyperCube::fit(NumC* _data, int k, int _R, int _hashTableSize) {
 }
 
 void HyperCube::transform() {
-    
+    hashTable.fit(data);
 }
 
 void HyperCube::fit_transform(NumC* _data, int k, int _R, int _hashTableSize) {
@@ -36,14 +36,53 @@ void HyperCube::fit_transform(NumC* _data, int k, int _R, int _hashTableSize) {
     transform();
 }
 
-Result HyperCube::predict_knn(Vector vector, int k) {
-    Result result;
-    
+Results HyperCube::predict_knn(Vector vector, int k, int maxPoints, int maxVertices) {
+    Results result = Results(k);
+    double dist;
+    int verticesProbed = 0;
+    int pointesChecked = 0;
+
+    clock_t start = clock();
+    int hashValue = hashTable.hash(vector);
+    while (verticesProbed < maxVertices && pointesChecked < maxPoints) {
+        Bucket bucket = hashTable.getBucket(hashValue);
+        for (int j=0; j < bucket.size(); j++) {
+            dist = NumC::dist(vector, bucket[j], 1);
+            // results.add(index, dist);
+            if (++pointesChecked == maxPoints) break;
+        }
+        // hashValue = Update_hashValue(hashValue)
+        verticesProbed++;
+    }
+    clock_t end = clock();
+
+    // result.setTime((double) (end - start) / CLOCKS_PER_SEC);
     return result;
 }
 
-Result HyperCube::predict_rs(Vector vector, int r) {
-    Result result;
-    
+Results HyperCube::predict_rs(Vector vector, int r, int maxPoints, int maxVertices) {
+    Results result = Results();
+    double dist;
+    int verticesProbed = 0;
+    int pointesChecked = 0;
+
+    clock_t start = clock();
+    int hashValue = hashTable.hash(vector);
+    while (verticesProbed < maxVertices && pointesChecked < maxPoints) {
+        Bucket bucket = hashTable.getBucket(hashValue);
+        for (int j=0; j < bucket.size(); j++) {
+            dist = NumC::dist(vector, bucket[j], 1);
+            if (dist <= r) {
+                // results.add(index, dist);
+            }
+            if (++pointesChecked == maxPoints) break;
+        }
+        // hashValue = Update_hashValue(hashValue)
+        verticesProbed++;
+    }
+    clock_t end = clock();
+
+    // result.setTime((double) (end - start) / CLOCKS_PER_SEC);
+    // result.time = (double)(end - start) / CLOCKS_PER_SEC;
     return result;
 }

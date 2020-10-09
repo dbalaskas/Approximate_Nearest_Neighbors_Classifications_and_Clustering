@@ -3,6 +3,7 @@
 
 #include "./numc.h"
 #include "./lsh_hashtable.h"
+#include "./prediction_results.h"
 
 typedef vector<LSH_HashTable> HashTableList;
 
@@ -20,8 +21,8 @@ class LSH {
         void fit(NumC* _data, int k, int _R, int _L, int _hashTableSize);
         void transform();
         void fit_transform(NumC* _data, int k, int _R, int _L, int _hashTableSize);
-        Result predict_knn(Vector vector, int k);
-        Result predict_rs(Vector vector, int r);
+        Results predict_knn(Vector vector, int k);
+        Results predict_rs(Vector vector, int r);
 };
 
 #endif
