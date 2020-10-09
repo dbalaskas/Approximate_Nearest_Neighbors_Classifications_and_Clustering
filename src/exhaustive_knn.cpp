@@ -32,7 +32,7 @@ Results ExaustiveKnn::predict_knn(Vector vector){
     // allocate results sruct for given k
     Results results(this->data->getRows());
     PointIndex pointIndex;
-    std::priority_queue<double> pQ;
+    // std::priority_queue<double> pQ;
     // results.resultList.reserve(this->data->getRows());
 
     // search every row data entry and find the k with minimun distance
@@ -48,25 +48,33 @@ Results ExaustiveKnn::predict_knn(Vector vector){
     return results;
 }
 
-// int main(){
+int main(){
 
-//     ExaustiveKnn knn(5);
+    ExaustiveKnn knn(5);
 
-//     NumC nn(6,33);
-//     for (int i = 0; i < nn.getRows(); i++){
-//         for (int j = 0; j < nn.getCols(); j++){
-//             nn.addElement(i, i, j);
-//         }
+    NumC nn(6,33);
+    for (int i = 0; i < nn.getRows(); i++){
+        for (int j = 0; j < nn.getCols(); j++){
+            nn.addElement(i, i, j);
+        }
         
-//     }
+    }
 
-//     knn.fit(&nn);
+    knn.fit(&nn);
 
 
-//     Results results;
-//     results = knn.predict_knn(nn.getVector(2));
-//     for (int row = 0; row < nn.getRows(); row++){
-//         std::cout << results.resultList.at(row).dist << "\n";
-//     }
+    Results results;
+    results = knn.predict_knn(nn.getVector(2));
+    for (int row = 0; row < nn.getRows(); row++){
+        std::cout << results.resultList.at(row).dist << "\n";
+    }
 
-// }
+    std::priority_queue<double> pQ;
+    for (int row = 0; row < nn.getRows(); row++){
+        pQ.push(-row);
+    }
+    for (int row = 0; row < nn.getRows(); row++){
+        cout << pQ. << "\n";
+    }
+
+}

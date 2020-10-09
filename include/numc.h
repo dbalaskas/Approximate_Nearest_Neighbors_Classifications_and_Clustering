@@ -20,6 +20,8 @@ class NumC {
         NumC(int numOfRows, int numOfCols);
         ~NumC();
 
+        NumC& operator=(NumC other_numc);
+
         int getRows();
         int getCols();
 
