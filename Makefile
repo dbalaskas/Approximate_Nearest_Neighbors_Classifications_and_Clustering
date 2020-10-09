@@ -23,7 +23,7 @@ GDBFLAGS = -ggdb3
 
 # Organization of directories and files.
 DOC= doc
-README= $(DOC)/README.md
+README= README.md
 OUTPUT= ./doc/output
 INPUT= ./doc/input
 QUERY= ./doc/query
