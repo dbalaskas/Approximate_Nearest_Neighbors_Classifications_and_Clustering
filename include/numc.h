@@ -24,6 +24,8 @@ class NumC {
 
         int getRows();
         int getCols();
+        VectorDataType* getData();
+
 
         Vector getVector(int index);
         void addElement(VectorDataType element, int row, int col);
