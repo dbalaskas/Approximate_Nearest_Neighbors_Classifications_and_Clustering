@@ -5,21 +5,17 @@
 #include <vector>
 #include "./numc.h"
 
-class LSH_HashFunction {
-    private:
-        int w;
-        NumC sVector;
-    public:
-        LSH_HashFunction();
-        LSH_HashFunction(int w, int k, int d);
-        ~LSH_HashFunction();
-
-        int hash(Vector vector);
-};
+typedef std::vector<std::vector<Vector>> BucketList;
+typedef std::vector<Vector> Bucket;
+typedef struct {
+    int w;
+    NumC sVector;
+} HashFunction;
 
 class LSH_HashTable {
     private:
-        LSH_HashFunction hashFunction;
+        HashFunction hashFunction;
+        // LSH_HashFunction hashFunction;
         std::vector<std::vector<Vector>> bucketList;
         int numOfBuckets;
 

@@ -10,6 +10,7 @@ class HyperCube {
         HC_HashTable** hashTable;
         int R;
     public:
+        HyperCube();
         HyperCube(int R);
         ~HyperCube();
 

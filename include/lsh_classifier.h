@@ -12,6 +12,7 @@ class LSH {
         // int L;
         int R;
     public:
+        LSH();
         LSH(int k, int L, int R);
         ~LSH();
 

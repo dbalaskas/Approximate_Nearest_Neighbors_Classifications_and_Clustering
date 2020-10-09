@@ -3,10 +3,6 @@
 
 using namespace std;
 
-// void PandaC::toDat(FILE* filepath, char* text) {
-
-// }
-
 int PandaC::reverseInt(int num) {
     unsigned char c1, c2, c3, c4;
     c1 = num & 255;
@@ -51,6 +47,6 @@ NumC* PandaC::fromMNIST(char *filePath) {
         data->print();
         return data;
     }
-    printf("error\n");
+    printf("error in PandaC::fromMNIST\n");
     return NULL;
 }
