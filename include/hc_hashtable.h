@@ -20,14 +20,15 @@ class HC_HashTable {
 
     public:
         HC_HashTable();
-        HC_HashTable(int r, int numOfBucket, int k, int d);
+        HC_HashTable(int r, int numOfBuckets, int k, int d);
         ~HC_HashTable();
 
+        int getNumOfBuckets();
         int hash(Vector vector);
         Bucket getBucket(int bucketNum);
         Bucket getBucket(Vector vector);
-        void fit(NumC* data);
         void fit(Vector vector);
+        void fit(NumC* data);
 };
 
 #endif

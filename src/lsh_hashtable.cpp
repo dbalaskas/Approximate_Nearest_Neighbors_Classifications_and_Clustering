@@ -12,7 +12,7 @@ LSH_HashTable::LSH_HashTable() {
 }
 
 
-LSH_HashTable::LSH_HashTable(int _r, int _numOfBucket, int _k, int _d) {
+LSH_HashTable::LSH_HashTable(int _r, int _numOfBuckets, int _k, int _d) {
     srand(time(NULL));
     hashFunction.w = _r*R_MULTIPLIER;
     hashFunction.sVector = NumC(_k, _d);
@@ -21,13 +21,17 @@ LSH_HashTable::LSH_HashTable(int _r, int _numOfBucket, int _k, int _d) {
             hashFunction.sVector.addElement(rand()%hashFunction.w, i, j);
         }
     }
-    bucketList = BucketList(_numOfBucket);
-    numOfBuckets = numOfBuckets;
+    bucketList = BucketList(_numOfBuckets);
+    numOfBuckets = _numOfBuckets;
 }
 
 LSH_HashTable::~LSH_HashTable() {
     hashFunction.w = 0;
     numOfBuckets = 0;
+}
+
+int LSH_HashTable::getNumOfBuckets() {
+    return numOfBuckets;
 }
 
 int LSH_HashTable::hash(Vector vector) {

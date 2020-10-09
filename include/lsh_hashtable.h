@@ -20,14 +20,15 @@ class LSH_HashTable {
 
     public:
         LSH_HashTable();
-        LSH_HashTable(int r, int numOfBucket, int k, int d);
+        LSH_HashTable(int r, int numOfBuckets, int k, int d);
         ~LSH_HashTable();
 
+        int getNumOfBuckets();
         int hash(Vector vector);
         Bucket getBucket(int bucketNum);
         Bucket getBucket(Vector vector);
+        void fit(Vector vector);
         void fit(NumC* data);
-        void fit(Vector data);
 };
 
 #endif

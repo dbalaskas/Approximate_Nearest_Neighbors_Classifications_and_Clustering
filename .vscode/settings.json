@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.html": "html",
+        "*.tcc": "cpp",
+        "cstdarg": "cpp",
+        "unordered_map": "cpp",
+        "istream": "cpp"
+    }
+}

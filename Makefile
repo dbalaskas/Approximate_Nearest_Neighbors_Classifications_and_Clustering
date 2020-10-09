@@ -4,25 +4,37 @@
 #####################################################################
 
 .PHONY: clean default run
+
+# Define exec names.
+LSH_EXEC= lsh
+CUBE_EXEC= cube
+CLUSTER_EXEC= cluster
+
+# Define filetype and compiler type.
 CXX= g++ -std=c++11 
 CODETYPE = cpp
 HEADERTYPE = h
 
+# Define commands and tags.
 CXXFLAGS= -Wall -g3
 LDLIBS= -lpthread
 RM= rm -f
 GDBFLAGS = -ggdb3
 
+# Organization of directories and files.
+DOC= doc
+README= $(DOC)/README.md
+OUTPUT= ./doc/output
+INPUT= ./doc/input
+QUERY= ./doc/query
 BDIR= bin
 SRCDIR= src
 SRC= $(wildcard $(SRCDIR)/*.$(CODETYPE))
 IDIR= include
 DEPS= $(wildcard $(IDIR)/*.h)
 ODIR= build
-DOC= doc
-README= $(DOC)/README.md
-DEMANDED_OBJECTS= $(ODIR)/rbtree.o $(ODIR)/stats_entity.o $(ODIR)/record.o $(ODIR)/hash_table.o \
- $(ODIR)/func.o $(ODIR)/record_date_func.o $(ODIR)/bounded_buffer.o
+DEMANDED_OBJECTS= $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/exhaustive_knn.o $(ODIR)/lsh_hashtable.o \
+ $(ODIR)/hc_hashtable.o $(ODIR)/numc.o $(ODIR)/pandac.o $(ODIR)/prediction_results.o
 
 default: exec
 	@echo "============================================================================"
@@ -33,14 +45,17 @@ info:
 	@echo "include directory: $(IDIR)."
 	@echo "object directory: $(ODIR)."
 	@echo "documents/data directory: $(DOC)."
+	@echo "input directory: $(INPUT)."
+	@echo "output directory: $(OUTPUT)."
+	@echo "query directory: $(QUERY)."
 	@echo "executable directory: $(BDIR)."
 	@echo "At compilation we are adding the libraries: $(LDLIBS)."
-	@echo "README path: $(DOC)/README.txt."
+	@echo "README path: $(README)."
 	@echo "============================================================================"
 	@echo "make: compiles the executable."
 	@echo "make <filename>.o: compiles the object file of $(SRCDIR)/<filename>.$(CODETYPE) on $(ODIR)/<filename>.o."
-	@echo "make clean: Clears the project from the executables, the object files, and the data."
-	@echo "make clean_cache: Clears the project from the data (logfiles, outputs and named pipes)."
+	@echo "make clean: Clears the project from the executables and the object files."
+	@echo "make clean_cache: Clears the project from the output files."
 	@echo "make debug: compiles the project with $(GDBFLAGS) and runs gdb on the executable."
 	@echo "make README: Prints the README file of the project."
 	@echo "============================================================================"
@@ -67,15 +82,10 @@ clean:
 	@echo "Cleaning up..."
 	$(RM) $(ODIR)/*
 	$(RM) $(BDIR)/*
-	$(RM) ./doc/logs/logfile.*
-	$(RM) ./doc/output/output.txt
-	$(RM) ./worker_*
 clean_cache:
 	@echo "============================================================================"
-	@echo "Removing datafiles..."
-	$(RM) ./doc/logs/logfile.*
-	$(RM) ./doc/output/output.txt
-	$(RM) ./worker_*
+	@echo "Removing cached outputs..."
+	$(RM) $(OUTPUT)/* 
 debug: $(DEMANDED_OBJECTS)
 	@echo "============================================================================"
 	@echo "Debugging..."
