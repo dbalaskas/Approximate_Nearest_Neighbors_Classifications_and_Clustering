@@ -31,14 +31,15 @@ NumC::NumC(int numOfRows, int numOfCols){
 
 NumC& NumC::operator=(NumC other_numc){
             
-            this->numOfRows = other_numc.getRows();
-            this->numOfCols = other_numc.getCols();
-            this->size = this->numOfCols * this->numOfRows;
+    this->numOfRows = other_numc.getRows();
+    this->numOfCols = other_numc.getCols();
+    this->size = this->numOfCols * this->numOfRows;
 
-            this->data = (VectorDataType*)malloc(this->size * sizeof(VectorDataType));
-            memset(this->data, 0, this->size * sizeof(VectorDataType));
+    this->data = (VectorDataType*)malloc(this->size * sizeof(VectorDataType));
+    memset(this->data, 0, this->size * sizeof(VectorDataType));
+    memcpy(this->data, other_numc.getData(), this->size);
 
-            return *this;
+    return *this;
 }
 
 NumC::~NumC(){
@@ -56,6 +57,9 @@ Vector NumC::getVector(int index){
     vector.size = this->numOfCols;
     return vector;
 
+}
+VectorDataType* NumC::getData(){
+    return this->data;
 }
 
 int NumC::getRows(){
