@@ -15,9 +15,9 @@ class HyperCube {
         HyperCube();
         ~HyperCube();
 
-        void fit(NumC* _data, int k, int _R, int _hashTableSize);
+        void fit(NumC* _data, int k, int _R, int _hashTableSize=0);
         void transform();
-        void fit_transform(NumC* _data, int k, int _R, int _hashTableSize);
+        void fit_transform(NumC* _data, int k, int _R, int _hashTableSize=0);
         Results predict_knn(Vector vector, int k, int maxPoints, int maxVertices);
         Results predict_rs(Vector vector, int r, int maxPoints, int maxVertices);
 };

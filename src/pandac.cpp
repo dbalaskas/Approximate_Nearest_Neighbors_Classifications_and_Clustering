@@ -1,3 +1,5 @@
+// Source: https://stackoverflow.com/questions/8286668/how-to-read-mnist-data-in-c
+
 #include "../include/pandac.h"
 #include <fstream>
 
@@ -16,37 +18,33 @@ NumC* PandaC::fromMNIST(char *filePath) {
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
         printf("file open\n");
-        int magic_number=0;
         int number_of_images=0;
         int n_rows=0;
         int n_cols=0;
-        file.read((char*) &magic_number, sizeof(int)); 
-        magic_number= reverseInt(magic_number);
+        file.seekg (sizeof(int), file.beg);
         file.read((char*) &number_of_images, sizeof(int));
         number_of_images= reverseInt(number_of_images);
         file.read((char*) &n_rows, sizeof(int));
         n_rows= reverseInt(n_rows);
         file.read((char*) &n_cols, sizeof(int));
         n_cols= reverseInt(n_cols);
-        cout << "Read " << number_of_images << endl;
-        cout << "Read " << n_rows << endl;
-        cout << "Read " << n_cols << endl;
         NumC *data = new NumC(n_rows, n_cols);
-        Vector row = {(int*)malloc(n_rows*sizeof(int)), n_rows}; 
+        int *row = (int*)malloc(n_cols*sizeof(int));
         for(int i=0;i<number_of_images;++i) {
             for(int r=0;r<n_rows;++r) {
                 for(int c=0;c<n_cols;++c) {
-                    // unsigned char temp=0;
-                    // file.read((char*) &temp,sizeof(temp));
-                    row.vector[c] = 0;
-                    file.read((char*) row.vector+c, sizeof(int));
+                    row[c] = 0;
+                    file.read((char*) row+c, sizeof(int));
                 }
-                data->addVector(row);
+                data->addVector({row, n_cols});
             }
         }
-        data->print();
+        cout << "Rows: " << number_of_images << endl;
+        cout << "Pictures: " << n_rows << " x " << n_cols << endl;
+        // data->print();
+        free(row);
         return data;
     }
-    printf("error in PandaC::fromMNIST\n");
+    perror("Error: PandaC::fromMNIST");
     return NULL;
 }

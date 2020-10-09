@@ -18,9 +18,9 @@ class LSH {
         LSH();
         ~LSH();
 
-        void fit(NumC* _data, int k, int _R, int _L, int _hashTableSize);
+        void fit(NumC* _data, int k, int _R, int _L, int _hashTableSize=0);
         void transform();
-        void fit_transform(NumC* _data, int k, int _R, int _L, int _hashTableSize);
+        void fit_transform(NumC* _data, int k, int _R, int _L, int _hashTableSize=0);
         Results predict_knn(Vector vector, int k);
         Results predict_rs(Vector vector, int r);
 };

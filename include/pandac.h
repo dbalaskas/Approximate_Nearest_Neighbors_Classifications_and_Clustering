@@ -6,9 +6,10 @@
 
 class PandaC {
     private:
+        // Transform Little Endian to Big Endian.
         static int reverseInt(int num);
     public:
-        static void toDat(FILE* filepath, char* text);
+        // Creates a NumC object from the MNIST's data.
         static NumC* fromMNIST(char* filepath);
 };
 

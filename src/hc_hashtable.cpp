@@ -23,7 +23,7 @@ HC_HashTable::HC_HashTable(int _r, int _numOfBuckets, int _k, int _d) {
     hashFunction.sVector = NumC(_k, _d);
     for (int i=0; i < _k; i++) {
         for (int j=0; j < _d; j++) {
-            hashFunction.sVector->addElement(rand()%hashFunction.w, i, j);
+            hashFunction.sVector.addElement(rand()%hashFunction.w, i, j);
         }
     }
     bucketList = BucketList(_numOfBuckets);
@@ -32,7 +32,7 @@ HC_HashTable::HC_HashTable(int _r, int _numOfBuckets, int _k, int _d) {
 
 HC_HashTable::~HC_HashTable() {
     cout << "DESTRUCTED" << endl;
-    cout << hashFunction.sVector << endl;
+    // cout << hashFunction.sVector << endl;
     cout << numOfBuckets << endl;
     hashFunction.w = 0;
     // free(hashFunction.sVector);
@@ -76,9 +76,9 @@ void HC_HashTable::fit(NumC* data) {
 // ------------------------------------------------
 
 int main() {
-    // HC_HashTable hc;
-    // hc = HC_HashTable(1, 10, 3, 5);
-    HC_HashTable hc = HC_HashTable(1, 10, 3, 5);
+    HC_HashTable hc;
+    hc = HC_HashTable(1, 10, 3, 5);
+    // HC_HashTable hc = HC_HashTable(1, 10, 3, 5);
     cout << "starting" << endl;
     BucketList bucket = BucketList(10);
 

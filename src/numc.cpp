@@ -48,7 +48,7 @@ NumC::~NumC(){
 
 }
 
-// get the vector of a column
+// get the vector of a row.
 Vector NumC::getVector(int index){
 
     Vector vector;
@@ -71,9 +71,7 @@ void NumC::addElement(VectorDataType element, int row, int col){
 }
 
 void NumC::addVector(Vector vector){
-    NumC::print(vector);
-
-
+    // NumC::print(vector);
     if( vector.size != this->numOfCols ){
         cout << "Wrong input size vector\n";
         return;
