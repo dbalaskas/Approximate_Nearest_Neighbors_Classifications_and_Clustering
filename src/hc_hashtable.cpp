@@ -2,6 +2,8 @@
 #include <time.h>
 #include <stdlib.h>
 
+#define R_MULTIPLIER 100
+
 using namespace std;
 
 HC_HashTable::HC_HashTable() {
@@ -10,13 +12,13 @@ HC_HashTable::HC_HashTable() {
 }
 
 
-HC_HashTable::HC_HashTable(int _w, int _numOfBucket, int _k, int _d) {
+HC_HashTable::HC_HashTable(int _r, int _numOfBucket, int _k, int _d) {
     srand(time(NULL));
-    hashFunction.w = _w;
+    hashFunction.w = _r*R_MULTIPLIER;
     hashFunction.sVector = NumC(_k, _d);
-    for (int i=0; i<_d; i++) {
-        for (int j=0; j<_k; j++) {
-            hashFunction.sVector.addElement(rand()%_w, i, j);
+    for (int i=0; i < _k; i++) {
+        for (int j=0; j < _d; j++) {
+            hashFunction.sVector.addElement(rand()%hashFunction.w, i, j);
         }
     }
     bucketList = BucketList(_numOfBucket);
@@ -30,6 +32,10 @@ HC_HashTable::~HC_HashTable() {
 
 int HC_HashTable::hash(Vector vector) {
     // ...
+}
+
+Bucket HC_HashTable::getBucket(int bucketNum) {
+    return bucketList[bucketNum];
 }
 
 Bucket HC_HashTable::getBucket(Vector vector) {

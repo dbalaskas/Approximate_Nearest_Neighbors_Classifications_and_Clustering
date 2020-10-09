@@ -15,17 +15,17 @@ typedef struct {
 class LSH_HashTable {
     private:
         HashFunction hashFunction;
-        // LSH_HashFunction hashFunction;
-        std::vector<std::vector<Vector>> bucketList;
+        BucketList bucketList;
         int numOfBuckets;
 
     public:
         LSH_HashTable();
-        LSH_HashTable(int w, int numOfBucket, int k, int d);
+        LSH_HashTable(int r, int numOfBucket, int k, int d);
         ~LSH_HashTable();
 
         int hash(Vector vector);
-        std::vector<Vector> getBucket(Vector vector);
+        Bucket getBucket(int bucketNum);
+        Bucket getBucket(Vector vector);
         void fit(NumC* data);
         void fit(Vector data);
 };

@@ -4,23 +4,24 @@
 #include "./numc.h"
 #include "./lsh_hashtable.h"
 
+typedef vector<LSH_HashTable> HashTableList;
+
 class LSH {
     private:
         NumC* data;
-        LSH_HashTable** hashTable;
-        // int k;
-        // int L;
+        int hashTableSize;
+        int L;
+        HashTableList hashTableList;
         int R;
     public:
         LSH();
-        LSH(int k, int L, int R);
         ~LSH();
 
-        void fit(NumC* train_data);
+        void fit(NumC* _data, int k, int _R, int _L, int _hashTableSize);
         void transform();
-        void fit_transform(NumC* train_data);
-        int* predict_knn(Vector vector, double* time);
-        int* predict_rs(Vector vector, double* time);
+        void fit_transform(NumC* _data, int k, int _R, int _L, int _hashTableSize);
+        Result predict_knn(Vector vector, int k);
+        Result predict_rs(Vector vector, int r);
 };
 
 #endif

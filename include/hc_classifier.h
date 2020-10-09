@@ -7,18 +7,18 @@
 class HyperCube {
     private:
         NumC* data;
-        HC_HashTable** hashTable;
+        int hashTableSize;
+        HC_HashTable hashTable;
         int R;
     public:
         HyperCube();
-        HyperCube(int R);
         ~HyperCube();
 
-        void fit(NumC* train_data);
+        void fit(NumC* _data, int k, int _R, int _hashTableSize);
         void transform();
-        void fit_transform(NumC* train_data);
-        int* predict_knn(Vector vector, double* time);
-        int* predict_rs(Vector vector, double* time);
+        void fit_transform(NumC* _data, int k, int _R, int _hashTableSize);
+        int* predict_knn(Vector vector, int k);
+        int* predict_rs(Vector vector, int r);
 };
 
 #endif
