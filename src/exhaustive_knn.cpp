@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <iostream>
+#include <vector>
+#include <queue>
 
 ExaustiveKnn::ExaustiveKnn(int k){
     this->k = k;
