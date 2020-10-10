@@ -1,7 +1,9 @@
 // Source: https://stackoverflow.com/questions/8286668/how-to-read-mnist-data-in-c
+//         https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
 
 #include "../include/pandac.h"
 #include <fstream>
+#include <string.h>
 
 using namespace std;
 
@@ -14,35 +16,98 @@ int PandaC::reverseInt(int num) {
     return ((int)c1 << 24) + ((int)c2 << 16) + ((int)c3 << 8) + c4;
 }
 
+unsigned char reverseChar(unsigned char num) {
+   num = (num & 0xF0) >> 4 | (num & 0x0F) << 4;
+   num = (num & 0xCC) >> 2 | (num & 0x33) << 2;
+   num = (num & 0xAA) >> 1 | (num & 0x55) << 1;
+   return num;
+}
+
 NumC* PandaC::fromMNIST(char *filePath) {
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
         printf("file open\n");
-        int number_of_images=0;
-        int n_rows=0;
-        int n_cols=0;
+        int number_of_images = 0;
+        int n_cols_of_matrix = 0;
+        int n_rows_of_image  = 0;
+        int n_cols_of_image  = 0;
+        
+        // magic number
         file.seekg (sizeof(int), file.beg);
+
         file.read((char*) &number_of_images, sizeof(int));
         number_of_images= reverseInt(number_of_images);
-        file.read((char*) &n_rows, sizeof(int));
-        n_rows= reverseInt(n_rows);
-        file.read((char*) &n_cols, sizeof(int));
-        n_cols= reverseInt(n_cols);
-        NumC *data = new NumC(n_rows, n_cols);
-        int *row = (int*)malloc(n_cols*sizeof(int));
-        for(int i=0;i<number_of_images;++i) {
-            for(int r=0;r<n_rows;++r) {
-                for(int c=0;c<n_cols;++c) {
-                    row[c] = 0;
-                    file.read((char*) row+c, sizeof(int));
-                }
-                data->addVector({row, n_cols});
+        file.read((char*) &n_rows_of_image, sizeof(int));
+        n_rows_of_image = reverseInt(n_rows_of_image);
+        file.read((char*) &n_cols_of_image, sizeof(int));
+        n_cols_of_image = reverseInt(n_cols_of_image);
+
+        // initialize martix to store all the images
+        n_cols_of_matrix = n_cols_of_image*n_rows_of_image;
+        NumC *data = new NumC(number_of_images, n_cols_of_image*n_rows_of_image);
+
+        // read the pixels of every image
+        char *pixel = (char*)malloc(n_cols_of_matrix*sizeof(char));
+        int int_pixel;
+
+        for(int i=0;i<number_of_images; ++i) {
+
+            // read all the pixels of an image
+            file.read( pixel, sizeof(char)*n_cols_of_matrix);
+            for( int j = 0; j < n_cols_of_matrix; j++){
+                // reverse the char pixel and store in int
+                int_pixel =  reverseChar(pixel[j]);
+                data->addElement(int_pixel, i, j);
             }
+
         }
         cout << "Rows: " << number_of_images << endl;
-        cout << "Pictures: " << n_rows << " x " << n_cols << endl;
+        cout << "Pictures: " << n_rows_of_image << " x " << n_cols_of_image << endl;
         // data->print();
-        free(row);
+
+        free(pixel);
+        return data;
+    }
+    perror("Error: PandaC::fromMNIST");
+    return NULL;
+}
+
+NumC* PandaC::fromMNISTlabels(char *filePath) {
+    ifstream file(filePath, ifstream::in | ifstream::binary);
+    if (file.is_open()) {
+        printf("file open\n");
+        int number_of_images = 0;
+        int n_cols_of_matrix = 1;
+        
+        // magic number
+        file.read((char*) &number_of_images, sizeof(int));
+        // file.seekg (sizeof(int), file.beg);
+
+        file.read((char*) &number_of_images, sizeof(int));
+        number_of_images= reverseInt(number_of_images);
+
+
+        // initialize martix to store all the labels
+        NumC *data = new NumC(number_of_images, n_cols_of_matrix);
+
+        // read the pixels of every image
+        char *label = (char*)malloc(n_cols_of_matrix*sizeof(char));
+        int int_label;
+
+        for(int i=0;i<number_of_images; ++i) {
+
+            // read all the pixels of an image
+            file.read( label, sizeof(char)*n_cols_of_matrix);
+            for( int j = 0; j < n_cols_of_matrix; j++){
+                // do not reverse the char pixel and store in int
+                int_label =  label[j];
+                data->addElement(int_label, i, j);
+            }
+
+        }
+        cout << "Rows: " << number_of_images << endl;
+        
+        free(label);
         return data;
     }
     perror("Error: PandaC::fromMNIST");

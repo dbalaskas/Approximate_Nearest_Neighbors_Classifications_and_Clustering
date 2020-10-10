@@ -1,6 +1,7 @@
 #include "../include/exhaustive_knn.h"
 #include "../include/prediction_results.h"
 #include "../include/numc.h"
+#include "../include/pandac.h"
 
 #include <stdio.h>
 #include <cstdlib>
@@ -8,17 +9,19 @@
 #include <vector>
 #include <queue>
 
-ExaustiveKnn::ExaustiveKnn(int k){
-    this->k = k;
+using namespace std;
+
+ExaustiveKnn::ExaustiveKnn(int numOfNeighbors){
+    this->numOfNeighbors = numOfNeighbors;
 }
 
-ExaustiveKnn::ExaustiveKnn(NumC* data, int k){
+ExaustiveKnn::ExaustiveKnn(NumC* data, int numOfNeighbors){
     this->data = data;
-    this->k = k;
+    this->numOfNeighbors = numOfNeighbors;
 }
 
 ExaustiveKnn::~ExaustiveKnn(){
-    this->k = 0;
+    this->numOfNeighbors = 0;
     this->data = NULL;
 }
 
@@ -30,51 +33,48 @@ void ExaustiveKnn::fit(NumC* train_data){
 Results ExaustiveKnn::predict_knn(Vector vector){
 
     // allocate results sruct for given k
-    Results results(this->data->getRows());
-    PointIndex pointIndex;
-    // std::priority_queue<double> pQ;
-    // results.resultList.reserve(this->data->getRows());
+    Results results(this->numOfNeighbors);
+    ResultIndex resultIndex;
 
     // search every row data entry and find the k with minimun distance
+    clock_t start = clock();
     for (int row = 0; row < this->data->getRows(); row++){
-        std::cout << "naii\n";
         // get the distance
-        pointIndex.dist = NumC::dist(this->data->getVector(row), vector, 1);
-        pointIndex.intex = row;
-        results.resultList.push_back(pointIndex);
+        resultIndex.dist = NumC::dist(this->data->getVector(row), vector, 1);
+        resultIndex.index = row;
+
+        // add to results and the will figure out the best neighbors
+        results.addResult(resultIndex);
     }
+    clock_t end = clock();
     
+    // set execution time
+    results.setTime((double) (end - start) / CLOCKS_PER_SEC);
 
     return results;
 }
 
-int main(){
-
-    ExaustiveKnn knn(5);
-
-    NumC nn(6,33);
-    for (int i = 0; i < nn.getRows(); i++){
-        for (int j = 0; j < nn.getCols(); j++){
-            nn.addElement(i, i, j);
-        }
-        
-    }
-
-    knn.fit(&nn);
 
 
-    Results results;
-    results = knn.predict_knn(nn.getVector(2));
-    for (int row = 0; row < nn.getRows(); row++){
-        std::cout << results.resultList.at(row).dist << "\n";
-    }
+///////////////// Test /////////////////
+// int main(){
 
-    std::priority_queue<double> pQ;
-    for (int row = 0; row < nn.getRows(); row++){
-        pQ.push(-row);
-    }
-    for (int row = 0; row < nn.getRows(); row++){
-        cout << pQ. << "\n";
-    }
+//     ExaustiveKnn knn(50);
 
-}
+
+//     NumC* inputData = PandaC::fromMNIST("../doc/input/train-images-idx3-ubyte");
+//     NumC::print(inputData->getVector(0));
+
+//     NumC* inputDatalabels = PandaC::fromMNISTlabels("../doc/input/train-labels-idx1-ubyte");
+//     NumC::print(inputDatalabels->getVector(0));
+
+//     knn.fit(inputData);
+
+
+//     Results results;
+//     results = knn.predict_knn(inputData->getVector(0));
+
+//     results.print(inputDatalabels);
+
+
+// }
