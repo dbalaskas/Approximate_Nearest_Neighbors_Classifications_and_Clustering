@@ -6,24 +6,43 @@
 #include <cstdlib>
 #include <iostream>
 
-typedef struct PointIndex{
+#include "../include/numc.h"
 
-    PointIndex() {}
-    PointIndex(int intex, double dist) : intex(intex), dist(dist) {}
-    int intex;
+typedef struct ResultIndex{
+
+    ResultIndex() {}
+    ResultIndex(int index, double dist) : index(index), dist(dist) {}
+    int index;
     double dist;
 
-} PointIndex;
+} ResultIndex;
 
-typedef struct Results{
+class Results{
 
-    Results() {}
-    Results(int size) {this->resultList.reserve(size);}
-    int numOfResults;
-    std::vector<PointIndex> resultList;
-    double time;
+    private:
+        int numOfResults;
+        int numOfBestResults;
+        std::vector<ResultIndex> resultList;
+        double executionTime;
+        void result_swap(ResultIndex* res1, ResultIndex* res2);
 
-} Results;
+    public:
+        Results() {}
+        Results(int size);
+        ~Results();
+
+        int addResult(ResultIndex resultIndex);
+        void setTime(double time);
+
+        double getTime();
+        std::vector<ResultIndex> getResultList();
+        int getNumOfResults();
+        
+        void print();
+        void print(NumC* labels, bool checkLabels=0);
+
+
+};
 
 
 

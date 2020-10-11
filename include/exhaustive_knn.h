@@ -6,11 +6,11 @@
 class ExaustiveKnn {
     private:
         NumC* data;
-        int k;
+        int numOfNeighbors;
 
     public:
-        ExaustiveKnn(int k);
-        ExaustiveKnn(NumC* data, int k);
+        ExaustiveKnn(int numOfNeighbors);
+        ExaustiveKnn(NumC* data, int numOfNeighbors);
         ~ExaustiveKnn();
 
         void fit(NumC* train_data);

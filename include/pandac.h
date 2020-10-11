@@ -11,6 +11,7 @@ class PandaC {
     public:
         // Creates a NumC object from the MNIST's data.
         static NumC* fromMNIST(char* filepath);
+        static NumC* fromMNISTlabels(char* filepath);
 };
 
 #endif
