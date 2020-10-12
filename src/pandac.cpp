@@ -7,6 +7,8 @@
 
 using namespace std;
 
+template class NumC<int>;
+
 int PandaC::reverseInt(int num) {
     unsigned char c1, c2, c3, c4;
     c1 = num & 255;
@@ -23,7 +25,7 @@ unsigned char reverseChar(unsigned char num) {
    return num;
 }
 
-NumC* PandaC::fromMNIST(char *filePath) {
+NumC<int>* PandaC::fromMNIST(char *filePath) {
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
         printf("file open\n");
@@ -44,7 +46,7 @@ NumC* PandaC::fromMNIST(char *filePath) {
 
         // initialize martix to store all the images
         n_cols_of_matrix = n_cols_of_image*n_rows_of_image;
-        NumC *data = new NumC(number_of_images, n_cols_of_image*n_rows_of_image);
+        NumC<int> *data = new NumC<int>(number_of_images, n_cols_of_image*n_rows_of_image);
 
         // read the pixels of every image
         char *pixel = (char*)malloc(n_cols_of_matrix*sizeof(char));
@@ -72,7 +74,7 @@ NumC* PandaC::fromMNIST(char *filePath) {
     return NULL;
 }
 
-NumC* PandaC::fromMNISTlabels(char *filePath) {
+NumC<int>* PandaC::fromMNISTlabels(char *filePath) {
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
         printf("file open\n");
@@ -88,7 +90,7 @@ NumC* PandaC::fromMNISTlabels(char *filePath) {
 
 
         // initialize martix to store all the labels
-        NumC *data = new NumC(number_of_images, n_cols_of_matrix);
+        NumC<int> *data = new NumC<int>(number_of_images, n_cols_of_matrix);
 
         // read the pixels of every image
         char *label = (char*)malloc(n_cols_of_matrix*sizeof(char));

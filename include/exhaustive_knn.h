@@ -3,17 +3,18 @@
 #include "./numc.h"
 #include "./prediction_results.h"
 
+template <typename NumCDataType> 
 class ExaustiveKnn {
     private:
-        NumC* data;
+        NumC<NumCDataType>* data;
         int numOfNeighbors;
 
     public:
         ExaustiveKnn(int numOfNeighbors);
-        ExaustiveKnn(NumC* data, int numOfNeighbors);
+        ExaustiveKnn(NumC<NumCDataType>* data, int numOfNeighbors);
         ~ExaustiveKnn();
 
-        void fit(NumC* train_data);
-        Results predict_knn(Vector vector);
+        void fit(NumC<NumCDataType>* train_data);
+        Results predict_knn(Vector<NumCDataType> vector);
 };
 #endif

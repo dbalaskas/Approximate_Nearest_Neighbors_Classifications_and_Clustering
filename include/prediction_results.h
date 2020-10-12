@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdio.h>
 #include <cstdlib>
+#include <queue>
 #include <iostream>
 
 #include "../include/numc.h"
@@ -17,6 +18,13 @@ typedef struct ResultIndex{
 
 } ResultIndex;
 
+class CompareResults{
+    public:
+    bool operator() (ResultIndex res1, ResultIndex res2){
+        return res1.dist > res2.dist;
+    }
+};
+
 class Results{
 
     private:
@@ -25,6 +33,8 @@ class Results{
         std::vector<ResultIndex> resultList;
         double executionTime;
         void result_swap(ResultIndex* res1, ResultIndex* res2);
+
+        std::priority_queue <ResultIndex, std::vector<ResultIndex>, CompareResults > pq;
 
     public:
         Results() {}
@@ -39,7 +49,7 @@ class Results{
         int getNumOfResults();
         
         void print();
-        void print(NumC* labels, bool checkLabels=0);
+        void print(NumC<int>* labels, bool checkLabels=0);
 
 
 };

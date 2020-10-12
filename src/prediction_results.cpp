@@ -41,7 +41,7 @@ void Results::print(){
 
 }
 
-void Results::print(NumC* labels, bool checkLabels){
+void Results::print(NumC<int>* labels, bool checkLabels){
 
     int numOfResults_ = this->numOfBestResults;
     if (this->numOfResults < this->numOfBestResults)
@@ -55,6 +55,9 @@ void Results::print(NumC* labels, bool checkLabels){
         cout << "Index: " << index << setw(15) 
              << " Distance: " << this->resultList[i].dist << setw(15) 
              << " Label: "<< labels->getVector(index).vector[0] << endl;
+        cout << "pqIndex: " << pq.top().index <<endl;
+        pq.pop();
+
     }
 
 }
@@ -89,6 +92,7 @@ void Results::setTime(double time){
 }
 
 int Results::addResult(ResultIndex point){
+    pq.push(point);
 
     // add and keep the best num of results elements
     if (this->numOfResults > 0){
@@ -128,6 +132,7 @@ int Results::addResult(ResultIndex point){
         this->resultList.push_back(point);
         this->numOfResults++;
     }
+
 
 }
 

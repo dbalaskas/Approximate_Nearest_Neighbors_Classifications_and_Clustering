@@ -11,26 +11,31 @@
 
 using namespace std;
 
-ExaustiveKnn::ExaustiveKnn(int numOfNeighbors){
+template <typename NumCDataType> 
+ExaustiveKnn<NumCDataType>::ExaustiveKnn(int numOfNeighbors){
     this->numOfNeighbors = numOfNeighbors;
 }
 
-ExaustiveKnn::ExaustiveKnn(NumC* data, int numOfNeighbors){
+template <typename NumCDataType> 
+ExaustiveKnn<NumCDataType>::ExaustiveKnn(NumC<NumCDataType>* data, int numOfNeighbors){
     this->data = data;
     this->numOfNeighbors = numOfNeighbors;
 }
 
-ExaustiveKnn::~ExaustiveKnn(){
+template <typename NumCDataType> 
+ExaustiveKnn<NumCDataType>::~ExaustiveKnn(){
     this->numOfNeighbors = 0;
     this->data = NULL;
 }
 
-void ExaustiveKnn::fit(NumC* train_data){
+template <typename NumCDataType> 
+void ExaustiveKnn<NumCDataType>::fit(NumC<NumCDataType>* train_data){
     this->data = train_data;
 }
 
 // perform exaustivr search on every data for the near neighbours
-Results ExaustiveKnn::predict_knn(Vector vector){
+template <typename NumCDataType> 
+Results ExaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
 
     // allocate results sruct for given k
     Results results(this->numOfNeighbors);
@@ -40,7 +45,7 @@ Results ExaustiveKnn::predict_knn(Vector vector){
     clock_t start = clock();
     for (int row = 0; row < this->data->getRows(); row++){
         // get the distance
-        resultIndex.dist = NumC::dist(this->data->getVector(row), vector, 1);
+        resultIndex.dist = NumC<NumCDataType>::dist(this->data->getVector(row), vector, 1);
         resultIndex.index = row;
 
         // add to results and the will figure out the best neighbors
@@ -54,19 +59,30 @@ Results ExaustiveKnn::predict_knn(Vector vector){
     return results;
 }
 
+// NumC<double> pipi(int input){
+//     NumC<double> nn(6,input);
+//     for (int i = 0; i < nn.getRows(); i++){
+//         for (int j = 0; j < nn.getCols(); j++){
+//             nn.addElement(i, i, j);
+//         }
+        
+//     }
+//     nn.print();
+//     return nn;
+// }
 
 
-///////////////// Test /////////////////
+// ///////////////// Test /////////////////
 // int main(){
 
-//     ExaustiveKnn knn(50);
+//     ExaustiveKnn<int> knn(50);
 
 
-//     NumC* inputData = PandaC::fromMNIST("../doc/input/train-images-idx3-ubyte");
-//     NumC::print(inputData->getVector(0));
+//     NumC<int>* inputData = PandaC::fromMNIST("../doc/input/train-images-idx3-ubyte");
+//     NumC<int>::print(inputData->getVector(0));
 
-//     NumC* inputDatalabels = PandaC::fromMNISTlabels("../doc/input/train-labels-idx1-ubyte");
-//     NumC::print(inputDatalabels->getVector(0));
+//     NumC<int>* inputDatalabels = PandaC::fromMNISTlabels("../doc/input/train-labels-idx1-ubyte");
+//     NumC<int>::print(inputDatalabels->getVector(0));
 
 //     knn.fit(inputData);
 
@@ -75,6 +91,15 @@ Results ExaustiveKnn::predict_knn(Vector vector){
 //     results = knn.predict_knn(inputData->getVector(0));
 
 //     results.print(inputDatalabels);
+
+//     NumC<double> matrix = pipi(3);
+//     matrix.print();
+//     matrix = pipi(10);
+
+//     matrix.addVector(matrix.getVector(0), 3);
+//     matrix.print();
+//     matrix.transpose();
+//     matrix.print();
 
 
 // }
