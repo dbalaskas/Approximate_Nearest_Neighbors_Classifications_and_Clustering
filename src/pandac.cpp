@@ -46,7 +46,7 @@ NumC<int>* PandaC::fromMNIST(char *filePath) {
 
         // initialize martix to store all the images
         n_cols_of_matrix = n_cols_of_image*n_rows_of_image;
-        NumC<int> *data = new NumC<int>(number_of_images, n_cols_of_image*n_rows_of_image);
+        NumC<int> *data = new NumC<int>(number_of_images, n_cols_of_image*n_rows_of_image, true);
 
         // read the pixels of every image
         char *pixel = (char*)malloc(n_cols_of_matrix*sizeof(char));
@@ -90,7 +90,7 @@ NumC<int>* PandaC::fromMNISTlabels(char *filePath) {
 
 
         // initialize martix to store all the labels
-        NumC<int> *data = new NumC<int>(number_of_images, n_cols_of_matrix);
+        NumC<int> *data = new NumC<int>(number_of_images, n_cols_of_matrix, true);
 
         // read the pixels of every image
         char *label = (char*)malloc(n_cols_of_matrix*sizeof(char));

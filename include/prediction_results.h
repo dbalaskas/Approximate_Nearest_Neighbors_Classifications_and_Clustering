@@ -18,40 +18,71 @@ typedef struct ResultIndex{
 
 } ResultIndex;
 
-class CompareResults{
+
+typedef struct Results{
+
+    Results(){}
+    Results(NumCIndexType resultsRows, NumCIndexType resultsCol){
+        this->resultsIndexArray = NumC<NumCIndexType>(resultsRows, resultsCol);
+        this->resultsDistArray  = NumC<NumCDistType>(resultsRows, resultsCol);
+    }
+    NumC<NumCIndexType> resultsIndexArray;
+    NumC<NumCDistType> resultsDistArray;
+    double executionTime;
+
+    // Results(){ 
+    //     resultsIndexArray = NumC<NumCIndexType>(); 
+    // }
+    // ~Results(){}
+    // Results(Results& other_results){ 
+
+    //     this->resultsIndexArray = other_results.resultsIndexArray;
+    //     this->resultsDistArray  = other_results.resultsDistArray;
+    //     this->executionTime     = other_results.executionTime;
+    // }
+    // Results& operator=(Results& other_results){
+    //     // delete current data
+    //     this->resultsIndexArray = other_results.resultsIndexArray;
+    //     this->resultsDistArray  = other_results.resultsDistArray;
+    //     this->executionTime     = other_results.executionTime;
+    //     return *this;
+    // }
+    // Results& operator=(Results&& other_results) noexcept{ // move assignment
+    //     this->resultsIndexArray = other_results.resultsIndexArray;
+    //     this->resultsDistArray  = other_results.resultsDistArray;
+    //     this->executionTime     = other_results.executionTime;
+    //     return *this;
+    // }
+
+} Results;
+
+class Compare{
     public:
     bool operator() (ResultIndex res1, ResultIndex res2){
         return res1.dist > res2.dist;
     }
 };
 
-class Results{
+class ResultsComparator{
 
     private:
-        int numOfResults;
         int numOfBestResults;
-        std::vector<ResultIndex> resultList;
-        double executionTime;
-        void result_swap(ResultIndex* res1, ResultIndex* res2);
-
-        std::priority_queue <ResultIndex, std::vector<ResultIndex>, CompareResults > pq;
+        std::priority_queue <ResultIndex, std::vector<ResultIndex>, Compare > priorityQueue;
 
     public:
-        Results() {}
-        Results(int size);
-        ~Results();
+        ResultsComparator() {}
+        ResultsComparator(int size);
+        ~ResultsComparator();
+        static void print(Results* results, NumC<int>* labels);
 
-        int addResult(ResultIndex resultIndex);
-        void setTime(double time);
 
-        double getTime();
+        int addResult(int index, double dist);
+
+        Results* getResults();
         std::vector<ResultIndex> getResultList();
         int getNumOfResults();
         
         void print();
-        void print(NumC<int>* labels, bool checkLabels=0);
-
-
 };
 
 

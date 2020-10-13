@@ -14,7 +14,8 @@ class ExaustiveKnn {
         ExaustiveKnn(NumC<NumCDataType>* data, int numOfNeighbors);
         ~ExaustiveKnn();
 
-        void fit(NumC<NumCDataType>* train_data);
-        Results predict_knn(Vector<NumCDataType> vector);
+        void fit(NumC<NumCDataType>* trainData);
+        Results* predict_knn(Vector<NumCDataType> vector);
+        Results* predict_knn(NumC<NumCDataType>* testData);
 };
 #endif
