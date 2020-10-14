@@ -9,6 +9,7 @@
 using namespace std;
 
 template class NumC<int>;
+template class NumC<long>;
 template class NumC<double>;
 
 template <typename NumCDataType>
@@ -138,7 +139,7 @@ NumCDataType NumC<NumCDataType>::getElement(NumCIndexType row, NumCIndexType col
 }
 
 template <typename NumCDataType>
-void NumC<NumCDataType>::randn(NumCDataType maxValue){
+void NumC<NumCDataType>::random(NumCDataType maxValue){
     // fill with random values
     srand(time(NULL));
 
@@ -322,8 +323,6 @@ NumCDistType NumC<NumCDataType>::distSparse(Vector<NumCDataType> v1, Vector<NumC
             }
         }
         return dist;
-
-
     }
 
     // calculate distance with p-norm

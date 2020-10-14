@@ -39,7 +39,7 @@ class NumC {
         NumCDataType getElement(NumCIndexType row, NumCIndexType col);
 
         void transpose();
-        void randn(NumCDataType maxValue);
+        void random(NumCDataType maxValue);
 
         bool isSparse();
         NumCIndexType* getSparseData();
