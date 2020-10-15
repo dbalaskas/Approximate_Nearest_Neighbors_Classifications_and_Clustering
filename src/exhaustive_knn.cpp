@@ -56,25 +56,25 @@ Results ExaustiveKnn::predict_knn(Vector vector){
 
 
 
-///////////////// Test /////////////////
-// int main(){
+/////////////// Test /////////////////
+int main(){
 
-//     ExaustiveKnn knn(50);
-
-
-//     NumC* inputData = PandaC::fromMNIST("../doc/input/train-images-idx3-ubyte");
-//     NumC::print(inputData->getVector(0));
-
-//     NumC* inputDatalabels = PandaC::fromMNISTlabels("../doc/input/train-labels-idx1-ubyte");
-//     NumC::print(inputDatalabels->getVector(0));
-
-//     knn.fit(inputData);
+    ExaustiveKnn knn(50);
 
 
-//     Results results;
-//     results = knn.predict_knn(inputData->getVector(0));
+    NumC* inputData = PandaC::fromMNIST("./doc/input/train-images-idx3-ubyte");
+    NumC::print(inputData->getVector(0));
 
-//     results.print(inputDatalabels);
+    NumC* inputDatalabels = PandaC::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+    NumC::print(inputDatalabels->getVector(0));
+
+    knn.fit(inputData);
 
 
-// }
+    Results results;
+    results = knn.predict_knn(inputData->getVector(0));
+
+    results.print(inputDatalabels);
+
+
+}

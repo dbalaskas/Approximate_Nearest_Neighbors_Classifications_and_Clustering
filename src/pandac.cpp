@@ -24,17 +24,19 @@ unsigned char reverseChar(unsigned char num) {
 }
 
 NumC* PandaC::fromMNIST(char *filePath) {
+// Open file.
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
-        printf("file open\n");
+        printf("Open file\n");
         int number_of_images = 0;
         int n_cols_of_matrix = 0;
         int n_rows_of_image  = 0;
         int n_cols_of_image  = 0;
         
-        // magic number
-        file.seekg (sizeof(int), file.beg);
+    // Ignore magic number.
+        file.seekg(sizeof(int), file.beg);
 
+    // Read the metadata.
         file.read((char*) &number_of_images, sizeof(int));
         number_of_images= reverseInt(number_of_images);
         file.read((char*) &n_rows_of_image, sizeof(int));
@@ -42,74 +44,80 @@ NumC* PandaC::fromMNIST(char *filePath) {
         file.read((char*) &n_cols_of_image, sizeof(int));
         n_cols_of_image = reverseInt(n_cols_of_image);
 
-        // initialize martix to store all the images
+    // initialize martix to store all the images' data.
         n_cols_of_matrix = n_cols_of_image*n_rows_of_image;
-        NumC *data = new NumC(number_of_images, n_cols_of_image*n_rows_of_image);
+        NumC *data = new NumC(number_of_images, n_cols_of_matrix);
 
-        // read the pixels of every image
-        char *pixel = (char*)malloc(n_cols_of_matrix*sizeof(char));
-        int int_pixel;
-
+    // read the pixels of every image.
+        char *image = (char*)malloc(n_cols_of_matrix*sizeof(char));
+        int pixel;
         for(int i=0;i<number_of_images; ++i) {
-
-            // read all the pixels of an image
-            file.read( pixel, sizeof(char)*n_cols_of_matrix);
-            for( int j = 0; j < n_cols_of_matrix; j++){
-                // reverse the char pixel and store in int
-                int_pixel =  reverseChar(pixel[j]);
-                data->addElement(int_pixel, i, j);
+        // read all the pixels of the i-th image.
+            file.read(image, sizeof(char)*n_cols_of_matrix);
+            for(int j = 0; j < n_cols_of_matrix; j++){
+            // reverse the char pixel and store in int.
+                pixel = reverseChar(image[j]);
+                data->addElement(pixel, i, j);
             }
-
         }
+
+    // Print file's info.
         cout << "Rows: " << number_of_images << endl;
         cout << "Pictures: " << n_rows_of_image << " x " << n_cols_of_image << endl;
         // data->print();
 
-        free(pixel);
+    // Free allocated space and return data's matrix.
+        free(image);
         return data;
     }
+
+// Unable to open file, return NULL.
     perror("Error: PandaC::fromMNIST");
     return NULL;
 }
 
 NumC* PandaC::fromMNISTlabels(char *filePath) {
+// Open file.
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
-        printf("file open\n");
+        printf("Open file\n");
         int number_of_images = 0;
         int n_cols_of_matrix = 1;
         
-        // magic number
-        file.read((char*) &number_of_images, sizeof(int));
-        // file.seekg (sizeof(int), file.beg);
+    // Ignore magic number.
+        // file.read((char*) &number_of_images, sizeof(int));
+        file.seekg (sizeof(int), file.beg);
 
+    // Read the metadata.
         file.read((char*) &number_of_images, sizeof(int));
         number_of_images= reverseInt(number_of_images);
 
 
-        // initialize martix to store all the labels
+    // initialize martix to store all the labels
         NumC *data = new NumC(number_of_images, n_cols_of_matrix);
 
-        // read the pixels of every image
+    // read the pixels of every image
         char *label = (char*)malloc(n_cols_of_matrix*sizeof(char));
-        int int_label;
-
+        int  int_label;
         for(int i=0;i<number_of_images; ++i) {
-
-            // read all the pixels of an image
-            file.read( label, sizeof(char)*n_cols_of_matrix);
-            for( int j = 0; j < n_cols_of_matrix; j++){
-                // do not reverse the char pixel and store in int
+        // read all the pixels of an image
+            file.read(label, sizeof(char)*n_cols_of_matrix);
+            for(int j = 0; j < n_cols_of_matrix; j++){
+            // do not reverse the char pixel and store in int
                 int_label =  label[j];
                 data->addElement(int_label, i, j);
             }
-
         }
+        
+    // Print file's info.
         cout << "Rows: " << number_of_images << endl;
         
+    // Free allocated space and return labels's matrix.
         free(label);
         return data;
     }
+
+// Unable to open file, return NULL.
     perror("Error: PandaC::fromMNIST");
     return NULL;
 }
