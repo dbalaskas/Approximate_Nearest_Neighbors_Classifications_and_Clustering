@@ -21,6 +21,7 @@ HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w){
 
     // initialize m
     this->m = 4586243;
+    // this->m = (int)pow(2, (int)(32 - 32/this->k));
     this->m_d = (int*)malloc(this->dimension*sizeof(int));
     for (int i = 0; i < this->dimension; i++){
         m_d[i] = modularExponentiation(this->m, i, this->M);
@@ -42,13 +43,13 @@ int HashFunction<NumCDataType>::modularExponentiation(int base, int exponent, in
     if (mod == 1)
         return 0;
 
-    int c = 1;
+    unsigned int c = 1;
     for (int i = 0; i < exponent; i++){
-        c = (c * base) % mod;
+        c = (c * (unsigned int)base) % mod;
         // cout<<c<<endl;
     }
     
-    return c;
+    return (int)c;
 }
 
 template <typename NumCDataType>
@@ -87,7 +88,7 @@ int HashFunction<NumCDataType>::h(Vector<NumCDataType> v, int hi){
     int* a = (int*)malloc(this->dimension * sizeof(int));
     for (int i = 0; i < this->dimension; i++){
         a[i] = (int)floor( (double)( v.vector[i] - s.getElement(hi, i) ) / (double)w );
-        cout << a[i] << " ,";
+        // cout << a[i] << " ,";
     }
     
     // calculate sums of a
@@ -98,14 +99,28 @@ int HashFunction<NumCDataType>::h(Vector<NumCDataType> v, int hi){
         sum_h += ( abs(a[this->dimension -1 -i] % this->M)  *   this->m_d[i]) % this->M;
     }
     h = sum_h % this->M;
-    cout <<"HHH "<<h<<endl;
+    // cout <<"HHH "<<h<<endl;
     
     free(a);
 
     return h;
 }
 
+template <typename NumCDataType>
+int HashFunction<NumCDataType>::lshHash(Vector<NumCDataType> v){
 
+    // initialize g
+    unsigned int g = 0;
+
+    // concat hi to g
+    for (int i = 0; i < this->k; i++){
+        g  = (this->h(v, i) << (i*this->k)) | g;
+    }
+    
+    g = (int)(g % (unsigned int)this->M);
+
+    return (int)g;
+}
 
 
 int main(){
@@ -119,13 +134,18 @@ int main(){
     // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
     // // NumC<int>::print(inputDatalabels->getVector(0));
 
-    HashFunction<int> hash(5, 28*28,100);
+    HashFunction<int> hash(4, 28*28,100);
 
-    hash.h(inputData->getVector(0), 0);
-    hash.h(inputData->getVector(0), 1);
-    hash.h(inputData->getVector(0), 2);
-    hash.h(inputData->getVector(0), 3);
-    hash.h(inputData->getVector(0), 4);
+    // hash.h(inputData->getVector(0), 0);
+    // hash.h(inputData->getVector(0), 1);
+    // hash.h(inputData->getVector(0), 2);
+    // hash.h(inputData->getVector(0), 3);
+    // hash.h(inputData->getVector(0), 4);
+
+    for (int i = 0; i < 10; i++){
+        cout << "lshHash-> " << hash.lshHash(inputData->getVector(i)) <<endl;
+    }
+    
 
 
 

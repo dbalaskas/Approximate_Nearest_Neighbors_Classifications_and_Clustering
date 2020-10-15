@@ -59,7 +59,7 @@ NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath) {
 
     // read the pixels of every image.
         char *image = (char*)malloc(n_cols_of_matrix*sizeof(char));
-        int pixel;
+        // int pixel;
         for(int i=0;i<number_of_images; ++i) {
 
             // read all the pixels of an image

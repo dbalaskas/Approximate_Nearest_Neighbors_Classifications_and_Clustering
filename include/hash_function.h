@@ -15,17 +15,19 @@ class HashFunction{
         int m;
         int* m_d;
         NumC<NumCDataType> s;
+        int modularExponentiation(int base, int exponent, int mod);
+        int modularAddition(int base, int exponent, int mod);
+        int modularMultiplication(int base, int exponent, int mod);
 
     public:
         HashFunction(){};
         HashFunction(int k, int dimension, int w);
         ~HashFunction();
         
-        int modularExponentiation(int base, int exponent, int mod);
-        int modularAddition(int base, int exponent, int mod);
-        int modularMultiplication(int base, int exponent, int mod);
 
         int h(Vector<NumCDataType> v, int hi);
+
+        int lshHash(Vector<NumCDataType> v);
 
 };
 
