@@ -97,13 +97,15 @@ int HashFunction<NumCDataType>::h(Vector<NumCDataType> v, int hi){
     for (int i = 0; i < this->dimension; i++){
         sum_h += ( abs(a[this->dimension -1 -i] % this->M)  *   this->m_d[i]) % this->M;
     }
-    cout <<"HHH "<<sum_h<<endl;
     h = sum_h % this->M;
+    cout <<"HHH "<<h<<endl;
     
     free(a);
 
     return h;
 }
+
+
 
 
 int main(){
@@ -117,13 +119,15 @@ int main(){
     // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
     // // NumC<int>::print(inputDatalabels->getVector(0));
 
-    HashFunction<int> hash(5, 28*28,10);
+    HashFunction<int> hash(5, 28*28,100);
 
     hash.h(inputData->getVector(0), 0);
     hash.h(inputData->getVector(0), 1);
     hash.h(inputData->getVector(0), 2);
     hash.h(inputData->getVector(0), 3);
     hash.h(inputData->getVector(0), 4);
+
+
 
 
 }

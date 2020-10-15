@@ -123,19 +123,19 @@ int main(){
         inputData_->addVector(inputData->getVector(i), i);
     }
 
-    HashFunction<int> hash(5, 10, 10);
+    // HashFunction<int> hash(5, 10, 10);
     
     // cout << NumC<int>::dist(inputData->getVector(0), inputData->getVector(1), 1)<<endl;
 
-    // Results* results;
-    // results = knn.predict_knn(inputData_);
-    // // results = knn.predict_knn(inputData->getVector(6));
+    Results* results;
+    results = knn.predict_knn(inputData_);
+    // results = knn.predict_knn(inputData->getVector(6));
     
-    // // results.print();
-    // results->resultsIndexArray.print();
-    // ResultsComparator::print(results, inputDatalabels);
+    // results.print();
+    results->resultsIndexArray.print();
+    ResultsComparator::print(results, inputDatalabels);
 
-    // delete results;
+    delete results;
 
 
     // clock_t start = clock();

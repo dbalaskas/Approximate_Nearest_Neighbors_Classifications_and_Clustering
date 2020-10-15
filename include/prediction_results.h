@@ -7,7 +7,7 @@
 #include <queue>
 #include <iostream>
 
-#include "../include/numc.h"
+#include "./numc.h"
 
 typedef struct ResultIndex{
 
