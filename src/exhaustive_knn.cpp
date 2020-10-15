@@ -2,6 +2,7 @@
 #include "../include/prediction_results.h"
 #include "../include/numc.h"
 #include "../include/pandac.h"
+#include "../include/hash_function.h"
 
 #include <stdio.h>
 #include <cstdlib>
@@ -11,70 +12,157 @@
 
 using namespace std;
 
-ExaustiveKnn::ExaustiveKnn(int numOfNeighbors){
+template <typename NumCDataType> 
+ExaustiveKnn<NumCDataType>::ExaustiveKnn(int numOfNeighbors){
     this->numOfNeighbors = numOfNeighbors;
 }
 
-ExaustiveKnn::ExaustiveKnn(NumC* data, int numOfNeighbors){
+template <typename NumCDataType> 
+ExaustiveKnn<NumCDataType>::ExaustiveKnn(NumC<NumCDataType>* data, int numOfNeighbors){
     this->data = data;
     this->numOfNeighbors = numOfNeighbors;
 }
 
-ExaustiveKnn::~ExaustiveKnn(){
+template <typename NumCDataType> 
+ExaustiveKnn<NumCDataType>::~ExaustiveKnn(){
     this->numOfNeighbors = 0;
     this->data = NULL;
 }
 
-void ExaustiveKnn::fit(NumC* train_data){
-    this->data = train_data;
+template <typename NumCDataType> 
+void ExaustiveKnn<NumCDataType>::fit(NumC<NumCDataType>* trainData){
+    this->data = trainData;
 }
 
 // perform exaustivr search on every data for the near neighbours
-Results ExaustiveKnn::predict_knn(Vector vector){
+template <typename NumCDataType> 
+Results* ExaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
 
-    // allocate results sruct for given k
-    Results results(this->numOfNeighbors);
-    ResultIndex resultIndex;
+    // comparator to get best results distances
+    ResultsComparator resultsComparator(this->numOfNeighbors);
 
     // search every row data entry and find the k with minimun distance
     clock_t start = clock();
     for (int row = 0; row < this->data->getRows(); row++){
-        // get the distance
-        resultIndex.dist = NumC::dist(this->data->getVector(row), vector, 1);
-        resultIndex.index = row;
 
         // add to results and the will figure out the best neighbors
-        results.addResult(resultIndex);
+        resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(this->data->getVector(row), vector, 1));
+
     }
     clock_t end = clock();
     
-    // set execution time
-    results.setTime((double) (end - start) / CLOCKS_PER_SEC);
+    Results* results = resultsComparator.getResults();
+    // results 
+    results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
 
     return results;
 }
 
+// perform exaustivr search on every data for the near neighbours for every vector in query
+template <typename NumCDataType> 
+Results* ExaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData){
+
+    int numOfQueries = testData->getRows();
+    // allocate results sruct for given k
+    Results* totalResults = new Results(numOfQueries, this->numOfNeighbors); 
+    Results* queryResults;
+
+    // search every row data entry and find the k with minimun distance
+    clock_t start = clock();
+    for (int query = 0; query < numOfQueries; query++){
+
+        // add to results the results of every query
+        queryResults = this->predict_knn(testData->getVector(query));
+        totalResults->resultsIndexArray.addVector(queryResults->resultsIndexArray.getVector(0), query);
+        totalResults->resultsDistArray.addVector(queryResults->resultsDistArray.getVector(0), query);
+
+        // free query results
+        delete queryResults;
+
+    }
+    clock_t end = clock();
+    
+    // results 
+    totalResults->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+
+    return totalResults;
+}
+
+NumC<double> pipi(int input){
+    NumC<double> nn(6,input);
+    for (int i = 0; i < nn.getRows(); i++){
+        for (int j = 0; j < nn.getCols(); j++){
+            nn.addElement(i, i, j);
+        }
+        
+    }
+    nn.print();
+    return nn;
+}
 
 
-/////////////// Test /////////////////
+
+///////////////// Test /////////////////
 int main(){
 
-    ExaustiveKnn knn(50);
+    ExaustiveKnn<int> knn(10);
 
 
-    NumC* inputData = PandaC::fromMNIST("./doc/input/train-images-idx3-ubyte");
-    NumC::print(inputData->getVector(0));
+    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+    // NumC<int>::print(inputData->getVector(0));
+    // NumC<int>::printSparse(inputData->getVector(1));
 
-    NumC* inputDatalabels = PandaC::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
-    NumC::print(inputDatalabels->getVector(0));
+
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+    // NumC<int>::print(inputDatalabels->getVector(0));
 
     knn.fit(inputData);
 
+    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+    for (int i = 0; i < 10; i++){
+        inputData_->addVector(inputData->getVector(i), i);
+    }
 
-    Results results;
-    results = knn.predict_knn(inputData->getVector(0));
+    HashFunction<int> hash(5, 10, 10);
+    
+    // cout << NumC<int>::dist(inputData->getVector(0), inputData->getVector(1), 1)<<endl;
 
-    results.print(inputDatalabels);
+    // Results* results;
+    // results = knn.predict_knn(inputData_);
+    // // results = knn.predict_knn(inputData->getVector(6));
+    
+    // // results.print();
+    // results->resultsIndexArray.print();
+    // ResultsComparator::print(results, inputDatalabels);
 
+    // delete results;
+
+
+    // clock_t start = clock();
+    // for (long query = 0; query < 60000 * 10; query++){
+    //     NumC<int>::distSparse(inputData->getVector(0), inputData->getVector(1), 1);
+    // }
+    // clock_t end = clock();
+    
+    // // results 
+    // cout << endl<<"TIMEEEEEEE "<<((double) (end - start) / CLOCKS_PER_SEC) <<endl;
+
+
+    
+    // NumC<double> matrix(3,5);
+    // matrix = NumC<double>(5,10);
+    // matrix.randn(100);
+    // matrix.print();
+    // matrix = pipi(10);
+
+    // matrix.addVector(matrix.getVector(0), 3);
+    // matrix.print();
+    // matrix.transpose();
+    // matrix.print();
+
+    delete inputData_;
+    delete inputData;
+    delete inputDatalabels;
+    
 
 }

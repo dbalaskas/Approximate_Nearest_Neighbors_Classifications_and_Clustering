@@ -4,16 +4,16 @@
 #include <iostream>
 #include "./numc.h"
 
-// Class for reading the files
+
+template <typename NumCDataType>
 class PandaC {
     private:
         // Transform Little Endian to Big Endian.
         static int reverseInt(int num);
     public:
-        // Creates a NumC object from the MNIST's data file.
-        static NumC* fromMNIST(char* filepath);
-        // Creates a NumC object from the MNIST's labels file.
-        static NumC* fromMNISTlabels(char* filepath);
+        // Creates a NumC object from the MNIST's data.
+        static NumC<NumCDataType>* fromMNIST(char* filepath);
+        static NumC<NumCDataType>* fromMNISTlabels(char* filepath);
 };
 
 #endif

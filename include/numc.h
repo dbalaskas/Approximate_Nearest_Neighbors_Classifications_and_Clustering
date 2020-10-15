@@ -1,41 +1,63 @@
 #ifndef NUMC_H
 #define NUMC_H
 
-typedef int VectorDataType;
-typedef struct {
-    VectorDataType* vector;
-    int size;
-} Vector;
+// typedef int VectorDataType;
 
+typedef int NumCIndexType;
+typedef double NumCDistType;
+
+template <typename NumCDataType>
+class Vector{
+    public:
+        NumCDataType* vector;
+        NumCIndexType size;
+        NumCIndexType* sparseData;
+};
+
+template <typename NumCDataType> 
 class NumC {
 
     private:
-        int numOfRows;
-        int numOfCols;
-        int size;
-        VectorDataType* data;
+        NumCIndexType numOfRows;
+        NumCIndexType numOfCols;
+        NumCIndexType size;
+        NumCDataType* data;
+        bool isSparse_;
+        NumCIndexType* sparseData;
 
     public:
         NumC();
-        NumC(int numOfRows, int numOfCols);
+        NumC(NumCIndexType numOfRows, NumCIndexType numOfCols, bool isSparse=false);
         ~NumC();
 
         NumC& operator=(NumC other_numc);
 
-        int getRows();
-        int getCols();
-        VectorDataType* getData();
 
+        NumCIndexType getRows();
+        NumCIndexType getCols();
+        NumCDataType* getData();
+        NumCDataType getElement(NumCIndexType row, NumCIndexType col);
 
-        Vector getVector(int index);
-        void addElement(VectorDataType element, int row, int col);
-        void addVector(Vector vector);
+        void transpose();
+        void random(NumCDataType maxValue);
+
+        bool isSparse();
+        NumCIndexType* getSparseData();
+
+        Vector<NumCDataType>  getVector(NumCIndexType index);
+        void addElement(NumCDataType element, NumCIndexType row, NumCIndexType col);
+        void addVector(Vector<NumCDataType> vector, NumCIndexType index);
+        void addArray(NumC<NumCDataType> array, NumCIndexType index);
+        void appendVector(Vector<NumCDataType> vector);
 
         void print();
 
         NumC* median();
-        static void print(Vector vector);
-        static double dist(Vector v1, Vector v2, int d);
+        static void print(Vector<NumCDataType> vector);
+        static void printSparse(Vector<NumCDataType> vector);
+        static NumCDistType dist(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d);
+        static NumCDistType distSparse(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d);
+
 };
 
 #endif
