@@ -4,13 +4,14 @@
 #include <iostream>
 #include <vector>
 #include "./numc.h"
+#include "./hash_function.h"
 
 typedef std::vector<std::vector<Vector>> BucketList;
 typedef std::vector<Vector> Bucket;
-typedef struct {
-    int w;
-    NumC sVector;
-} HashFunction;
+// typedef struct {
+//     int w;
+//     NumC sVector;
+// } HashFunction;
 
 class HC_HashTable {
     private:
