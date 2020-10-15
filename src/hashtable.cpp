@@ -40,9 +40,9 @@ template <typename NumCDataType>
 int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
     switch (hashType) {
         case LSH:
-            return hashFunction->lsh_hash(vector) % numOfBuckets;
+            return (int)(hashFunction.lsh_hash(vector) % (unsigned int)numOfBuckets);
         case HC:
-            return hashFunction->hc_hash(vector) % numOfBuckets;
+            return (int)(hashFunction.hc_hash(vector) % (unsigned int)numOfBuckets);
     }
 }
 
@@ -57,14 +57,45 @@ std::vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(Vector<NumC
 }
 
 template <typename NumCDataType>
-void HashTable<NumCDataType>::fit(Vector<NumCDataType> vector) {
-    bucketList[hash(vector)].push_back(vector);
+void HashTable<NumCDataType>::fit(Vector<NumCDataType> vector, int index) {
+    struct Node<NumCDataType> node;
+    node.index = index;
+    node.sVector = vector;
+    bucketList[hash(vector)].push_back(node);
 }
 
 template <typename NumCDataType>
 void HashTable<NumCDataType>::fit(NumC<NumCDataType>* data) {
     int dataSize = data->getRows();
     for (int i=0; i < dataSize; i++) {
-        fit(data->getVector(i));
+        fit(data->getVector(i), i);
     }
+}
+
+#include "../include/pandac.h"
+int main(){
+
+
+    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+    // // NumC<int>::print(inputData->getVector(0));
+    // // NumC<int>::printSparse(inputData->getVector(1));
+
+
+    // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+    // // NumC<int>::print(inputDatalabels->getVector(0));
+
+
+    // hash.h(inputData->getVector(0), 0);
+    // hash.h(inputData->getVector(0), 1);
+    // hash.h(inputData->getVector(0), 2);
+    // hash.h(inputData->getVector(0), 3);
+    // hash.h(inputData->getVector(0), 4);
+
+    // for (int i = 0; i < 10; i++){
+    //     cout << "lshHash-> " << hash.lsh_hash(inputData->getVector(i)) <<endl;
+    // }
+    HashTable<int> table(LSH, 60000/8, 5, 28*28, 10);
+
+    table.fit(inputData);
+
 }

@@ -28,8 +28,6 @@ HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w){
         // cout<<m_d[i]<<endl;
     }
     
-
-
 }
 
 template <typename NumCDataType>
@@ -107,47 +105,50 @@ int HashFunction<NumCDataType>::h(Vector<NumCDataType> v, int hi){
 }
 
 template <typename NumCDataType>
-int HashFunction<NumCDataType>::lshHash(Vector<NumCDataType> v){
+unsigned int HashFunction<NumCDataType>::lsh_hash(Vector<NumCDataType> v){
 
     // initialize g
     unsigned int g = 0;
 
     // concat hi to g
-    for (int i = 0; i < this->k; i++){
-        g  = (this->h(v, i) << (i*this->k)) | g;
-    }
-    
-    g = (int)(g % (unsigned int)this->M);
-
-    return (int)g;
-}
-
-
-int main(){
-
-
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
-    // // NumC<int>::print(inputData->getVector(0));
-    // // NumC<int>::printSparse(inputData->getVector(1));
-
-
-    // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
-    // // NumC<int>::print(inputDatalabels->getVector(0));
-
-    HashFunction<int> hash(4, 28*28,100);
-
-    // hash.h(inputData->getVector(0), 0);
-    // hash.h(inputData->getVector(0), 1);
-    // hash.h(inputData->getVector(0), 2);
-    // hash.h(inputData->getVector(0), 3);
-    // hash.h(inputData->getVector(0), 4);
-
-    for (int i = 0; i < 10; i++){
-        cout << "lshHash-> " << hash.lshHash(inputData->getVector(i)) <<endl;
+    for (int i = 0; i < (8*sizeof(int))/this->k; i++){
+        g  |= (this->h(v, i) << (i*this->k));
     }
     
 
+    return g;
+}
 
+template <typename NumCDataType>
+unsigned int HashFunction<NumCDataType>::hc_hash(Vector<NumCDataType> v){
 
+    ;
 
 }
+
+
+// int main(){
+
+
+//     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+//     // // NumC<int>::print(inputData->getVector(0));
+//     // // NumC<int>::printSparse(inputData->getVector(1));
+
+
+//     // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+//     // // NumC<int>::print(inputDatalabels->getVector(0));
+
+//     HashFunction<int> hash(5, 28*28,100);
+
+//     // hash.h(inputData->getVector(0), 0);
+//     // hash.h(inputData->getVector(0), 1);
+//     // hash.h(inputData->getVector(0), 2);
+//     // hash.h(inputData->getVector(0), 3);
+//     // hash.h(inputData->getVector(0), 4);
+
+//     for (int i = 0; i < 10; i++){
+//         cout << "lshHash-> " << hash.lsh_hash(inputData->getVector(i)) <<endl;
+//     }
+    
+
+// }

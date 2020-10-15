@@ -27,7 +27,8 @@ class HashFunction{
 
         int h(Vector<NumCDataType> v, int hi);
 
-        int lshHash(Vector<NumCDataType> v);
+        unsigned int lsh_hash(Vector<NumCDataType> v);
+        unsigned int hc_hash(Vector<NumCDataType> v);
 
 };
 
