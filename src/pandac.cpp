@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define LIMIT 50
+
 template class PandaC<int>;
 template class PandaC<long>;
 template class PandaC<double>;
@@ -51,22 +53,19 @@ NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath) {
 
     // initialize martix to store all the images' data.
         n_cols_of_matrix = n_cols_of_image*n_rows_of_image;
+        number_of_images = LIMIT;
         NumC<NumCDataType> *data = new NumC<NumCDataType>(number_of_images, n_cols_of_image*n_rows_of_image, true);
 
-        // read the pixels of every image
-        char *pixel = (char*)malloc(n_cols_of_matrix*sizeof(char));
-        NumCDataType pixelType;
-
     // read the pixels of every image.
+        NumCDataType pixelType;
         char *image = (char*)malloc(n_cols_of_matrix*sizeof(char));
         // int pixel;
         for(int i=0;i<number_of_images; ++i) {
-
             // read all the pixels of an image
-            file.read( pixel, sizeof(char)*n_cols_of_matrix);
+            file.read( image, sizeof(char)*n_cols_of_matrix);
             for( int j = 0; j < n_cols_of_matrix; j++){
                 // reverse the char pixel and store in int
-                pixelType =  (NumCDataType)reverseChar(pixel[j]);
+                pixelType =  (NumCDataType)reverseChar(image[j]);
                 data->addElement(pixelType, i, j);
             }
         }

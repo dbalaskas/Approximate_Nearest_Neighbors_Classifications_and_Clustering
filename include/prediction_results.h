@@ -22,10 +22,7 @@ typedef struct ResultIndex{
 typedef struct Results{
 
     Results(){}
-    Results(NumCIndexType resultsRows, NumCIndexType resultsCol){
-        this->resultsIndexArray = NumC<NumCIndexType>(resultsRows, resultsCol);
-        this->resultsDistArray  = NumC<NumCDistType>(resultsRows, resultsCol);
-    }
+    Results(NumCIndexType resultsRows, NumCIndexType resultsCol): resultsIndexArray(resultsRows, resultsCol), resultsDistArray(resultsRows, resultsCol) {}
     NumC<NumCIndexType> resultsIndexArray;
     NumC<NumCDistType> resultsDistArray;
     double executionTime;
@@ -70,7 +67,7 @@ class ResultsComparator{
         std::priority_queue <ResultIndex, std::vector<ResultIndex>, Compare > priorityQueue;
 
     public:
-        ResultsComparator() {}
+        ResultsComparator() {};
         ResultsComparator(int size);
         ~ResultsComparator();
         static void print(Results* results, NumC<int>* labels);

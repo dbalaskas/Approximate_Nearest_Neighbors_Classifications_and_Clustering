@@ -5,14 +5,6 @@
 using namespace std;
 
 template <typename NumCDataType>
-LSH<NumCDataType>::LSH() {
-    data = NULL;
-    hashTableSize = 0;
-    L = 0;
-    R = 0;
-}
-
-template <typename NumCDataType>
 LSH<NumCDataType>::~LSH() {
     data = NULL;
     hashTableSize = 0;

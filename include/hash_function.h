@@ -3,6 +3,7 @@
 
 
 #include "./numc.h"
+#include <iostream>
 
 template <typename NumCDataType>
 class HashFunction{
@@ -20,7 +21,7 @@ class HashFunction{
         int modularMultiplication(int base, int exponent, int mod);
 
     public:
-        HashFunction(){};
+        HashFunction(): m_d{NULL} {};
         HashFunction(int k, int dimension, int w);
         ~HashFunction();
         

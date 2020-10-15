@@ -33,7 +33,7 @@ class HashTable {
         HashType hashType;
         
     public:
-        HashTable();
+        HashTable(): numOfBuckets{0}, hashType{LSH} {};
         HashTable(HashType _hashType, int _numOfBuckets, int k, int d, int w);
         ~HashTable();
 

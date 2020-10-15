@@ -2,10 +2,10 @@
 #define LSH_H
 
 #include "./numc.h"
-#include "./lsh_hashtable.h"
+#include "./hashtable.h"
 #include "./prediction_results.h"
 
-typedef vector<LSH_HashTable> HashTableList;
+typedef vector<HashTable<NumCDataType>> HashTableList;
 
 
 template <typename NumCDataType>
@@ -19,7 +19,7 @@ class LSH {
         int R;
 
     public:
-        LSH();
+        LSH():data{NULL}, hashTableSize{0}, L{0}, R{0} {};
         ~LSH();
 
         void fit(NumC<NumCDataType>* _data, int k, int _R, int _L, int _hashTableSize=0);

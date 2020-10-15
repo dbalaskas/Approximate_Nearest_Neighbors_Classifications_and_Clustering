@@ -8,18 +8,9 @@
 using namespace std;
 
 template <typename NumCDataType>
-HashTable<NumCDataType>::HashTable() {
-    numOfBuckets = 0;
-    hashType = LSH;
-}
-
-template <typename NumCDataType>
-HashTable<NumCDataType>::HashTable(HashType _hashType, int _numOfBuckets, int k, int d, int w) {
-    this->bucketList.reserve(_numOfBuckets);
-    this->numOfBuckets = _numOfBuckets;
-    this->hashFunction = HashFunction<NumCDataType>(k, d, W);
-    hashType = _hashType;
-}
+HashTable<NumCDataType>::HashTable(HashType _hashType, int _numOfBuckets, int k, int d, int w)
+: hashFunction(k, d, w), numOfBuckets{_numOfBuckets}, hashType{_hashType}, bucketList(_numOfBuckets)
+{}
 
 template <typename NumCDataType>
 HashTable<NumCDataType>::~HashTable() {
@@ -47,12 +38,12 @@ int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
 }
 
 template <typename NumCDataType>
-std::vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(int bucketNum) {
+vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(int bucketNum) {
     return bucketList[bucketNum];
 }
 
 template <typename NumCDataType>
-std::vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(Vector<NumCDataType> vector) {
+vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(Vector<NumCDataType> vector) {
     return bucketList[hash(vector)];
 }
 
@@ -97,5 +88,7 @@ int main(){
     HashTable<int> table(LSH, 60000/8, 5, 28*28, 10);
 
     table.fit(inputData);
+
+    delete inputData;
 
 }

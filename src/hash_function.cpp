@@ -7,11 +7,15 @@
 using namespace std;
 
 template <typename NumCDataType>
-HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w){
+HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w)
+: s(k, dimension, false)
+{
+    cout << k << endl;
+    cout << dimension << endl;
     this->k = k;
     this->w = w;
     this->dimension = dimension;
-    this->s = NumC<NumCDataType>(k, dimension);
+    // this->s = NumC<NumCDataType>(k, dimension);
     // fill with random [0, w)
     this->s.random(w);
     // this->s.print();
@@ -32,7 +36,10 @@ HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w){
 
 template <typename NumCDataType>
 HashFunction<NumCDataType>::~HashFunction(){
-    free(m_d);
+    if (m_d != NULL) {
+        free(m_d);
+        m_d = NULL;
+    }
 }
 
 template <typename NumCDataType>
@@ -111,8 +118,8 @@ unsigned int HashFunction<NumCDataType>::lsh_hash(Vector<NumCDataType> v){
     unsigned int g = 0;
 
     // concat hi to g
-    for (int i = 0; i < (8*sizeof(int))/this->k; i++){
-        g  |= (this->h(v, i) << (i*this->k));
+    for (int i = 0; i < this->k; i++){
+        g  |= (this->h(v, i) << (i* (32/this->k)) );
     }
     
 

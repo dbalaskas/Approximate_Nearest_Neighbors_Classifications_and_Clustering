@@ -44,6 +44,8 @@ NumC<NumCDataType>::NumC(NumCIndexType numOfRows, NumCIndexType numOfCols, bool 
             this->sparseData[i*(this->numOfCols+1)] = 0;
         }
         
+    } else {
+        this->sparseData = NULL;
     }
 
 }
@@ -75,6 +77,8 @@ NumC<NumCDataType>& NumC<NumCDataType>::operator=(NumC<NumCDataType> other_numc)
         for (int i = 1; i < this->numOfRows; i++){
             this->sparseData[i*(this->numOfCols+1)] = 0;
         }
+    } else {
+        sparseData = NULL;
     }
 
     return *this;
@@ -84,10 +88,15 @@ template <typename NumCDataType>
 NumC<NumCDataType>::~NumC(){
 
     // deallocate the matrix memory
-    if (this->data != NULL)
+    if (this->data != NULL) {
         free(this->data);
-    if (this->isSparse_)
+        this->data = NULL;
+    }
+    cout << "ALL OK" << endl;
+    if (this->sparseData != NULL) {
         free(this->sparseData);
+        this->sparseData = NULL;
+    }
 }
 
 // get the vector of a row.

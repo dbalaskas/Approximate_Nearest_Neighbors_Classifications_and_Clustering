@@ -10,12 +10,6 @@ HyperCube::HyperCube() {
     R = 0;
 }
 
-HyperCube::HyperCube() {
-    data = NULL;
-    hashTableSize = 0;
-    R = 0;
-}
-
 void HyperCube::fit(NumC* _data, int k, int _R, int _hashTableSize) {
     data = _data;
     R = _R;
