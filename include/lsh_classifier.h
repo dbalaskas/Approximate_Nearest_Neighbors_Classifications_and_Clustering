@@ -5,26 +5,28 @@
 #include "./hashtable.h"
 #include "./prediction_results.h"
 
-typedef vector<HashTable<NumCDataType>> HashTableList;
+// typedef vector<HashTable<NumCDataType>> HashTableList;
 
 
 template <typename NumCDataType>
 class LSH {
 
     private:
-        NumC<NumCDataType>* data;
-        int hashTableSize;
+        int N;
         int L;
-        HashTableList hashTableList;
-        int R;
+        int k;
+        int w;
+        NumC<NumCDataType>* data;
+        std::vector<HashTable<NumCDataType>> hashTableList;
 
     public:
-        LSH():data{NULL}, hashTableSize{0}, L{0}, R{0} {};
+        LSH():data{NULL}, N{1}, L{5}, k{4}, w{10} {};
+        LSH(int N, int L = 5, int k = 4, int w = 10);
         ~LSH();
 
-        void fit(NumC<NumCDataType>* _data, int k, int _R, int _L, int _hashTableSize=0);
+        void fit(NumC<NumCDataType>* _data);
         void transform();
-        void fit_transform(NumC<NumCDataType>* _data, int k, int _R, int _L, int _hashTableSize=0);
+        void fit_transform(NumC<NumCDataType>* _data);
 
         Results* predict_knn(Vector<NumCDataType> vector, int k);
         Results* predict_knn(NumC<NumCDataType>* testData, int k);
