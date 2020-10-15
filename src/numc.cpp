@@ -92,7 +92,6 @@ NumC<NumCDataType>::~NumC(){
         free(this->data);
         this->data = NULL;
     }
-    cout << "ALL OK" << endl;
     if (this->sparseData != NULL) {
         free(this->sparseData);
         this->sparseData = NULL;

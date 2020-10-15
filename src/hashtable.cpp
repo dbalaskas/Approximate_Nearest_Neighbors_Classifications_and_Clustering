@@ -34,11 +34,13 @@ int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
             return (int)(hashFunction.lsh_hash(vector) % (unsigned int)numOfBuckets);
         case HC:
             return (int)(hashFunction.hc_hash(vector) % (unsigned int)numOfBuckets);
+        default:
+            return 0;
     }
 }
 
 template <typename NumCDataType>
-vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(int bucketNum) {
+vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(unsigned int bucketNum) {
     return bucketList[bucketNum];
 }
 
@@ -63,48 +65,54 @@ void HashTable<NumCDataType>::fit(NumC<NumCDataType>* data) {
     }
 }
 
-#include "../include/pandac.h"
-int main(){
+// #include "../include/pandac.h"
+// #include <math.h>
+// int main(){
 
 
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
-    // // NumC<int>::print(inputData->getVector(0));
-    // // NumC<int>::printSparse(inputData->getVector(1));
+//     // NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+//     // // NumC<int>::print(inputData->getVector(0));
+//     // // NumC<int>::printSparse(inputData->getVector(1));
 
 
-    // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
-    // // NumC<int>::print(inputDatalabels->getVector(0));
+//     // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+//     // // NumC<int>::print(inputDatalabels->getVector(0));
 
 
-    // hash.h(inputData->getVector(0), 0);
-    // hash.h(inputData->getVector(0), 1);
-    // hash.h(inputData->getVector(0), 2);
-    // hash.h(inputData->getVector(0), 3);
-    // hash.h(inputData->getVector(0), 4);
+//     // hash.h(inputData->getVector(0), 0);
+//     // hash.h(inputData->getVector(0), 1);
+//     // hash.h(inputData->getVector(0), 2);
+//     // hash.h(inputData->getVector(0), 3);
+//     // hash.h(inputData->getVector(0), 4);
 
-    // for (int i = 0; i < 10; i++){
-    //     cout << "lshHash-> " << hash.lsh_hash(inputData->getVector(i)) <<endl;
-    // }
-    HashTable<int> table(LSH, 60000/8, 5, 28*28, 10);
+//     // for (int i = 0; i < 10; i++){
+//     //     cout << "lshHash-> " << hash.lsh_hash(inputData->getVector(i)) <<endl;
+//     // }
+//     // HashTable<int> table(HC, 512, log2(1024)-1, 28*28, 10);
 
-    table.fit(inputData);
+//     // table.fit(inputData);
 
-    for (int i = 0; i < table.getNumOfBuckets(); i+=10){
-        cout << table.getBucket(i).size() << " " << 
-        table.getBucket(i+1).size() << " " << 
-        table.getBucket(i+2).size() << " " << 
-        table.getBucket(i+3).size() << " " << 
-        table.getBucket(i+4).size() << " " << 
-        table.getBucket(i+5).size() << " " <<
-        table.getBucket(i+6).size() << " " <<
-        table.getBucket(i+7).size() << " " <<
-        table.getBucket(i+8).size() << " " <<
-        table.getBucket(i+9).size() << " " <<
-        table.getBucket(i+10).size() << " " <<endl;
-    }
-        cout << table.getNumOfBuckets() << endl;
+//     // for (int i = 0; i < table.getNumOfBuckets(); i+=10){
+//     //     cout << table.getBucket(i).size() << " " << 
+//     //     table.getBucket(i+1).size() << " " << 
+//     //     table.getBucket(i+2).size() << " " << 
+//     //     table.getBucket(i+3).size() << " " << 
+//     //     table.getBucket(i+4).size() << " " << 
+//     //     table.getBucket(i+5).size() << " " <<
+//     //     table.getBucket(i+6).size() << " " <<
+//     //     table.getBucket(i+7).size() << " " <<
+//     //     table.getBucket(i+8).size() << " " <<
+//     //     table.getBucket(i+9).size() << " " <<
+//     //     table.getBucket(i+10).size() << " " <<endl;
+//     // }
+//     // for (int i = 0; i < table.getNumOfBuckets(); i+=1){
+//     //     cout << table.getBucket(i).size() << " ";
+//     //     if (i > 0 && i%10 == 0) cout << endl;
+//     // }
+
+//     //     cout << endl << table.getNumOfBuckets() << endl;
     
 
-    delete inputData;
+//     // delete inputData;
 
-}
+// }

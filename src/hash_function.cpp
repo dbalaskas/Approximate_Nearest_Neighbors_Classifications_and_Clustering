@@ -12,8 +12,6 @@ template <typename NumCDataType>
 HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w)
 : s(k, dimension, false)
 {
-    cout << k << endl;
-    cout << dimension << endl;
     this->k = k;
     this->w = w;
     this->dimension = dimension;
@@ -95,10 +93,12 @@ template <typename NumCDataType>
 int* HashFunction<NumCDataType>::initThreasholds(int k){
     srand(time(NULL));
 
-    thresholds = (int*) malloc(k*sizeof(int));
+    int* thresholds = (int*) malloc(k*sizeof(int));
     for (int i = 0; i < k; i++){
         thresholds[i] = rand() % this->M;
     }
+
+    return thresholds;
 
 }
 
@@ -145,10 +145,17 @@ unsigned int HashFunction<NumCDataType>::lsh_hash(Vector<NumCDataType> v){
 
 template <typename NumCDataType>
 unsigned int HashFunction<NumCDataType>::hc_hash(Vector<NumCDataType> v){
+    unsigned int hash_value = 0;
     for (int i = 0; i < this->k; i++){
-        // if
+        cout << this->h(v, i) << " " << f_thresholds[i]<<endl; 
+        if (this->h(v, i) >= f_thresholds[i]) {
+            hash_value = hash_value << 1;
+            hash_value++;
+        } else {
+            hash_value = hash_value << 1;
+        }
     }
-    return 0;
+    return hash_value;
 
 }
 

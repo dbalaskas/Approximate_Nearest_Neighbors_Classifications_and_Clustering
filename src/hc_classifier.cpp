@@ -1,10 +1,12 @@
+#include <math.h>
 #include "../include/hc_classifier.h"
 
 #define HASHTABLE_SIZE data->getRows()/8
 
 using namespace std;
 
-HyperCube::HyperCube() {
+template <typename NumCDataType>
+LSH<NumCDataType>::~LSH() {
     data = NULL;
     hashTableSize = 0;
     R = 0;

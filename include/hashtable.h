@@ -40,7 +40,7 @@ class HashTable {
         int getNumOfBuckets();
         char* getHashType();
         int hash(Vector<NumCDataType> vector);
-        std::vector< Node<NumCDataType> > getBucket(int bucketNum);
+        std::vector< Node<NumCDataType> > getBucket(unsigned int bucketNum);
         std::vector< Node<NumCDataType> > getBucket(Vector<NumCDataType> vector);
         void fit(Vector<NumCDataType> vector, int index);
         void fit(NumC<NumCDataType>* data);

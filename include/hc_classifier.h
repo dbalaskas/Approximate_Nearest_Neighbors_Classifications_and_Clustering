@@ -2,14 +2,14 @@
 #define HC_H
 
 #include "./numc.h"
-#include "./hc_hashtable.h"
+#include "./hashtable.h"
 #include "./prediction_results.h"
 
 class HyperCube {
     private:
         NumC* data;
         int hashTableSize;
-        HC_HashTable hashTable;
+        HashTable hashTable;
         int R;
     public:
         HyperCube(): data{NULL}, hashTableSize{0}, R{0} {};
