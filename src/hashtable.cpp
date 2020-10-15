@@ -120,6 +120,6 @@ void HashTable<NumCDataType>::fit(NumC<NumCDataType>* data) {
 //     //     cout << endl << table.getNumOfBuckets() << endl;
     
 
-//     // delete inputData;
+    // delete inputData;
 
 // }
