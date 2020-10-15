@@ -4,6 +4,8 @@
 
 #include "../include/pandac.h"
 
+#define SIZE_INT 32
+
 using namespace std;
 
 template <typename NumCDataType>
@@ -21,7 +23,7 @@ HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w)
     // this->s.print();
 
     // initialize M
-    this->M = (int)pow(2, (int)(32/this->k));
+    this->M = (int)pow(2, (int)(SIZE_INT/this->k));
 
     // initialize m
     this->m = 4586243;
@@ -119,7 +121,7 @@ unsigned int HashFunction<NumCDataType>::lsh_hash(Vector<NumCDataType> v){
 
     // concat hi to g
     for (int i = 0; i < this->k; i++){
-        g  |= (this->h(v, i) << (i* (32/this->k)) );
+        g  |= (this->h(v, i) << (i* (SIZE_INT/this->k)) );
     }
     
 
@@ -145,7 +147,7 @@ unsigned int HashFunction<NumCDataType>::hc_hash(Vector<NumCDataType> v){
 //     // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
 //     // // NumC<int>::print(inputDatalabels->getVector(0));
 
-//     HashFunction<int> hash(5, 28*28,100);
+//     HashFunction<int> hash(4, 28*28,100);
 
 //     // hash.h(inputData->getVector(0), 0);
 //     // hash.h(inputData->getVector(0), 1);

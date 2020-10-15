@@ -53,7 +53,7 @@ NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath) {
 
     // initialize martix to store all the images' data.
         n_cols_of_matrix = n_cols_of_image*n_rows_of_image;
-        number_of_images = LIMIT;
+        // number_of_images = LIMIT;
         NumC<NumCDataType> *data = new NumC<NumCDataType>(number_of_images, n_cols_of_image*n_rows_of_image, true);
 
     // read the pixels of every image.

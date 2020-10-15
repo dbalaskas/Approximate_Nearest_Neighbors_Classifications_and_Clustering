@@ -89,6 +89,22 @@ int main(){
 
     table.fit(inputData);
 
+    for (int i = 0; i < table.getNumOfBuckets(); i+=10){
+        cout << table.getBucket(i).size() << " " << 
+        table.getBucket(i+1).size() << " " << 
+        table.getBucket(i+2).size() << " " << 
+        table.getBucket(i+3).size() << " " << 
+        table.getBucket(i+4).size() << " " << 
+        table.getBucket(i+5).size() << " " <<
+        table.getBucket(i+6).size() << " " <<
+        table.getBucket(i+7).size() << " " <<
+        table.getBucket(i+8).size() << " " <<
+        table.getBucket(i+9).size() << " " <<
+        table.getBucket(i+10).size() << " " <<endl;
+    }
+        cout << table.getNumOfBuckets() << endl;
+    
+
     delete inputData;
 
 }
