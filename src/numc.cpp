@@ -8,10 +8,6 @@
 
 using namespace std;
 
-template class NumC<int>;
-template class NumC<long>;
-template class NumC<double>;
-
 template <typename NumCDataType>
 NumC<NumCDataType>::NumC() {
     // set matrix dimensions

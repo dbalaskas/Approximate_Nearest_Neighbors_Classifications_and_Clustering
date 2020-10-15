@@ -1,8 +1,6 @@
 #ifndef NUMC_H
 #define NUMC_H
 
-// typedef int VectorDataType;
-
 typedef int NumCIndexType;
 typedef double NumCDistType;
 
@@ -59,5 +57,9 @@ class NumC {
         static NumCDistType distSparse(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d);
 
 };
+
+template class NumC<int>;
+template class NumC<long>;
+template class NumC<double>;
 
 #endif

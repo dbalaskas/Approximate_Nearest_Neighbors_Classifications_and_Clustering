@@ -32,8 +32,8 @@ class HashFunction{
 
 };
 
-
-
-
+template class HashFunction<int>;
+template class HashFunction<long>;
+template class HashFunction<double>;
 
 #endif

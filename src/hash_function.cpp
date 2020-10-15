@@ -122,7 +122,7 @@ unsigned int HashFunction<NumCDataType>::lsh_hash(Vector<NumCDataType> v){
 template <typename NumCDataType>
 unsigned int HashFunction<NumCDataType>::hc_hash(Vector<NumCDataType> v){
 
-    ;
+    return 0;
 
 }
 
