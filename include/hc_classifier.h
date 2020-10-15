@@ -5,21 +5,22 @@
 #include "./hashtable.h"
 #include "./prediction_results.h"
 
+template <typename NumCDataType>
 class HyperCube {
     private:
-        NumC* data;
+        NumC<NumCDataType>* data;
         int hashTableSize;
-        HashTable hashTable;
-        int R;
+        HashTable<NumCDataType> hashTable;
+        int k;
     public:
-        HyperCube(): data{NULL}, hashTableSize{0}, R{0} {};
+        HyperCube(): hashTable(HC), data{NULL}, hashTableSize{0}, k{0} {};
         ~HyperCube();
 
-        void fit(NumC* _data, int k, int _R, int _hashTableSize=0);
+        void fit(NumC<NumCDataType>* _data);
         void transform();
-        void fit_transform(NumC* _data, int k, int _R, int _hashTableSize=0);
-        Results predict_knn(Vector vector, int k, int maxPoints, int maxVertices);
-        Results predict_rs(Vector vector, int r, int maxPoints, int maxVertices);
+        void fit_transform(NumC<NumCDataType>* _data);
+        // Results predict_knn(Vector<NumCDataType> vector, int k, int maxPoints, int maxVertices);
+        // Results predict_rs(Vector<NumCDataType> vector, int r, int maxPoints, int maxVertices);
 };
 
 #endif

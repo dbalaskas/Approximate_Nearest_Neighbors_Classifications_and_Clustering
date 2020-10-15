@@ -1,6 +1,6 @@
-#include "../include/hashtable.h"
 #include <time.h>
 #include <stdlib.h>
+#include "../include/hashtable.h"
 
 #define R_MULTIPLIER 100
 #define W 100
@@ -23,8 +23,15 @@ int HashTable<NumCDataType>::getNumOfBuckets() {
 }
 
 template <typename NumCDataType>
-char* HashTable<NumCDataType>::getHashType() {
-    return HashTypes[hashType];
+const char* HashTable<NumCDataType>::getHashType(HashType hashType) {
+    switch (hashType) {
+        case LSH:
+            return "LSH";
+        case HC:
+            return "HC";
+        default:
+            return "ERROR";
+    }
 }
 
 template <typename NumCDataType>
@@ -88,7 +95,7 @@ void HashTable<NumCDataType>::fit(NumC<NumCDataType>* data) {
 //     // for (int i = 0; i < 10; i++){
 //     //     cout << "lshHash-> " << hash.lsh_hash(inputData->getVector(i)) <<endl;
 //     // }
-//     // HashTable<int> table(HC, 512, log2(1024)-1, 28*28, 10);
+    // HashTable<int> table(HC, 512, log2(1024)-1, 28*28, 10);
 
 //     // table.fit(inputData);
 

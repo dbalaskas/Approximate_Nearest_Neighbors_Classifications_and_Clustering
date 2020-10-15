@@ -53,10 +53,14 @@ NumC<NumCDataType>::NumC(NumCIndexType numOfRows, NumCIndexType numOfCols, bool 
 template <typename NumCDataType>
 NumC<NumCDataType>& NumC<NumCDataType>::operator=(NumC<NumCDataType> other_numc){
     // delete current data
-    if (this->data != NULL)
+    if (this->data != NULL) {
         free(this->data);
-    if (this->isSparse_)
+        this->data = NULL;
+    }
+    if (this->isSparse_) {
         free(this->sparseData);
+        this->data = NULL;
+    }
     
     // copy opreations
     this->numOfRows = other_numc.getRows();

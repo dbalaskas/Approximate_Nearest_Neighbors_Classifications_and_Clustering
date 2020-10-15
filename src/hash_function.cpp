@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+
 #include <math.h>
 #include "../include/hash_function.h"
 #include "../include/numc.h"
@@ -32,6 +35,25 @@ HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w)
     }
     this->f_thresholds = initThreasholds(this->k);
 }
+
+template <typename NumCDataType>
+HashFunction<NumCDataType>& HashFunction<NumCDataType>::operator=(HashFunction<NumCDataType> other_hashFunction) {
+    // copy opreations
+    this->k = other_hashFunction.k;
+    this->w = other_hashFunction.w;
+    this->dimension = other_hashFunction.dimension;
+    this->s = other_hashFunction.s;
+
+    this->M = (int)pow(2, (int)(SIZE_INT/this->k));
+    this->m = 4586243;
+    this->m_d = (int*)malloc(this->dimension*sizeof(int));
+    memcpy(this->m_d, other_hashFunction.m_d, this->dimension*sizeof(int));
+    this->f_thresholds = (int*) malloc(k*sizeof(int));
+    memcpy(this->f_thresholds, other_hashFunction.f_thresholds, k*sizeof(int));
+
+    return *this;
+}
+
 
 template <typename NumCDataType>
 HashFunction<NumCDataType>::~HashFunction(){
@@ -147,7 +169,6 @@ template <typename NumCDataType>
 unsigned int HashFunction<NumCDataType>::hc_hash(Vector<NumCDataType> v){
     unsigned int hash_value = 0;
     for (int i = 0; i < this->k; i++){
-        cout << this->h(v, i) << " " << f_thresholds[i]<<endl; 
         if (this->h(v, i) >= f_thresholds[i]) {
             hash_value = hash_value << 1;
             hash_value++;

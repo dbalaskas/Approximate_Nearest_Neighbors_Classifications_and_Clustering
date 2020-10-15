@@ -25,6 +25,7 @@ class HashFunction{
     public:
         HashFunction(): m_d{NULL}, f_thresholds{NULL} {};
         HashFunction(int k, int dimension, int w);
+        HashFunction<NumCDataType>& operator=(HashFunction<NumCDataType> other_hashFunction);
         ~HashFunction();
         
 
