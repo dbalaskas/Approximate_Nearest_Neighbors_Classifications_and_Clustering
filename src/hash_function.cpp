@@ -29,9 +29,8 @@ HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w)
     this->m_d = (int*)malloc(this->dimension*sizeof(int));
     for (int i = 0; i < this->dimension; i++){
         m_d[i] = modularExponentiation(this->m, i, this->M);
-        // cout<<m_d[i]<<endl;
     }
-    
+    this->f_thresholds = initThreasholds(this->k);
 }
 
 template <typename NumCDataType>
@@ -39,6 +38,10 @@ HashFunction<NumCDataType>::~HashFunction(){
     if (m_d != NULL) {
         free(m_d);
         m_d = NULL;
+    }
+    if (f_thresholds != NULL) {
+        free(f_thresholds);
+        f_thresholds = NULL;
     }
 }
 
@@ -87,6 +90,18 @@ int HashFunction<NumCDataType>::modularMultiplication(int base, int exponent, in
 }
 
 template <typename NumCDataType>
+int* HashFunction<NumCDataType>::initThreasholds(int k){
+    srand(time(NULL));
+
+    thresholds = (int*) malloc(k*sizeof(int));
+    for (int i = 0; i < k; i++){
+        thresholds[i] = rand() % this->M;
+    }
+
+}
+
+
+template <typename NumCDataType>
 int HashFunction<NumCDataType>::h(Vector<NumCDataType> v, int hi){
 
     // calculate a
@@ -128,7 +143,9 @@ unsigned int HashFunction<NumCDataType>::lsh_hash(Vector<NumCDataType> v){
 
 template <typename NumCDataType>
 unsigned int HashFunction<NumCDataType>::hc_hash(Vector<NumCDataType> v){
-
+    for (int i = 0; i < this->k; i++){
+        // if
+    }
     return 0;
 
 }

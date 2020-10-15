@@ -15,13 +15,15 @@ class HashFunction{
         int M;
         int m;
         int* m_d;
+        int* f_thresholds;
         NumC<NumCDataType> s;
         int modularExponentiation(int base, int exponent, int mod);
         int modularAddition(int base, int exponent, int mod);
         int modularMultiplication(int base, int exponent, int mod);
+        int* initThreasholds(int k);
 
     public:
-        HashFunction(): m_d{NULL} {};
+        HashFunction(): m_d{NULL}, f_thresholds{NULL} {};
         HashFunction(int k, int dimension, int w);
         ~HashFunction();
         
