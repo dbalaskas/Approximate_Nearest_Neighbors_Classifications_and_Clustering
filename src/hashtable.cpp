@@ -35,7 +35,7 @@ const char* HashTable<NumCDataType>::getHashType(HashType hashType) {
 }
 
 template <typename NumCDataType>
-int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
+unsigned int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
     switch (hashType) {
         case LSH:
             return (int)(hashFunction.lsh_hash(vector) % (unsigned int)numOfBuckets);
@@ -44,6 +44,25 @@ int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
         default:
             return 0;
     }
+}
+
+template <typename NumCDataType>
+unsigned int HashTable<NumCDataType>::get_nearestHash(Vector<NumCDataType> vector, int i) {
+    unsigned int hashValue = hash(vector);
+    unsigned int mask = 0;
+    unsigned int start_pos = 0;
+    unsigned int steps = hashFunction.getk();
+    // if ((1 << steps) < i) return -1;
+    while (i > steps && steps > 0) {
+        start_pos++;
+        mask = (mask << 1) + 1;
+        i -= steps;
+        steps --;
+    }
+    mask |= (1 << start_pos+i);
+    hashValue = hashValue ^ mask;
+
+    return hashValue;
 }
 
 template <typename NumCDataType>

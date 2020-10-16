@@ -124,7 +124,6 @@ int* HashFunction<NumCDataType>::initThreasholds(int k){
 
 }
 
-
 template <typename NumCDataType>
 int HashFunction<NumCDataType>::h(Vector<NumCDataType> v, int hi){
 

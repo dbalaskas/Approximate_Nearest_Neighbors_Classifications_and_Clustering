@@ -27,7 +27,10 @@ class HashFunction{
         HashFunction(int k, int dimension, int w);
         HashFunction<NumCDataType>& operator=(HashFunction<NumCDataType> other_hashFunction);
         ~HashFunction();
-        
+
+        int getk() {return k;};
+        int getw() {return w;};
+        int getM() {return M;};
 
         int h(Vector<NumCDataType> v, int hi);
 

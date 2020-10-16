@@ -58,7 +58,7 @@ Results* ExaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
     return results;
 }
 
-// perform exaustivr search on every data for the near neighbours for every vector in query
+// perform exaustive search on every data for the near neighbours for every vector in query
 template <typename NumCDataType> 
 Results* ExaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData){
 
