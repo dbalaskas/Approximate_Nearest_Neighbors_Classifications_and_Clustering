@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <queue>
 #include <iostream>
+#include <unordered_set>
+#include <functional>
 
 #include "./numc.h"
 
@@ -65,6 +67,7 @@ class ResultsComparator{
     private:
         int numOfBestResults;
         std::priority_queue <ResultIndex, std::vector<ResultIndex>, Compare > priorityQueue;
+        std::unordered_set<NumCIndexType> indexSet; 
 
     public:
         ResultsComparator() {};

@@ -1,21 +1,28 @@
 #include "../include/lsh_classifier.h"
 
+
 #define HASHTABLE_SIZE data->getRows()/8
 
 using namespace std;
 
 template <typename NumCDataType>
-LSH<NumCDataType>::LSH(int N, int L, int k, int w)
-: data{NULL}, N{N}, L{L}, k{k}, w{w}, hashTableList(L)
+LSHashing<NumCDataType>::LSHashing(int N, int L, int k, int w)
+: data{NULL}, N{N}, L{L}, k{k}, w{w}
 {
-    for (int i=0; i < L; i++) {
-        hashTableList.push_back(HashTable<NumCDataType>(LSH, this->L, this->k, _data->getCols(), this->w));
-    }
+    this->hashTableList = new HashTable<NumCDataType>*[this->L];
 }
 
 
 template <typename NumCDataType>
-LSH<NumCDataType>::~LSH() {
+LSHashing<NumCDataType>::~LSHashing() {
+    
+    for (int i=0; i < L; i++) {
+        if (hashTableList[i] != NULL) {
+            delete hashTableList[i];
+            hashTableList[i] = NULL;
+        }
+    }
+    delete[] hashTableList;
     data = NULL;
     L = 0;
     N = 0;
@@ -24,44 +31,45 @@ LSH<NumCDataType>::~LSH() {
 }
 
 template <typename NumCDataType>
-void LSH<NumCDataType>::fit(NumC<NumCDataType>* _data) {
+void LSHashing<NumCDataType>::fit(NumC<NumCDataType>* _data) {
     this->data = _data;
 
-    // if (hashTableSize == 0) {
-    //     hashTableSize = HASHTABLE_SIZE;
-    // } else {
-    //     hashTableSize = _hashTableSize;
-    // }
+    for (int i=0; i < L; i++) {
+        hashTableList[i] = new HashTable<NumCDataType>(LSH, HASHTABLE_SIZE, this->k, this->data->getCols(), this->w) ;
+    }
 
 }
 
 template <typename NumCDataType>
-void LSH<NumCDataType>::transform() {
+void LSHashing<NumCDataType>::transform() {
     for (int i=0; i < L; i++) {
-       hashTableList[i].fit(data); 
+       hashTableList[i]->fit(data); 
     }
 }
 
 template <typename NumCDataType>
-void LSH<NumCDataType>::fit_transform(NumC<NumCDataType>* _data) {
+void LSHashing<NumCDataType>::fit_transform(NumC<NumCDataType>* _data) {
     fit(_data);
     transform();
 }
 
 template <typename NumCDataType>
-Results* LSH<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N) {
+Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N) {
+    if (N == 0)
+        N = this->N;
 
-    ResultsComparator resultsComparator(this->N);
-    vector< Node<NumCDataType> > bucket;
+    ResultsComparator resultsComparator(N);
+    std::vector< Node<NumCDataType> > bucket;
+    double dist;
 
     clock_t start = clock();
     for (int i=0; i < L; i++) {
         // get bucket
-        bucket = hashTableList[i].getBucket(vector);
+        bucket = hashTableList[i]->getBucket(vector);
 
         for (int j=0; j < bucket.size(); j++) {
-            resultsComparator.addResult(bucket[j].index, NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1));
-            // dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
+            dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
+            resultsComparator.addResult(bucket[j].index, dist);
         }
         // results.add(index, dist);
     }
@@ -75,28 +83,38 @@ Results* LSH<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N) {
 }
 
 template <typename NumCDataType>
-Results* LSH<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int k) {
-    // Results result = Results(k);
-    // double dist;
+Results* LSHashing<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int N) {
+    if (N == 0)
+        N = this->N;
+    
+    int numOfQueries = testData->getRows();
+    // allocate results sruct for given k
+    Results* totalResults = new Results(numOfQueries, N); 
+    Results* queryResults;
 
-    // clock_t start = clock();
-    // for (int i=0; i < L; i++) {
-    //     Bucket bucket = hashTableList[i].getBucket(vector);
+    // search every row data entry and find the k with minimun distance
+    clock_t start = clock();
+    for (int query = 0; query < numOfQueries; query++){
 
-    //     for (int j=0; j < bucket.size(); j++) {
-            
-    //         dist = NumC<NumCDataType>::dist(vector, bucket[j], 1);
-    //     }
-    //     // results.add(index, dist);
-    // }
-    // clock_t end = clock();
+        // add to results the results of every query
+        queryResults = this->predict_knn(testData->getVector(query), N);
+        totalResults->resultsIndexArray.addVector(queryResults->resultsIndexArray.getVector(0), query);
+        totalResults->resultsDistArray.addVector(queryResults->resultsDistArray.getVector(0), query);
 
-    // // result.setTime((double) (end - start) / CLOCKS_PER_SEC);
-    // return result;
+        // free query results
+        delete queryResults;
+
+    }
+    clock_t end = clock();
+    
+    // results 
+    totalResults->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+
+    return totalResults;
 }
 
 template <typename NumCDataType>
-Results* LSH<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r) {
+std::vector<ResultIndex> LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double r) {
     // Results result = Results();
     // double dist;
     
@@ -115,12 +133,70 @@ Results* LSH<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r) {
     // // result.setTime((double) (end - start) / CLOCKS_PER_SEC);
     // // result.time = (double)(end - start) / CLOCKS_PER_SEC;
     // return result;
+
+    // ResultsComparator resultsComparator(N);
+    ResultIndex result;
+    std::vector<ResultIndex> results;
+    std::vector< Node<NumCDataType> > bucket;
+    double dist;
+
+    clock_t start = clock();
+    for (int i=0; i < L; i++) {
+        // get bucket
+        bucket = hashTableList[i]->getBucket(vector);
+
+        for (int j=0; j < bucket.size(); j++) {
+            dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
+            if (dist <= r){
+                result.dist = dist;
+                result.index = bucket[j].index;
+                results.push_back(result);
+            }
+            // resultsComparator.addResult(bucket[j].index, dist);
+        }
+        // results.add(index, dist);
+    }
+    clock_t end = clock();
+
+    // Results* results = resultsComparator.getResults();
+    // results 
+    // results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+
+    return results;
 }
 
 #include "../include/pandac.h"
 int main(){
     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
 
-    LSH<int> lsh(1);
+    LSHashing<int> lsh(1,5,4,20000);
+    lsh.fit(inputData);
+    lsh.transform();
 
+
+    NumC<int>* inputData_ = new NumC<int>(100, inputData->getCols(), true);
+    for (int i = 0; i < 100; i++){
+        inputData_->addVector(inputData->getVector(i), i);
+    }
+    Results* results;
+    results = lsh.predict_knn(inputData->getVector(9), 50);
+    delete results;
+    results = lsh.predict_knn(inputData_, 50);
+    ResultsComparator::print(results, inputDatalabels);
+    delete results;
+    delete inputData_;
+
+
+    std::vector<ResultIndex> resultss = lsh.predict_rs(inputData->getVector(0), 40000.0);
+    int size = resultss.size();
+    cout << "SIZE " <<size<<endl;
+    for (int i = 0; i < size; i++){
+        cout <<"DISt "<<resultss[i].dist << "  " << resultss[i].index <<endl; 
+    }
+    
+
+
+    delete inputData;
+    delete inputDatalabels;
 }
