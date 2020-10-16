@@ -5,6 +5,8 @@
 #include <cstring>
 #include <complex>
 #include <cmath>
+#include <ctime>
+#include <random>
 
 using namespace std;
 
@@ -151,8 +153,13 @@ void NumC<NumCDataType>::random(NumCDataType maxValue){
     // fill with random values
     srand(time(NULL));
 
+    std::random_device randomDevice; 
+    std::mt19937 generator(randomDevice()); 
+    std::uniform_int_distribution<int> distribution(0,maxValue-1);
+
     for (NumCIndexType i = 0; i < this->size; i++){
-        data[i] = (NumCDataType)(rand()%(int)maxValue);
+        // data[i] = (NumCDataType)(rand()%(NumCDataType)maxValue);
+        data[i] = (NumCDataType)distribution(generator);
     }
 
 }
