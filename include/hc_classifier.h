@@ -13,6 +13,8 @@ class HyperCube {
         int hashTableSize;
         HashTable<NumCDataType>* hashTable;
         int k;
+
+        void get_nearestHashes(unsigned int vector, int k, int changesLeft, std::vector<unsigned int>* hashList, int maxVertices=0);
     public:
         HyperCube(): hashTable{NULL}, data{NULL}, hashTableSize{0}, k{0} {};
         ~HyperCube();

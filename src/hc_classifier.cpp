@@ -19,8 +19,8 @@ HyperCube<NumCDataType>::~HyperCube() {
 template <typename NumCDataType>
 void HyperCube<NumCDataType>::fit(NumC<NumCDataType>* _data) {
     data = _data;
-    hashTableSize = 0;
-    hashTable = new HashTable<NumCDataType>(HC, 1<<(int)HASH_SIZE, HASH_SIZE, data->getCols(), 10);
+    hashTableSize = 1<<(int)HASH_SIZE;
+    hashTable = new HashTable<NumCDataType>(HC, hashTableSize, HASH_SIZE, data->getCols(), 10);
 }
 
 template <typename NumCDataType>
@@ -35,28 +35,59 @@ void HyperCube<NumCDataType>::fit_transform(NumC<NumCDataType>* _data) {
 }
 
 template <typename NumCDataType>
+void HyperCube<NumCDataType>::get_nearestHashes(unsigned int hashValue, int k, int changesLeft, std::vector<unsigned int>* hashList, int maxVertices) {
+    if (hashList->size() == maxVertices) return;
+    cout << changesLeft << " ";
+    if (changesLeft == 0) {
+        hashList->push_back(hashValue);
+        return;
+    }
+    if (k<0) return;
+    unsigned int mask = 1 << (k-1);
+    // cout << "hashValue: " << hashValue << endl;
+    // cout << "hashValue with mask: " << (hashValue^mask) << endl;
+    hashValue = hashValue^mask;
+    get_nearestHashes(hashValue, k-1, changesLeft-1, hashList, maxVertices);
+    hashValue = hashValue^mask;
+    get_nearestHashes(hashValue, k-1, changesLeft, hashList, maxVertices);
+}
+
+template <typename NumCDataType>
 Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k, int maxPoints, int maxVertices) {
     int verticesProbed = 0;
     int pointesChecked = 0;
+    if (maxVertices > hashTableSize) maxVertices = hashTableSize;
     // comparator to get best results distances
     ResultsComparator resultsComparator(k);
     std::vector<Node<NumCDataType>> bucket;
     // search and find the k with minimun distance
     clock_t start = clock();
     // Get first bucket index (vector's bucket)
-    int i = 0;
+    std::vector<unsigned int> hashList;
     unsigned int hashValue = hashTable->hash(vector);
+    hashList.push_back(hashValue);
+    cout << hashList.size() << endl;
+    for (int i=0; i<(int)HASH_SIZE; i++) {
+        cout << i << " changes" << endl;
+        get_nearestHashes(hashValue, hashTableSize-1, i+1, &hashList, maxVertices);
+        cout << hashList.size() << endl;
+        if (hashList.size() >= k)
+            break;
+    }
+    int bucketNum = 0;
     while (verticesProbed < maxVertices && pointesChecked < maxPoints) {
-        bucket = hashTable->getBucket(hashValue);
+        cout << "before getBucket " << hashList[bucketNum] << endl;
+        bucket = hashTable->getBucket(hashList[bucketNum++]);
+        cout << "after getBucket" << endl;
         for (int j=0; j < bucket.size(); j++) {
             // add to results and the will figure out the best neighbors
             resultsComparator.addResult(bucket[j].index, NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1));
             // resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(bucket[j].sVector, vector, 1));
             if (++pointesChecked == maxPoints) break;
         }
+        // if (++verticesProbed < maxVertices)
+        //     hashValue = hashTable->get_nearestHash(vector, verticesProbed);
         // Get next bucket index
-        hashValue = hashTable->get_nearestHash(vector, ++i);
-        verticesProbed++;
     }
     clock_t end = clock();
 
@@ -111,9 +142,9 @@ std::vector<int> HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector
             }
             if (++pointesChecked == maxPoints) break;
         }
-        // Get next bucket index
-        hashValue = hashTable->get_nearestHash(vector, ++i);
-        verticesProbed++;
+        // // Get next bucket index
+        // hashValue = hashTable->get_nearestHash(vector, ++i);
+        // verticesProbed++;
     }
 
     return data_instances;
@@ -138,7 +169,7 @@ int main() {
 
     cout << "Classifier knn predict" << endl;
     Results* results;
-    results = hyperCube.predict_knn(inputData_, 10, 20000, 100);
+    results = hyperCube.predict_knn(inputData_, 10, 20000, 200);
 
     // results.print();
     results->resultsIndexArray.print();

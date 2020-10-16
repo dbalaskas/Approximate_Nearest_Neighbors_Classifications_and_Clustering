@@ -38,7 +38,7 @@ class HashTable {
         int getNumOfBuckets();
         const char* getHashType(HashType hashType);
         unsigned int hash(Vector<NumCDataType> vector);
-        unsigned int get_nearestHash(Vector<NumCDataType> vector, int i);
+        // unsigned int get_nearestHash(Vector<NumCDataType> vector, int i);
         std::vector< Node<NumCDataType> > getBucket(unsigned int bucketNum);
         std::vector< Node<NumCDataType> > getBucket(Vector<NumCDataType> vector);
         void fit(Vector<NumCDataType> vector, int index);

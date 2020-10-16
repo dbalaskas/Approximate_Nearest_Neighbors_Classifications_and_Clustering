@@ -118,6 +118,7 @@ int* HashFunction<NumCDataType>::initThreasholds(int k){
     int* thresholds = (int*) malloc(k*sizeof(int));
     for (int i = 0; i < k; i++){
         thresholds[i] = rand() % this->M;
+        // cout << thresholds[i] << endl;
     }
 
     return thresholds;
