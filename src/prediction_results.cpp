@@ -143,6 +143,12 @@ int ResultsComparator::addResult(int index, double dist){
 
 Results* ResultsComparator::getResults(){
 
+    // if comparatorr is initialized for range search then 
+    // the num of best resutls equal with the number of all the results
+    if(this->numOfBestResults == 0){
+        this->numOfBestResults = priorityQueue.size();
+    }
+
     Results* results = new Results;
     results->resultsIndexArray = NumC<NumCIndexType>(1, this->numOfBestResults);
     results->resultsDistArray  = NumC<NumCDistType>(1, this->numOfBestResults);

@@ -79,7 +79,7 @@ class ResultsComparator{
         int addResult(int index, double dist);
 
         Results* getResults();
-        std::vector<ResultIndex> getResultList();
+        // std::vector<ResultIndex> getResultList();
         int getNumOfResults();
         
         void print();
