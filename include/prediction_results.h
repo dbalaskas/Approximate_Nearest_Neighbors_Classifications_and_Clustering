@@ -11,8 +11,8 @@
 
 typedef struct ResultIndex{
 
-    ResultIndex() {}
-    ResultIndex(int index, double dist) : index(index), dist(dist) {}
+    ResultIndex() {};
+    ResultIndex(int index, double dist) : index(index), dist(dist) {};
     int index;
     double dist;
 
@@ -21,8 +21,8 @@ typedef struct ResultIndex{
 
 typedef struct Results{
 
-    Results(){}
-    Results(NumCIndexType resultsRows, NumCIndexType resultsCol): resultsIndexArray(resultsRows, resultsCol), resultsDistArray(resultsRows, resultsCol) {}
+    Results() {};
+    Results(NumCIndexType resultsRows, NumCIndexType resultsCol): resultsIndexArray(resultsRows, resultsCol), resultsDistArray(resultsRows, resultsCol) {};
     NumC<NumCIndexType> resultsIndexArray;
     NumC<NumCDistType> resultsDistArray;
     double executionTime;

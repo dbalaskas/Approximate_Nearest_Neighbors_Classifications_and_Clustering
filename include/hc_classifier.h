@@ -21,7 +21,7 @@ class HyperCube {
         void transform();
         void fit_transform(NumC<NumCDataType>* _data);
         Results* predict_knn(Vector<NumCDataType> vector, int k, int maxPoints, int maxVertices);
-        Results* predict_knn(NumC<NumCDataType>* testData);
+        Results* predict_knn(NumC<NumCDataType>* testData, int k, int maxPoints, int maxVertices);
         std::vector<int> predict_rs(Vector<NumCDataType> vector, int r, int maxPoints, int maxVertices);
 };
 

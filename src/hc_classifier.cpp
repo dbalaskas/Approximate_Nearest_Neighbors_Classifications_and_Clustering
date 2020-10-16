@@ -21,7 +21,6 @@ void HyperCube<NumCDataType>::fit(NumC<NumCDataType>* _data) {
     data = _data;
     hashTableSize = 0;
     hashTable = new HashTable<NumCDataType>(HC, 1<<(int)HASH_SIZE, HASH_SIZE, data->getCols(), 10);
-    hashTable->fit(data);
 }
 
 template <typename NumCDataType>
@@ -46,17 +45,17 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
     clock_t start = clock();
     // Get first bucket index (vector's bucket)
     int i = 0;
-    unsigned int hashValue = hashTable.hash(vector);
+    unsigned int hashValue = hashTable->hash(vector);
     while (verticesProbed < maxVertices && pointesChecked < maxPoints) {
-        bucket = hashTable.getBucket(hashValue);
+        bucket = hashTable->getBucket(hashValue);
         for (int j=0; j < bucket.size(); j++) {
             // add to results and the will figure out the best neighbors
-            resultsComparator.addResult(j, NumC<NumCDataType>::dist(this->data->getVector(j), vector, 1));
-            // resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(this->data->getVector(row), vector, 1));
+            resultsComparator.addResult(bucket[j].index, NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1));
+            // resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(bucket[j].sVector, vector, 1));
             if (++pointesChecked == maxPoints) break;
         }
         // Get next bucket index
-        hashValue = get_nearestHash(vector, ++i);
+        hashValue = hashTable->get_nearestHash(vector, ++i);
         verticesProbed++;
     }
     clock_t end = clock();
@@ -68,17 +67,17 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
 }
 
 template <typename NumCDataType>
-Results* HyperCube<NumCDataType>::predict_knn(NumC<NumCDataType>* testData) {
+Results* HyperCube<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int k, int maxPoints, int maxVertices) {
     int numOfQueries = testData->getRows();
     // allocate results sruct for given k
-    Results* totalResults = new Results(numOfQueries, this->numOfNeighbors); 
+    Results* totalResults = new Results(numOfQueries, k); 
     Results* queryResults;
 
     // search every row data entry and find the k with minimun distance
     clock_t start = clock();
     for (int query = 0; query < numOfQueries; query++){
         // add to results the results of every query
-        queryResults = this->predict_knn(testData->getVector(query));
+        queryResults = this->predict_knn(testData->getVector(query), k, maxPoints, maxVertices);
         totalResults->resultsIndexArray.addVector(queryResults->resultsIndexArray.getVector(0), query);
         totalResults->resultsDistArray.addVector(queryResults->resultsDistArray.getVector(0), query);
 
@@ -102,36 +101,56 @@ std::vector<int> HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector
     std::vector<Node<NumCDataType>> bucket;
     // Get first bucket index (vector's bucket)
     int i=0;
-    unsigned int hashValue = hashTable.hash(vector);
+    unsigned int hashValue = hashTable->hash(vector);
     while (verticesProbed < maxVertices && pointesChecked < maxPoints) {
-        bucket = hashTable.getBucket(hashValue);
+        bucket = hashTable->getBucket(hashValue);
         for (int j=0; j < bucket.size(); j++) {
-            dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
+            dist = NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1);
             if (dist <= r) {
                 data_instances.push_back(bucket[j].index);
             }
             if (++pointesChecked == maxPoints) break;
         }
         // Get next bucket index
-        hashValue = get_nearestHash(vector, ++i);
+        hashValue = hashTable->get_nearestHash(vector, ++i);
         verticesProbed++;
     }
 
     return data_instances;
 }
 
+// g++ -g ./src/hashtable.cpp ./src/pandac.cpp ./src/numc.cpp ./src/hash_function.cpp ./src/hc_classifier.cpp ./src/prediction_results.cpp
 #include "../include/pandac.h"
-
 int main() {
     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
     HyperCube<int> hyperCube;
 
+    cout << "HyperCube fit" << endl;
     hyperCube.fit(inputData);
-    cout << "Classifier is fit" << endl;
+    cout << "HyperCube transform" << endl;
     hyperCube.transform();
-    cout << "Classifier is transformed" << endl;
 
+    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+    for (int i = 0; i < 10; i++){
+        inputData_->addVector(inputData->getVector(i), i);
+    }
 
+    cout << "Classifier knn predict" << endl;
+    Results* results;
+    results = hyperCube.predict_knn(inputData_, 10, 20000, 100);
+
+    // results.print();
+    results->resultsIndexArray.print();
+    ResultsComparator::print(results, inputDatalabels);
+    
+    // cout << "Classifier range search" << endl;
+    // hyperCube.predict_rs(inputData_, 10, 10, 2);
+
+    delete results;
     delete inputData;
+    delete inputData_;
+    delete inputDatalabels;
+
     return 0;
 }

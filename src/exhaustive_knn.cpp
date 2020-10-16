@@ -101,8 +101,6 @@ NumC<double> pipi(int input){
 }
 
 
-
-///////////////// Test /////////////////
 int main(){
 
     ExaustiveKnn<int> knn(10);

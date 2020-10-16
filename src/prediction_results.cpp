@@ -94,7 +94,7 @@ int ResultsComparator::getNumOfResults(){
 int ResultsComparator::addResult(int index, double dist){
     ResultIndex result(index, dist);
     priorityQueue.push(result);
-    
+    return 0;
     // ResultIndex point(index, dist);
     // // add and keep the best num of results elements
     // if (this->numOfResults > 0){
