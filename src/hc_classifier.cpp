@@ -68,42 +68,42 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
     unsigned int hashValue = hashTable->hash(vector);
     cout << hashValue << endl;
     hashList.push_back(hashValue);
-    // cout << hashList.size() << endl;
+
+    cout << hashList.size() << endl;
+
     for (int i=0; i<(int)HASH_SIZE; i++) {
         cout << i << " changes" << endl;
         get_nearestHashes(hashValue, (int)HASH_SIZE-1, i+1, &hashList, maxVertices);
-        cout << "----------------------------------------------------------------" << go << endl;
-        // for (int i=0; i<hashList.size(); i++) {
-        //     cout << hashList[i] << endl;
-        // }
-        cout << "Curr Size: " << hashList.size() << endl;
-        cout << "----------------------------------------------------------------" << endl;
-        go = 0;
+        cout << hashList.size() << endl;
         if (hashList.size() >= maxVertices)
             break;
     }
-
-    // int bucketNum = 0;
-    // while (verticesProbed < maxVertices && pointesChecked < maxPoints) {
+    int bucketNum = 0;
+    for (int i = 0; i < hashList.size(); i++){
+        cout << ">" << hashList[i] << endl;
+    }
+    
+    // while (bucketNum < maxVertices && bucketNum < maxPoints) {
     //     cout << "before getBucket " << hashList[bucketNum] << endl;
     //     bucket = hashTable->getBucket(hashList[bucketNum++]);
-    //     cout << "after getBucket" << endl;
-    //     for (int j=0; j < bucket.size(); j++) {
-    //         // add to results and the will figure out the best neighbors
-    //         resultsComparator.addResult(bucket[j].index, NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1));
-    //         // resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(bucket[j].sVector, vector, 1));
-    //         if (++pointesChecked == maxPoints) break;
-    //     }
-    //     // if (++verticesProbed < maxVertices)
-    //     //     hashValue = hashTable->get_nearestHash(vector, verticesProbed);
-    //     // Get next bucket index
+    //     cout << "after getBucket"  <<endl;
+        
+        // for (int j=0; j < bucket.size(); j++) {
+        //     // add to results and the will figure out the best neighbors
+        //     resultsComparator.addResult(bucket[j].index, NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1));
+        //     // resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(bucket[j].sVector, vector, 1));
+        //     // if (++pointesChecked == maxPoints) break;
+        // }
+        // if (++verticesProbed < maxVertices)
+            // hashValue = hashTable->get_nearestHash(vector, verticesProbed);
+        // Get next bucket index
     // }
     clock_t end = clock();
 
     // results 
-    Results* results = resultsComparator.getResults();
-    results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
-    return results;
+    // Results* results = resultsComparator.getResults();
+    // results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    return 0;
 }
 
 template <typename NumCDataType>
