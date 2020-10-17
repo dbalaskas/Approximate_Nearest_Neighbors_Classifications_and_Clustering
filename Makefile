@@ -33,10 +33,10 @@ SRC= $(wildcard $(SRCDIR)/*.$(CODETYPE))
 IDIR= include
 DEPS= $(wildcard $(IDIR)/*.h)
 ODIR= build
-DEMANDED_OBJECTS= $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/exhaustive_knn.o $(ODIR)/lsh_hashtable.o \
- $(ODIR)/hc_hashtable.o $(ODIR)/numc.o $(ODIR)/pandac.o $(ODIR)/prediction_results.o
+DEMANDED_OBJECTS= $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/exhaustive_knn.o \
+ $(ODIR)/hashtable.o $(ODIR)/hash_function.o $(ODIR)/numc.o $(ODIR)/pandac.o $(ODIR)/prediction_results.o
 
-default: exec
+default: $(CUBE_EXEC) $(LSH_EXEC) $(CLUSTER_EXEC)
 	@echo "============================================================================"
 	@echo "Compiled Project..."
 info:
@@ -66,17 +66,26 @@ $(ODIR)/%.o: $(SRCDIR)/%.$(CODETYPE)
 %.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $(ODIR)/$@ "..."
 	$(CXX) -c -o $(ODIR)/$@ $< $(CXXFLAGS)
-exec: $(DEMANDED_OBJECTS)
+$(CUBE_EXEC): $(DEMANDED_OBJECTS)
+	@echo "============================================================================"
+	@echo "Creating $(CUBE_EXEC)..."
+	$(CXX) -c -o $(ODIR)/cube.o $(SRCDIR)/cube.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/cube $(ODIR)/cube.o $^ $(LDLIBS) $(CXXFLAGS)
+
+$(LSH_EXEC): $(DEMANDED_OBJECTS)
+	@echo "============================================================================"
+	@echo "Creating $(LSH_EXEC)..."
+	$(CXX) -c -o $(ODIR)/lsh.o $(SRCDIR)/lsh.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/lsh $(ODIR)/lsh.o $^ $(LDLIBS) $(CXXFLAGS)
+
+$(CLUSTER_EXEC): $(DEMANDED_OBJECTS)
+	@echo "============================================================================"
+	@echo "Creating $(CLUSTER_EXEC)..."
+	$(CXX) -c -o $(ODIR)/cluster.o $(SRCDIR)/cluster.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/cluster $(ODIR)/cluster.o $^ $(LDLIBS) $(CXXFLAGS)
+exec: $(CUBE_EXEC)
 	@echo "============================================================================"
 	@echo "Creating executables..."
-	$(CXX) -c -o $(ODIR)/master.o $(SRCDIR)/master.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/master $(ODIR)/master.o $^ $(LDLIBS) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/worker.o $(SRCDIR)/worker.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/worker $(ODIR)/worker.o $^ $(LDLIBS) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/whoClient.o $(SRCDIR)/whoClient.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/whoClient $(ODIR)/whoClient.o $^ $(LDLIBS) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/whoServer.o $(SRCDIR)/whoServer.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/whoServer $(ODIR)/whoServer.o $^ $(LDLIBS) $(CXXFLAGS)
 clean:
 	@echo "============================================================================"
 	@echo "Cleaning up..."

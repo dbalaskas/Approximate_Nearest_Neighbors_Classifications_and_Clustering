@@ -162,35 +162,35 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
     return results;
 }
 
-#include "../include/pandac.h"
-int main(){
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+// #include "../include/pandac.h"
+// int main(){
+//     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+//     NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
 
-    LSHashing<int> lsh(1,5,4,20000);
-    lsh.fit(inputData);
-    lsh.transform();
-
-
-    // NumC<int>* inputData_ = new NumC<int>(100, inputData->getCols(), true);
-    // for (int i = 0; i < 100; i++){
-    //     inputData_->addVector(inputData->getVector(i), i);
-    // }
-    Results* results;
-    // results = lsh.predict_knn(inputData->getVector(9), 50);
-    // delete results;
-    // results = lsh.predict_knn(inputData_, 50);
-    // ResultsComparator::print(results, inputDatalabels);
-    // delete results;
-    // delete inputData_;
+//     LSHashing<int> lsh(1,5,4,20000);
+//     lsh.fit(inputData);
+//     lsh.transform();
 
 
-    results = lsh.predict_rs(inputData->getVector(0), 40000.0);
-    ResultsComparator::print(results, inputDatalabels);
+//     // NumC<int>* inputData_ = new NumC<int>(100, inputData->getCols(), true);
+//     // for (int i = 0; i < 100; i++){
+//     //     inputData_->addVector(inputData->getVector(i), i);
+//     // }
+//     Results* results;
+//     // results = lsh.predict_knn(inputData->getVector(9), 50);
+//     // delete results;
+//     // results = lsh.predict_knn(inputData_, 50);
+//     // ResultsComparator::print(results, inputDatalabels);
+//     // delete results;
+//     // delete inputData_;
+
+
+//     results = lsh.predict_rs(inputData->getVector(0), 40000.0);
+//     ResultsComparator::print(results, inputDatalabels);
 
     
 
 
-    delete inputData;
-    delete inputDatalabels;
-}
+//     delete inputData;
+//     delete inputDatalabels;
+// }

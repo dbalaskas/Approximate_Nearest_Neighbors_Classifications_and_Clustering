@@ -11,9 +11,9 @@
 using namespace std;
 
 // Extracts the results from KNN classification compared to Exhaustive Search to output file.
-void extractKNNresults(FILE *output, Results results, Results true_results);
+void extractKNNresults(FILE *output, Results* results, Results *true_results);
 // Extracts the results from Range Search to output file.
-void extractRSresults(FILE *output, Results results);
+void extractRSresults(FILE *output, Results* results, double R);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -36,8 +36,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-d") == 0) break;
 	if (i >= argc - 1) {
-      	perror("\033[0;31mError!\033[0m Not included '-d' parameter.\n");
-        cout << "Executable should be called with: ./" << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -M <int> -probes <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-d' parameter.\n" << endl;
+        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -M <int> -probes <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -47,8 +47,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-q") == 0) break;
 	if (i >= argc - 1) {
-      	perror("\033[0;31mError!\033[0m Not included '-q' parameter.\n");
-        cout << "Executable should be called with: ./" << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -M <int> -probes <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-q' parameter.\n" << endl;
+        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -M <int> -probes <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -58,8 +58,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-o") == 0) break;
 	if (i >= argc - 1) {
-      	perror("\033[0;31mError!\033[0m Not included '-o' parameter.\n");
-        cout << "Executable should be called with: ./" << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -M <int> -probes <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-o' parameter.\n" << endl;
+        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -M <int> -probes <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
         if (!isNumber(argv[i+1])) {
         // <-k> parameter is invalid.
-            perror("\033[0;31mError!\033[0m Invalid value on '-k' parameter.\n");
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-k' parameter.\n" << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
         if (!isNumber(argv[i+1])) {
         // <-M> parameter is invalid.
-            perror("\033[0;31mError!\033[0m Invalid value on '-M' parameter.\n");
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-M' parameter.\n" << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
       	if (!isNumber(argv[i+1])) {
         // <-probes> parameter is invalid.
-            perror("\033[0;31mError!\033[0m Invalid value on '-probes' parameter.\n");
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-probes' parameter.\n" << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
       	if (!isNumber(argv[i+1])) {
         // <-N> parameter is invalid.
-            perror("\033[0;31mError!\033[0m Invalid value on '-N' parameter.\n");
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-N' parameter.\n" << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
       	if (!isNumber(argv[i+1])) {
         // <-R> parameter is invalid.
-            perror("\033[0;31mError!\033[0m Invalid value on '-R' parameter.\n");
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-R' parameter.\n" << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -145,16 +145,15 @@ int main(int argc, char** argv) {
         return 1;
     }
     // Read input file with PandaC.
-    NumC* inputData = PandaC::fromMNIST(inputFile);
-    NumC::print(inputData->getVector(60000));
+    NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile);
 
 //------------------------------------------------------------------------------------
 // Making predictions.
 
 char line[128], *answer;
 FILE *output;
-Results results, true_results;
-NumC* queryData;
+Results *results, *true_results;
+NumC<int>* queryData;
 
 do {
 //------------------------------------------------------------------------------------
@@ -167,8 +166,7 @@ do {
         return 1;
     }
     // Read input file with PandaC.
-    queryData = PandaC::fromMNIST(queryFile);
-    NumC::print(queryData->getVector(60000));
+    queryData = PandaC<int>::fromMNIST(queryFile, 50);
 
 //------------------------------------------------------------------------------------
 // Open output file.
@@ -181,27 +179,31 @@ do {
         return 1;
     }
 
-// //------------------------------------------------------------------------------------
-// // Call HyperCube classificator and train it.
+//------------------------------------------------------------------------------------
+// Call HyperCube classifier and train it.
 
-//     HyperCube cube = HyperCube();
-//     cube.fit_transform(inputData, k, R);
+    HyperCube<int> cube;
+    cube.fit_transform(inputData, k);
 
-// //------------------------------------------------------------------------------------
-// // Execute Predictions and extract results to output file.
+//------------------------------------------------------------------------------------
+// Call exhaustive knn classifier and train it.
 
-//     for (i=0; i < queryData->getRows(); i++) {
-//     // Execute k-NN prediction.
-//         results = cube.predict_knn(queryData->getVector(i), N, M, probes);
-//     // Execute Exhaustive KNN search.
-//         true_results = // ... ;
-//     // Extract results on output file.
-//         extractKNNresults(output, results, true_results);
-//     // Execute Range Search.
-//         results = cube.predict_rs(queryData->getVector(i), R, M, probes);
-//     // Extract results on output file.
-//         extractRSresults(output, results);
-//     }
+    ExhaustiveKnn<int> exhaustive_knn(inputData, N);
+
+//------------------------------------------------------------------------------------
+// Execute Predictions and extract results to output file.
+
+    // Execute k-NN prediction.
+    results = cube.predict_knn(queryData, N, M, probes);
+    // Execute Exhaustive KNN search.
+    true_results = exhaustive_knn.predict_knn(queryData);
+    // Extract results on output file.
+    extractKNNresults(output, results, true_results);
+    // // Execute Range Search.
+    // results = cube.predict_rs(queryData->getVector(i), R, M, probes);
+    // // Extract results on output file.
+    extractRSresults(output, results, R);
+    cout << "Results are extracted in file: " << outputFile << endl;
 
 //------------------------------------------------------------------------------------
 // Close output file.
@@ -234,14 +236,31 @@ do {
 //------------------------------------------------------------------------------------
 // End of program.
 
+    //Free allocated Space.
+
+
     // cout << endl << "-----------------------------------------------------------------" << endl;
     cout << "\033[0;36mExit program.\033[0m" << endl;
 
     return 0;
 }
 
-void extractKNNresults(FILE *output, Results results, Results true_results) {
+void extractKNNresults(FILE *output, Results* results, Results *true_results) {
+    for (int i=0; i < results->resultsIndexArray.getRows(); i++) {
+        cout << "Query: " << i+1 << endl;
+        for (int j=0; j < results->resultsIndexArray.getCols(); j++) {
+            cout << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << endl;
+            cout << "  distanceHypecube: " << results->resultsDistArray.getElement(i, j) << endl;
+            cout << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
+        }
+    }
+    cout << "tHypercube: " << results->executionTime << endl;
+    cout << "tTrue: " << true_results->executionTime << endl;
+    cout << results->resultsIndexArray.getRows() << " x " << results->resultsIndexArray.getCols() << endl;
+    cout << results->resultsDistArray.getRows() << " x " << results->resultsDistArray.getCols() << endl;
+    cout << true_results->resultsIndexArray.getRows() << " x " << true_results->resultsIndexArray.getCols() << endl;
 }
 
-void extractRSresults(FILE *output, Results results) {
+void extractRSresults(FILE *output, Results* results, double R) {
+    cout << R << "-near neighbors:" << endl;
 }

@@ -31,10 +31,10 @@ unsigned char reverseChar(unsigned char num) {
 }
 
 template <typename NumCDataType>
-NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath) {
+NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath, int limit) {
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
-        printf("Open file\n");
+        printf("Open file: %s\n", filePath);
         int number_of_images = 0;
         int n_cols_of_matrix = 0;
         int n_rows_of_image  = 0;
@@ -53,7 +53,7 @@ NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath) {
 
     // initialize martix to store all the images' data.
         n_cols_of_matrix = n_cols_of_image*n_rows_of_image;
-        // number_of_images = LIMIT;
+        if (limit != NO_LIMIT) number_of_images = limit;
         NumC<NumCDataType> *data = new NumC<NumCDataType>(number_of_images, n_cols_of_image*n_rows_of_image, true);
 
     // read the pixels of every image.
@@ -86,10 +86,10 @@ NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath) {
 }
 
 template <typename NumCDataType>
-NumC<NumCDataType>* PandaC<NumCDataType>::fromMNISTlabels(char *filePath) {
+NumC<NumCDataType>* PandaC<NumCDataType>::fromMNISTlabels(char *filePath, int limit) {
     ifstream file(filePath, ifstream::in | ifstream::binary);
     if (file.is_open()) {
-        printf("Open file\n");
+        printf("Open file: %s\n", filePath);
         int number_of_images = 0;
         int n_cols_of_matrix = 1;
         
@@ -103,6 +103,7 @@ NumC<NumCDataType>* PandaC<NumCDataType>::fromMNISTlabels(char *filePath) {
 
 
         // initialize martix to store all the labels
+        if (limit != NO_LIMIT) number_of_images = limit;
         NumC<NumCDataType> *data = new NumC<NumCDataType>(number_of_images, n_cols_of_matrix, true);
 
     // read the pixels of every image
