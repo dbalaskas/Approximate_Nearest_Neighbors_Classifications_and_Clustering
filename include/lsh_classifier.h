@@ -31,7 +31,7 @@ class LSHashing {
         Results* predict_knn(Vector<NumCDataType> vector, int N=0);
         Results* predict_knn(NumC<NumCDataType>* testData, int N=0);
 
-        std::vector<ResultIndex> predict_rs(Vector<NumCDataType> vector, double r);
+        Results* predict_rs(Vector<NumCDataType> vector, double r);
 };
 
 #endif

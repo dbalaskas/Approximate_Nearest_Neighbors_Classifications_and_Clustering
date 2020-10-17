@@ -114,7 +114,7 @@ Results* LSHashing<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int 
 }
 
 template <typename NumCDataType>
-std::vector<ResultIndex> LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double r) {
+Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double r) {
     // Results result = Results();
     // double dist;
     
@@ -134,9 +134,9 @@ std::vector<ResultIndex> LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType
     // // result.time = (double)(end - start) / CLOCKS_PER_SEC;
     // return result;
 
-    // ResultsComparator resultsComparator(N);
-    ResultIndex result;
-    std::vector<ResultIndex> results;
+    ResultsComparator resultsComparator(0);
+    // ResultIndex result;
+    // std::vector<ResultIndex> results;
     std::vector< Node<NumCDataType> > bucket;
     double dist;
 
@@ -148,19 +148,16 @@ std::vector<ResultIndex> LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType
         for (int j=0; j < bucket.size(); j++) {
             dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
             if (dist <= r){
-                result.dist = dist;
-                result.index = bucket[j].index;
-                results.push_back(result);
+                resultsComparator.addResult(bucket[j].index, dist);
             }
-            // resultsComparator.addResult(bucket[j].index, dist);
         }
         // results.add(index, dist);
     }
     clock_t end = clock();
 
-    // Results* results = resultsComparator.getResults();
+    Results* results = resultsComparator.getResults();
     // results 
-    // results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
 
     return results;
 }
@@ -175,25 +172,22 @@ int main(){
     lsh.transform();
 
 
-    NumC<int>* inputData_ = new NumC<int>(100, inputData->getCols(), true);
-    for (int i = 0; i < 100; i++){
-        inputData_->addVector(inputData->getVector(i), i);
-    }
+    // NumC<int>* inputData_ = new NumC<int>(100, inputData->getCols(), true);
+    // for (int i = 0; i < 100; i++){
+    //     inputData_->addVector(inputData->getVector(i), i);
+    // }
     Results* results;
-    results = lsh.predict_knn(inputData->getVector(9), 50);
-    delete results;
-    results = lsh.predict_knn(inputData_, 50);
+    // results = lsh.predict_knn(inputData->getVector(9), 50);
+    // delete results;
+    // results = lsh.predict_knn(inputData_, 50);
+    // ResultsComparator::print(results, inputDatalabels);
+    // delete results;
+    // delete inputData_;
+
+
+    results = lsh.predict_rs(inputData->getVector(0), 40000.0);
     ResultsComparator::print(results, inputDatalabels);
-    delete results;
-    delete inputData_;
 
-
-    std::vector<ResultIndex> resultss = lsh.predict_rs(inputData->getVector(0), 40000.0);
-    int size = resultss.size();
-    cout << "SIZE " <<size<<endl;
-    for (int i = 0; i < size; i++){
-        cout <<"DISt "<<resultss[i].dist << "  " << resultss[i].index <<endl; 
-    }
     
 
 
