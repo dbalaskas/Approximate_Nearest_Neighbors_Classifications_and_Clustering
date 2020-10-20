@@ -20,7 +20,7 @@ class LSHashing {
         HashTable<NumCDataType>** hashTableList;
 
     public:
-        LSHashing():data{NULL}, hashTableList{NULL}, N{1}, L{5}, k{4}, w{10} {};
+        LSHashing(): N{1}, L{5}, k{4}, w{10}, data{NULL}, hashTableList{NULL} {};
         LSHashing(int N, int L = 5, int k = 4, int w = 10);
         ~LSHashing();
 
@@ -33,5 +33,9 @@ class LSHashing {
 
         Results* predict_rs(Vector<NumCDataType> vector, double r);
 };
+
+template class LSHashing<int>;
+template class LSHashing<long>;
+template class LSHashing<double>;
 
 #endif

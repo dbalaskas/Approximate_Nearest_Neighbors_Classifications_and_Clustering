@@ -4,6 +4,7 @@
 #include <iostream>
 #include "./numc.h"
 
+#define NO_LIMIT -1
 
 template <typename NumCDataType>
 class PandaC {
@@ -12,8 +13,8 @@ class PandaC {
         static int reverseInt(int num);
     public:
         // Creates a NumC object from the MNIST's data.
-        static NumC<NumCDataType>* fromMNIST(char* filepath);
-        static NumC<NumCDataType>* fromMNISTlabels(char* filepath);
+        static NumC<NumCDataType>* fromMNIST(char* filepath, int limit=NO_LIMIT);
+        static NumC<NumCDataType>* fromMNISTlabels(char* filepath, int limit=NO_LIMIT);
 };
 
 #endif

@@ -1,8 +1,4 @@
 #include "../include/exhaustive_knn.h"
-#include "../include/prediction_results.h"
-#include "../include/numc.h"
-#include "../include/pandac.h"
-#include "../include/hash_function.h"
 
 #include <stdio.h>
 #include <cstdlib>
@@ -13,30 +9,30 @@
 using namespace std;
 
 template <typename NumCDataType> 
-ExaustiveKnn<NumCDataType>::ExaustiveKnn(int numOfNeighbors){
+ExhaustiveKnn<NumCDataType>::ExhaustiveKnn(int numOfNeighbors){
     this->numOfNeighbors = numOfNeighbors;
 }
 
 template <typename NumCDataType> 
-ExaustiveKnn<NumCDataType>::ExaustiveKnn(NumC<NumCDataType>* data, int numOfNeighbors){
+ExhaustiveKnn<NumCDataType>::ExhaustiveKnn(NumC<NumCDataType>* data, int numOfNeighbors){
     this->data = data;
     this->numOfNeighbors = numOfNeighbors;
 }
 
 template <typename NumCDataType> 
-ExaustiveKnn<NumCDataType>::~ExaustiveKnn(){
+ExhaustiveKnn<NumCDataType>::~ExhaustiveKnn(){
     this->numOfNeighbors = 0;
     this->data = NULL;
 }
 
 template <typename NumCDataType> 
-void ExaustiveKnn<NumCDataType>::fit(NumC<NumCDataType>* trainData){
+void ExhaustiveKnn<NumCDataType>::fit(NumC<NumCDataType>* trainData){
     this->data = trainData;
 }
 
 // perform exaustivr search on every data for the near neighbours
 template <typename NumCDataType> 
-Results* ExaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
+Results* ExhaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
 
     // comparator to get best results distances
     ResultsComparator resultsComparator(this->numOfNeighbors);
@@ -58,9 +54,9 @@ Results* ExaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
     return results;
 }
 
-// perform exaustive search on every data for the near neighbours for every vector in query
+// perform Exhaustive search on every data for the near neighbours for every vector in query
 template <typename NumCDataType> 
-Results* ExaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData){
+Results* ExhaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData){
 
     int numOfQueries = testData->getRows();
     // allocate results sruct for given k
@@ -100,67 +96,67 @@ NumC<double> pipi(int input){
     return nn;
 }
 
+// #include "../include/pandac.h"
+// int main(){
 
-int main(){
-
-    ExaustiveKnn<int> knn(10);
-
-
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
-    // NumC<int>::print(inputData->getVector(0));
-    // NumC<int>::printSparse(inputData->getVector(1));
+//     ExhaustiveKnn<int> knn(10);
 
 
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
-    // NumC<int>::print(inputDatalabels->getVector(0));
+//     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");
+//     // NumC<int>::print(inputData->getVector(0));
+//     // NumC<int>::printSparse(inputData->getVector(1));
 
-    knn.fit(inputData);
 
-    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
-    for (int i = 0; i < 10; i++){
-        inputData_->addVector(inputData->getVector(i), i);
-    }
+//     NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+//     // NumC<int>::print(inputDatalabels->getVector(0));
 
-    // HashFunction<int> hash(5, 10, 10);
+//     knn.fit(inputData);
+
+//     NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+//     for (int i = 0; i < 10; i++){
+//         inputData_->addVector(inputData->getVector(i), i);
+//     }
+
+//     // HashFunction<int> hash(5, 10, 10);
     
-    // cout << NumC<int>::dist(inputData->getVector(0), inputData->getVector(1), 1)<<endl;
+//     // cout << NumC<int>::dist(inputData->getVector(0), inputData->getVector(1), 1)<<endl;
 
-    Results* results;
-    results = knn.predict_knn(inputData_);
-    // results = knn.predict_knn(inputData->getVector(6));
+//     Results* results;
+//     results = knn.predict_knn(inputData_);
+//     // results = knn.predict_knn(inputData->getVector(6));
     
-    // results.print();
-    results->resultsIndexArray.print();
-    ResultsComparator::print(results, inputDatalabels);
+//     // results.print();
+//     results->resultsIndexArray.print();
+//     ResultsComparator::print(results, inputDatalabels);
 
-    delete results;
+//     delete results;
 
 
-    // clock_t start = clock();
-    // for (long query = 0; query < 60000 * 10; query++){
-    //     NumC<int>::distSparse(inputData->getVector(0), inputData->getVector(1), 1);
-    // }
-    // clock_t end = clock();
+//     // clock_t start = clock();
+//     // for (long query = 0; query < 60000 * 10; query++){
+//     //     NumC<int>::distSparse(inputData->getVector(0), inputData->getVector(1), 1);
+//     // }
+//     // clock_t end = clock();
     
-    // // results 
-    // cout << endl<<"TIMEEEEEEE "<<((double) (end - start) / CLOCKS_PER_SEC) <<endl;
+//     // // results 
+//     // cout << endl<<"TIMEEEEEEE "<<((double) (end - start) / CLOCKS_PER_SEC) <<endl;
 
 
     
-    // NumC<double> matrix(3,5);
-    // matrix = NumC<double>(5,10);
-    // matrix.randn(100);
-    // matrix.print();
-    // matrix = pipi(10);
+//     // NumC<double> matrix(3,5);
+//     // matrix = NumC<double>(5,10);
+//     // matrix.randn(100);
+//     // matrix.print();
+//     // matrix = pipi(10);
 
-    // matrix.addVector(matrix.getVector(0), 3);
-    // matrix.print();
-    // matrix.transpose();
-    // matrix.print();
+//     // matrix.addVector(matrix.getVector(0), 3);
+//     // matrix.print();
+//     // matrix.transpose();
+//     // matrix.print();
 
-    delete inputData_;
-    delete inputData;
-    delete inputDatalabels;
+//     delete inputData_;
+//     delete inputData;
+//     delete inputDatalabels;
     
 
-}
+// }

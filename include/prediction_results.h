@@ -2,12 +2,8 @@
 #define PRED_RES_H
 
 #include <vector>
-#include <stdio.h>
-#include <cstdlib>
 #include <queue>
-#include <iostream>
 #include <unordered_set>
-#include <functional>
 
 #include "./numc.h"
 
