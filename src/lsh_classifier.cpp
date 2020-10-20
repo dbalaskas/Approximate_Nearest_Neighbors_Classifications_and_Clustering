@@ -68,7 +68,7 @@ Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N
         bucket = hashTableList[i]->getBucket(vector);
 
         for (int j=0; j < bucket.size(); j++) {
-            dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
+            dist = NumC<NumCDataType>::distSparse(vector, bucket[j].sVector, 1);
             resultsComparator.addResult(bucket[j].index, dist);
         }
         // results.add(index, dist);
@@ -172,21 +172,24 @@ int main(){
     lsh.transform();
 
 
-    // NumC<int>* inputData_ = new NumC<int>(100, inputData->getCols(), true);
-    // for (int i = 0; i < 100; i++){
-    //     inputData_->addVector(inputData->getVector(i), i);
-    // }
+    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+    for (int i = 0; i < 10; i++){
+        inputData_->addVector(inputData->getVector(i), i);
+    }
     Results* results;
-    // results = lsh.predict_knn(inputData->getVector(9), 50);
-    // delete results;
-    // results = lsh.predict_knn(inputData_, 50);
-    // ResultsComparator::print(results, inputDatalabels);
-    // delete results;
-    // delete inputData_;
 
+    // results = lsh.predict_knn(inputData->getVector(9), 500);
+    // delete results;
 
-    results = lsh.predict_rs(inputData->getVector(0), 40000.0);
+    results = lsh.predict_knn(inputData_, 50);
+
     ResultsComparator::print(results, inputDatalabels);
+    delete results;
+    delete inputData_;
+
+
+    // results = lsh.predict_rs(inputData->getVector(0), 40000.0);
+    // ResultsComparator::print(results, inputDatalabels);
 
     
 

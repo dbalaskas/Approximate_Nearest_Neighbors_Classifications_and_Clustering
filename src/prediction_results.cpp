@@ -149,6 +149,7 @@ Results* ResultsComparator::getResults(){
         this->numOfBestResults = priorityQueue.size();
     }
 
+
     Results* results = new Results;
     results->resultsIndexArray = NumC<NumCIndexType>(1, this->numOfBestResults);
     results->resultsDistArray  = NumC<NumCDistType>(1, this->numOfBestResults);

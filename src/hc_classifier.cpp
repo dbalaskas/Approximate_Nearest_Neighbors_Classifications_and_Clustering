@@ -191,7 +191,7 @@ int main() {
     Results* results;
     // results = hyperCube.predict_knn(inputData_, 20, 20000, 20);
     results = hyperCube.predict_rs(inputData_->getVector(0), 25000, 500, 20);
-    
+
     ResultsComparator::print(results, inputDatalabels);
     
     // cout << "Classifier range search" << endl;
@@ -200,7 +200,7 @@ int main() {
     delete results;
     delete inputData;
     delete inputData_;
-    // delete inputDatalabels;
+    delete inputDatalabels;
 
     return 0;
 }

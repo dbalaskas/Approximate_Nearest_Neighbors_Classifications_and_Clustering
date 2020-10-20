@@ -28,6 +28,7 @@ HashFunction<NumCDataType>::HashFunction(int k, int dimension, int w)
 
     // initialize m
     this->m = 4586243;
+    // this->m = 275;
     // this->m = (int)pow(2, (int)(32 - 32/this->k));
     this->m_d = (int*)malloc(this->dimension*sizeof(int));
     for (int i = 0; i < this->dimension; i++){
