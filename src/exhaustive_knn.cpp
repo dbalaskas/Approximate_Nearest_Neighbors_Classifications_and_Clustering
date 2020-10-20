@@ -42,7 +42,8 @@ Results* ExhaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
     for (int row = 0; row < this->data->getRows(); row++){
 
         // add to results and the will figure out the best neighbors
-        resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(this->data->getVector(row), vector, 1));
+        // resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(this->data->getVector(row), vector, 1));
+        resultsComparator.addResult(row, NumC<NumCDataType>::dist(this->data->getVector(row), vector, 1));
 
     }
     clock_t end = clock();
@@ -108,7 +109,7 @@ NumC<double> pipi(int input){
 
 
 //     NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
-//     // NumC<int>::print(inputDatalabels->getVector(0));
+// //     // NumC<int>::print(inputDatalabels->getVector(0));
 
 //     knn.fit(inputData);
 
@@ -121,13 +122,13 @@ NumC<double> pipi(int input){
     
 //     // cout << NumC<int>::dist(inputData->getVector(0), inputData->getVector(1), 1)<<endl;
 
-//     Results* results;
-//     results = knn.predict_knn(inputData_);
-//     // results = knn.predict_knn(inputData->getVector(6));
+    // Results* results;
+    // results = knn.predict_knn(inputData_);
+    // results = knn.predict_knn(inputData->getVector(6));
     
 //     // results.print();
 //     results->resultsIndexArray.print();
-//     ResultsComparator::print(results, inputDatalabels);
+    // ResultsComparator::print(results, inputDatalabels);
 
 //     delete results;
 
