@@ -6,6 +6,8 @@
 #include "./exhaustive_knn.h"
 #include <vector>
 #include <numeric>
+#include <random>
+#include <queue>
 
 template <typename NumCDataType> 
 class ExhaustiveKmeans {
@@ -21,6 +23,8 @@ class ExhaustiveKmeans {
         int numOfPoints;
         NumCDistType calculateSilhouette(NumCDistType distA, NumCDistType distB);
         void getSilhouette(Results* results);
+        void randomInit();
+        void kmeansInit();
 
     public:
         ExhaustiveKmeans(int numOfClusters);

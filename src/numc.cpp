@@ -149,13 +149,29 @@ NumCDataType NumC<NumCDataType>::getElement(NumCIndexType row, NumCIndexType col
 }
 
 template <typename NumCDataType>
+NumCDataType NumC<NumCDataType>::getLast(){
+    return this->data[this->size-1];
+}
+
+template <typename NumCDataType>
+NumCIndexType NumC<NumCDataType>::find(NumCDataType element){
+    // search and find the first greater or equal element of the array
+    for (NumCIndexType i = 0; i < this->size; i++){
+        if (this->data[i] >= element)
+            return i;
+    }
+    return this->size-1;
+}
+
+
+template <typename NumCDataType>
 void NumC<NumCDataType>::random(NumCDataType maxValue){
     // fill with random values
     srand(time(NULL));
 
     std::random_device randomDevice; 
     std::mt19937 generator(randomDevice()); 
-    std::uniform_int_distribution<int> distribution(0,maxValue-1);
+    std::uniform_int_distribution<NumCIndexType> distribution(0,maxValue-1);
 
     for (NumCIndexType i = 0; i < this->size; i++){
         // data[i] = (NumCDataType)(rand()%(NumCDataType)maxValue);
@@ -163,6 +179,47 @@ void NumC<NumCDataType>::random(NumCDataType maxValue){
     }
 
 }
+
+template <typename NumCDataType>
+NumCDataType NumC<NumCDataType>::max(){
+    // get the max
+    NumCDataType max = this->data[0];
+    for (int i = 0; i < this->size; i++){
+        if (this->data[i] > max)
+            max = this->data[i];
+    }
+    return max;
+}
+
+template <typename NumCDataType>
+void NumC<NumCDataType>::square(){
+    // square all elements
+    for (int i = 0; i < this->size; i++){
+        this->data[i] = this->data[i] * this->data[i];
+    }
+}
+
+template <typename NumCDataType>
+void NumC<NumCDataType>::normalize(){
+    // normalize all elements
+    // get the max
+    NumCDataType max = this->max();
+    // devide by max
+    for (int i = 0; i < this->size; i++){
+        this->data[i] = this->data[i] / max;
+    }
+}
+
+template <typename NumCDataType>
+void NumC<NumCDataType>::cumulative(){
+    // get the comulative
+    // devide by max
+    for (int i = 1; i < this->size; i++){
+        this->data[i] = this->data[i] + this->data[i-1];
+    }
+}
+
+
 
 
 template <typename NumCDataType>
@@ -220,7 +277,7 @@ template <typename NumCDataType>
 void NumC<NumCDataType>::addVector(Vector<NumCDataType> vector, NumCIndexType index){
     // NumC::print(vector);
     if( vector.size != this->numOfCols ){
-        cout << "Wrong input size vector\n";
+        cout << "Wrong input size vector " << index <<endl;
         return;
     }
     
@@ -236,7 +293,7 @@ template <typename NumCDataType>
 void NumC<NumCDataType>::addArray(NumC<NumCDataType> array, NumCIndexType index){
     // NumC::print(vector);
     if( array.size != this->numOfCols ){
-        cout << "Wrong input size vector\n";
+        cout << "Wrong input size vector " << index <<endl;
         return;
     }
     

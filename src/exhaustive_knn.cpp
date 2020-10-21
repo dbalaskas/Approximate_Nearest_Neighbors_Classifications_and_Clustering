@@ -32,7 +32,9 @@ void ExhaustiveKnn<NumCDataType>::fit(NumC<NumCDataType>* trainData){
 
 // perform exaustivr search on every data for the near neighbours
 template <typename NumCDataType> 
-Results* ExhaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
+Results* ExhaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int numOfNeighbors_){
+    if (numOfNeighbors_ != 0)
+        this->numOfNeighbors = numOfNeighbors_;
 
     // comparator to get best results distances
     ResultsComparator resultsComparator(this->numOfNeighbors);
@@ -57,7 +59,9 @@ Results* ExhaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector){
 
 // perform Exhaustive search on every data for the near neighbours for every vector in query
 template <typename NumCDataType> 
-Results* ExhaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData){
+Results* ExhaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int numOfNeighbors_){
+    if (numOfNeighbors_ != 0)
+        this->numOfNeighbors = numOfNeighbors_;
 
     int numOfQueries = testData->getRows();
     // allocate results sruct for given k
@@ -85,17 +89,17 @@ Results* ExhaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData){
     return totalResults;
 }
 
-NumC<double> pipi(int input){
-    NumC<double> nn(6,input);
-    for (int i = 0; i < nn.getRows(); i++){
-        for (int j = 0; j < nn.getCols(); j++){
-            nn.addElement(i, i, j);
-        }
+// NumC<double> pipi(int input){
+//     NumC<double> nn(6,input);
+//     for (int i = 0; i < nn.getRows(); i++){
+//         for (int j = 0; j < nn.getCols(); j++){
+//             nn.addElement(i, i, j);
+//         }
         
-    }
-    nn.print();
-    return nn;
-}
+//     }
+//     nn.print();
+//     return nn;
+// }
 
 // #include "../include/pandac.h"
 // int main(){

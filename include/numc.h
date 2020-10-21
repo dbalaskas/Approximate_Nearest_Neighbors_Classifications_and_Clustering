@@ -33,7 +33,9 @@ class NumC {
 
         NumCIndexType getRows();
         NumCIndexType getCols();
+        NumCIndexType find(NumCDataType element);
         NumCDataType* getData();
+        NumCDataType getLast();
         NumCDataType getElement(NumCIndexType row, NumCIndexType col);
 
         void transpose();
@@ -51,6 +53,11 @@ class NumC {
         void print();
 
         NumC* median();
+        NumCDataType max();
+        void square();
+        void normalize();
+        void cumulative();
+
         static void print(Vector<NumCDataType> vector);
         static void printSparse(Vector<NumCDataType> vector);
         static NumCDistType dist(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d);
