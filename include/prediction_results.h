@@ -1,7 +1,6 @@
 #ifndef PRED_RES_H
 #define PRED_RES_H
 
-#include <vector>
 #include <queue>
 #include <unordered_set>
 #include <map> 
@@ -93,19 +92,21 @@ typedef struct RA_ResultIndex {
 class RA_ResultsComparator{
 
     private:
-        // int numOfBestResults;
+        int numOfBestResults;
         // std::priority_queue <ResultIndex, std::vector<ResultIndex>, Compare > priorityQueue;
         // std::unordered_set<NumCIndexType> indexSet;
         std::map<int, RA_ResultIndex> cluster_map;
 
     public:
         RA_ResultsComparator() {};
-        RA_ResultsComparator(int size);
-        ~RA_ResultsComparator();
+        RA_ResultsComparator(int size): numOfBestResults{size} {};
+        ~RA_ResultsComparator() {};
         // static void print(Results* results, NumC<int>* labels);
+        bool checkIndex(int index);
 
-
-        int addResult(int index, double dist);
+        int addResult(int index, int cluster_index, double dist);
+        int addResultConflict(int index, int cluster_index, double dist);
+        RA_ResultIndex getResult(int index);
 
         Results* getResults();
         // std::vector<ResultIndex> getResultList();

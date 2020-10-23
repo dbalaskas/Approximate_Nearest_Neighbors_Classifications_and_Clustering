@@ -89,7 +89,7 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
     clock_t start = clock();
     int pointsChecked = 0;
 
-    for (int i = 0; i < (int) hashList.size(); i++){
+    for (int i = 0; i < maxVertices; i++){
         bucket = hashTable->getBucket(hashList[i] % hashTableSize);
         // search and find the k with minimun distance
         for (int j=0; j < (int) bucket.size(); j++) {
@@ -147,7 +147,7 @@ Results* HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r,
     int pointsChecked = 0;
     double dist;
 
-    for (int i = 0; i < (int) hashList.size(); i++){
+    for (int i = 0; i < maxVertices; i++){
         bucket = hashTable->getBucket(hashList[i] % hashTableSize);
         // search and find the k with minimun distance
         for (int j=0; j < (int) bucket.size(); j++) {
@@ -192,106 +192,109 @@ vector<Results*> HyperCube<NumCDataType>::predict_rs(NumC<NumCDataType>* testDat
     return totalResults;
 }
 
-// template <typename NumCDataType>
-// Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroids) {
-//     // if (maxVertices > hashTableSize) maxVertices = hashTableSize;
-//     // // comparator to get best results distances
-//     // ResultsComparator resultsComparator(0);
-//     // std::vector<Node<NumCDataType>> bucket;
-//     // std::vector<unsigned int> hashList = getHashList(vector,  maxVertices); 
+template <typename NumCDataType>
+Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroids, int maxPoints, int maxVertices) {
+    // if (maxVertices > hashTableSize) maxVertices = hashTableSize;
+    // // comparator to get best results distances
+    // ResultsComparator resultsComparator(0);
+    // std::vector<Node<NumCDataType>> bucket;
+    // std::vector<unsigned int> hashList = getHashList(vector,  maxVertices); 
 
-//     // clock_t start = clock();
-//     // int pointsChecked = 0;
-//     // double dist;
+    // clock_t start = clock();
+    // int pointsChecked = 0;
+    // double dist;
 
-//     // for (int i = 0; i < (int) hashList.size(); i++){
-//     //     bucket = hashTable->getBucket(hashList[i] % hashTableSize);
-//     //     // search and find the k with minimun distance
-//     //     for (int j=0; j < (int) bucket.size(); j++) {
-//     //         // add to results and the will figure out the best neighbors
-//     //         dist = NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1);
-//     //         if (dist <= r){
-//     //             resultsComparator.addResult(bucket[j].index, dist);
-//     //         }
-//     //         pointsChecked++;
-//     //         // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
-//     //     }
-//     //     if(pointsChecked >= maxPoints)
-//     //         break;
-//     // }
-//     // clock_t end = clock();
-//     // // for (int i = 0; i < hashTable->getNumOfBuckets(); i+=1){
-//     // //     cout << hashTable->getBucket(i).size() << " ";
-//     // //     if (i > 0 && i%20 == 0) cout << endl;
-//     // // }
+    // for (int i = 0; i < (int) hashList.size(); i++){
+    //     bucket = hashTable->getBucket(hashList[i]);
+    //     // search and find the k with minimun distance
+    //     for (int j=0; j < (int) bucket.size(); j++) {
+    //         // add to results and the will figure out the best neighbors
+    //         dist = NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1);
+    //         if (dist <= r){
+    //             resultsComparator.addResult(bucket[j].index, dist);
+    //         }
+    //         pointsChecked++;
+    //         // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
+    //     }
+    //     if(pointsChecked >= maxPoints)
+    //         break;
+    // }
+    // clock_t end = clock();
+    // // for (int i = 0; i < hashTable->getNumOfBuckets(); i+=1){
+    // //     cout << hashTable->getBucket(i).size() << " ";
+    // //     if (i > 0 && i%20 == 0) cout << endl;
+    // // }
+    RA_ResultsComparator resultsComparator(this->data->getRows());
 
-//     double dist;
-//     int maxPoints = 1000000;
-//     int maxVertices = 1000000;
-//     int clusteredPoints = 0;
-//     // Results* queryResults;
-//     ResultsComparator resultsComparator(0);
-//     std::vector<Node<NumCDataType>> bucket;
-//     std::vector<unsigned int> hashList;
-//     //* GOOD MORNING BUDDY
-//     // r-Computation
-//     int r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
-//     for (int i = 0; i < centroids->getRows(); i++){
-//         for (int j=i+1; j < centroids->getRows(); j++) {
-//             dist = NumC<NumCDataType>::dist(centroids->getVector(i), centroids->getVector(j), 1);
-//             if (dist < r) {
-//                 r = dist;
-//             }
-//         }
-//     }
-//     r /= 2;
-//     cout << r << endl;
+    double dist;
+    int clusteredPoints = 0;
+    int pointsChecked;
+    // Results* queryResults;
+    // ResultsComparator resultsComparator(0);
+    std::vector<Node<NumCDataType>> bucket;
+    std::vector<unsigned int> hashList;
+
+    //* GOOD MORNING BUDDY
+    // r-Computation
+    int r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
+    for (int i = 0; i < centroids->getRows(); i++){
+        for (int j=i+1; j < centroids->getRows(); j++) {
+            dist = NumC<NumCDataType>::dist(centroids->getVector(i), centroids->getVector(j), 1);
+            if (dist < r) {
+                r = dist;
+            }
+        }
+    }
+    r /= 2;
+    cout << r << endl;
 //     //* ^^^^^^^^^ NOT TESTED ^^^^^^^^^
+    while (clusteredPoints < data->getRows()) {
 
-//     while (clusterPoints < data->getRows()) {
-//         for (int cetroidIndex=0; centroidIndex < centroids->getRows(); centroidIndex++) {
-//             //return points in distance r
-//             // queryResults = this->predict_rs(centroids->getVector(cetroidIndex), r, maxPoints, maxVertices);
-//             hashList = getHashList(centroids->getVector(cetroidIndex),  maxVertices);
-//             for (int i = 0; i < (int) hashList.size(); i++){
-//                 bucket = hashTable->getBucket(hashList[i]);
-//                 // search and find the k with minimun distance
-//                 for (int j=0; j < (int) bucket.size(); j++) {
-//                     // add to results and the will figure out the best neighbors
-//                     if (bucket[j].index in map) {
-//                         // check if confliict
-//                         if (map[bucket[j].index] != cetroidIndex) {
-//                             dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(cetroidIndex), 1);
-//                             if (dist < =map[bucket[j].index].distance) {
-//                                 //custom insert in map
-//                                 clusteredPoints++;
-//                             }
-//                         } // else continue
-//                     } else {
-//                         dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(cetroidIndex), 1);
-//                         if (dist <= r){
-//                             // resultsComparator.addResult(bucket[j].index, dist);
+        for (int centroidIndex=0; centroidIndex < centroids->getRows(); centroidIndex++) {
+            //return points in distance r
+            // queryResults = this->predict_rs(centroids->getVector(cetroidIndex), r, maxPoints, maxVertices);
+            hashList = getHashList(centroids->getVector(centroidIndex),  maxVertices);
+            pointsChecked = 0;
+            for (int i = 0; i < maxVertices; i++){
+                bucket = hashTable->getBucket(hashList[i]);
+                // search and find the k with minimun distance
+                for (int j=0; j < (int) bucket.size(); j++) {
+                    // add to results and the will figure out the best neighbors
+                    if (resultsComparator.checkIndex(bucket[j].index)) {
+                        // // check if confliict
+                        // if (map[bucket[j].index] != cetroidIndex) {
+                        //     dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(cetroidIndex), 1);
+                        //     if (dist < =map[bucket[j].index].distance) {
+                        //         //custom insert in map
+                        //         clusteredPoints++;
+                        //     }
+                        // } // else continue
+                            resultsComparator.addResultConflict(bucket[j].index, centroidIndex, dist);
+                    } else {
+                        dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
+                        if (dist <= r){
+                            resultsComparator.addResult(bucket[j].index, centroidIndex, dist);
 
-//                             //custom insert in map
-//                             clusteredPoints++;
-//                         }
-//                     }
-//                     // pointsChecked++;
-//                     // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
-//                 }
-//                 // if(pointsChecked >= maxPoints)
-//                 //     break;
-//             }
-//         }
-//         r *= 2;
-//     }
+                            //custom insert in map
+                            clusteredPoints++;
+                        }
+                    }
+                    pointsChecked++;
+                    // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
+                }
+                if(pointsChecked >= maxPoints)
+                    break;
+            }
+        }
+        r *= 2;
+    }
 
 
-//     // results 
-//     Results* results = resultsComparator.getResults();
-//     results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
-//     return results;
-// }
+    // results 
+    Results* results = resultsComparator.getResults();
+    // results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    return results;
+}
 
 // // g++ -g ./src/hashtable.cpp ./src/pandac.cpp ./src/numc.cpp ./src/hash_function.cpp ./src/hc_classifier.cpp ./src/prediction_results.cpp
 // #include "../include/pandac.h"
