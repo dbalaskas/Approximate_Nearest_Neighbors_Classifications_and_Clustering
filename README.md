@@ -1,5 +1,5 @@
 
-<p style="text-align: center;">
+<p align="center">
     <img src="./doc/images/di_uoa.png" alt="UOA">
     <h1>University of Athens</h1>
     <h2>Department of Informatics and Telecomunications</h2>
