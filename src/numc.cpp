@@ -112,6 +112,7 @@ Vector<NumCDataType> NumC<NumCDataType>::getVector(NumCIndexType index){
     vector.vector = (this->data + index*this->numOfCols);
     vector.size = this->numOfCols;
 
+    vector.isSparse_ = this->isSparse_;
     if(this->isSparse_){
         vector.sparseData = (this->sparseData + index*(this->numOfCols+1));
     }
@@ -361,70 +362,68 @@ NumCDistType NumC<NumCDataType>::dist(Vector<NumCDataType> v1, Vector<NumCDataTy
 
 template <typename NumCDataType>
 NumCDistType NumC<NumCDataType>::distSparse(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d){
+    // chech if both are sparse vectors
+    if ((v1.isSparse_ == true) && (v2.isSparse_ == true)){
 
-    NumCDistType dist = 0;
-    NumCIndexType sparseElements1 = v1.sparseData[0];
-    NumCIndexType sparseElements2 = v2.sparseData[0];
-    NumCIndexType index1 = 1;
-    NumCIndexType index2 = 1;
-    NumCIndexType index  = 1;
-    // calculate manhattan distance if dimension = 1
-    if (d == 1){
-        // for (NumCIndexType i = 1; i < sparseElements1; i++){
-        //     index = v1.sparseData[i];
-        //     dist += std::abs( v1.vector[index] - v2.vector[index] ); 
-        // }
-        // for (NumCIndexType i = 1; i < sparseElements2; i++){
-        //     index = v2.sparseData[i];
-        //     dist += std::abs( v1.vector[index] - v2.vector[index] ); 
-        // }
-        // return dist;    
+        NumCDistType dist = 0;
+        NumCIndexType sparseElements1 = v1.sparseData[0];
+        NumCIndexType sparseElements2 = v2.sparseData[0];
+        NumCIndexType index1 = 1;
+        NumCIndexType index2 = 1;
+        // NumCIndexType index  = 1;
+        // calculate manhattan distance if dimension = 1
+        if (d == 1){
+            // for (NumCIndexType i = 1; i < sparseElements1; i++){
+            //     index = v1.sparseData[i];
+            //     dist += std::abs( v1.vector[index] - v2.vector[index] ); 
+            // }
+            // for (NumCIndexType i = 1; i < sparseElements2; i++){
+            //     index = v2.sparseData[i];
+            //     dist += std::abs( v1.vector[index] - v2.vector[index] ); 
+            // }
+            // return dist;    
+            while( (index1 <= sparseElements1 )|| (index2 <= sparseElements2)){
+                if ( v1.sparseData[index1] < v2.sparseData[index2]){
+                    dist += std::abs( v1.vector[v1.sparseData[index1]] - v2.vector[v1.sparseData[index1]] );
+                    index1++; 
+                }
+                else if (v1.sparseData[index1] > v2.sparseData[index2]){
+                    dist += std::abs( v1.vector[v2.sparseData[index2]] - v2.vector[v2.sparseData[index2]] );
+                    index2++; 
+                }
+                else if (v1.sparseData[index1] == v2.sparseData[index2]){
+                    dist += std::abs( v1.vector[v1.sparseData[index1]] - v2.vector[v2.sparseData[index2]] );
+                    index1++;
+                    index2++;
+                }
+            }
+            return dist;
+        }
+
+        // calculate distance with p-norm
+
         while( (index1 <= sparseElements1 )|| (index2 <= sparseElements2)){
             if ( v1.sparseData[index1] < v2.sparseData[index2]){
-                dist += std::abs( v1.vector[v1.sparseData[index1]] - v2.vector[v1.sparseData[index1]] );
+                dist += std::pow( v1.vector[v1.sparseData[index1]] - v2.vector[v1.sparseData[index1]], d );
                 index1++; 
             }
             else if (v1.sparseData[index1] > v2.sparseData[index2]){
-                dist += std::abs( v1.vector[v2.sparseData[index2]] - v2.vector[v2.sparseData[index2]] );
+                dist += std::pow( v1.vector[v2.sparseData[index2]] - v2.vector[v2.sparseData[index2]], d );
                 index2++; 
             }
             else if (v1.sparseData[index1] == v2.sparseData[index2]){
-                dist += std::abs( v1.vector[v1.sparseData[index1]] - v2.vector[v2.sparseData[index2]] );
+                dist += std::pow( v1.vector[v1.sparseData[index1]] - v2.vector[v2.sparseData[index2]], d );
                 index1++;
                 index2++;
             }
         }
+
+        dist = std::pow( dist, 1.0/d );
         return dist;
     }
-
-    // calculate distance with p-norm
-
-    while( (index1 <= sparseElements1 )|| (index2 <= sparseElements2)){
-        if ( v1.sparseData[index1] < v2.sparseData[index2]){
-            dist += std::pow( v1.vector[v1.sparseData[index1]] - v2.vector[v1.sparseData[index1]], d );
-            index1++; 
-        }
-        else if (v1.sparseData[index1] > v2.sparseData[index2]){
-            dist += std::pow( v1.vector[v2.sparseData[index2]] - v2.vector[v2.sparseData[index2]], d );
-            index2++; 
-        }
-        else if (v1.sparseData[index1] == v2.sparseData[index2]){
-            dist += std::pow( v1.vector[v1.sparseData[index1]] - v2.vector[v2.sparseData[index2]], d );
-            index1++;
-            index2++;
-        }
+    else{
+        return NumC::dist(v1, v2, d);
     }
-    // for (NumCIndexType i = 1; i < sparseElements1; i++){
-    //     index = v1.sparseData[i];
-    //     dist += std::pow( v1.vector[index] - v2.vector[index], d ); 
-    // }
-    // for (NumCIndexType i = 1; i < sparseElements2; i++){
-    //     index = v2.sparseData[i];
-    //     dist += std::pow( v1.vector[index] - v2.vector[index], d ); 
-    // }
-    dist = std::pow( dist, 1.0/d );
-    return dist;
-
 }
 
 // int main(){

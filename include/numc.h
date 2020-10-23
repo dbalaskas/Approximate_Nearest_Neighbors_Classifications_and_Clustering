@@ -9,6 +9,7 @@ class Vector{
     public:
         NumCDataType* vector;
         NumCIndexType size;
+        bool isSparse_;
         NumCIndexType* sparseData;
 };
 

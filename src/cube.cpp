@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
-    cout << "\033[0;36mRunning Hypercube \033[0m" << endl;
+    cout << "\033[0;36mRunning Hypercube \033[0m" << endl << endl;
     // Read input file with PandaC.
     NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile);
 
@@ -190,7 +190,6 @@ do {
 // Call exhaustive knn classifier and train it.
 
     ExhaustiveKnn<int> exhaustive_knn(inputData, N);
-
 //------------------------------------------------------------------------------------
 // Execute Predictions and extract results to output file.
 
@@ -227,6 +226,7 @@ do {
 		fgets(line,sizeof(line),stdin);
 		queryFile = strtok(line,"\n");
         cout << "\033[0;36mPlease enter ann output file (press Enter to use the old one): \033[0m";
+		fgets(line,sizeof(line),stdin);
         if (strlen(line) > 1) {
     		outputFile = strtok(line,"\n");
         }
@@ -237,7 +237,7 @@ do {
 //------------------------------------------------------------------------------------
 // End of program.
 
-    //Free allocated Space.
+    // Free allocated Space.
     delete knn_results;
     delete true_results;
     for (int i=0; i < (int) r_results.size(); i++) {

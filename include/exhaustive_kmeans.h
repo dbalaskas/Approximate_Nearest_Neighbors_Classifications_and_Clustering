@@ -9,6 +9,9 @@
 #include <random>
 #include <queue>
 
+enum ClusteringType {LLOYDS_CLUSTERING, LSH_CLUSTERING, HC_CLUSTERING};
+
+
 template <typename NumCDataType> 
 class ExhaustiveKmeans {
     private:
@@ -26,13 +29,15 @@ class ExhaustiveKmeans {
         void randomInit();
         void kmeansInit();
 
+        Results* clustering();
+
     public:
         ExhaustiveKmeans(int numOfClusters);
         ExhaustiveKmeans(NumC<NumCDataType>* data, int numOfClusters);
         ~ExhaustiveKmeans();
 
         void fit(NumC<NumCDataType>* trainData);
-        void transform();
+        void transform(ClusteringType clusteringType);
         // Results* predict_knn(Vector<NumCDataType> vector);
         // Results* predict_knn(NumC<NumCDataType>* testData);
         Results* get_centroids();

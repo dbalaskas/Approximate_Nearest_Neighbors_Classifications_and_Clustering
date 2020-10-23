@@ -103,6 +103,8 @@ void ExhaustiveKmeans<NumCDataType>::kmeansInit(){
         results = initEstimator->predict_knn(this->data);
 
         // normalize and accumulate the values
+        // square
+        results->resultsDistArray.square();
         results->resultsDistArray.normalize();
         results->resultsDistArray.cumulative();
 
@@ -203,7 +205,7 @@ void ExhaustiveKmeans<NumCDataType>::getSilhouette(Results* results){
 }
 
 template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::transform(){
+void ExhaustiveKmeans<NumCDataType>::transform(ClusteringType clusteringType){
     // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
     std::vector<NumCIndexType> medianVector(this->numOfPoints / this->numOfClusters);
 
@@ -219,6 +221,22 @@ void ExhaustiveKmeans<NumCDataType>::transform(){
     int size = 0;
     Results* results;
     this->knnEstimator->fit(this->centroids);
+
+    // if (clusteringType == LLOYDS_CLUSTERING) {
+    //     // allocate memory for the knn estimaor
+    //     knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
+    //     knnEstimator->fit(this->centroids);
+    //     results = this->knnEstimator->predict_knn(this->data);
+    //     delete knnEstimator;
+    //     knnEstimator = NULL;
+    // } else if (clusteringType == LSH_CLUSTERING) {
+    //     this->knnEstimator->fit(this->centroids);
+    //     results = this->knnEstimator->predict_knn(this->data);
+
+    // } else if (clusteringType == HC_CLUSTERING) {
+    //     results = this->knnEstimator->predict_knn(this->data);
+
+    // }
 
     for (int i = 0; i < 100; i++){
         clock_t start = clock();

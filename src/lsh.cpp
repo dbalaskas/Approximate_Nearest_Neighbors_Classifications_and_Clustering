@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
-    cout << "\033[0;36mRunning LSH \033[0m" << endl;
+    cout << "\033[0;36mRunning LSH \033[0m" << endl << endl;
     // Read input file with PandaC.
     NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile);
 
@@ -247,7 +247,7 @@ void extractResults(FILE *output, Results* results, Results *true_results, vecto
             cout << "  distanceLSH: " << results->resultsDistArray.getElement(i, j) << endl;
             cout << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
         }
-        cout << "  tHypercube: " << results->executionTimeArray.getElement(i, 0) << endl;
+        cout << "  tLSH: " << results->executionTimeArray.getElement(i, 0) << endl;
         cout << "  tTrue: " << true_results->executionTimeArray.getElement(i, 0) << endl;
         cout << "  " << R << "-near neighbors:" << endl;
         for (int j=0; j < r_results[i]->resultsIndexArray.getCols(); j++) {

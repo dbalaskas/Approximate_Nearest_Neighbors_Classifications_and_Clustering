@@ -44,8 +44,8 @@ Results* ExhaustiveKnn<NumCDataType>::predict_knn(Vector<NumCDataType> vector, i
     for (int row = 0; row < this->data->getRows(); row++){
 
         // add to results and the will figure out the best neighbors
-        // resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(this->data->getVector(row), vector, 1));
-        resultsComparator.addResult(row, NumC<NumCDataType>::dist(this->data->getVector(row), vector, 1));
+        resultsComparator.addResult(row, NumC<NumCDataType>::distSparse(this->data->getVector(row), vector, 1));
+        // resultsComparator.addResult(row, NumC<NumCDataType>::dist(this->data->getVector(row), vector, 1));
 
     }
     clock_t end = clock();

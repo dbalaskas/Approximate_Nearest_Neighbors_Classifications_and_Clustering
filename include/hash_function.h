@@ -15,15 +15,16 @@ class HashFunction{
         int M;
         int m;
         int* m_d;
-        int* f_thresholds;
+        // int* f_thresholds;
         NumC<NumCDataType> s;
+        NumC<NumCDataType> f_thresholds;
         int modularExponentiation(int base, int exponent, int mod);
         int modularAddition(int base, int exponent, int mod);
         int modularMultiplication(int base, int exponent, int mod);
         int* initThreasholds(int k);
 
     public:
-        HashFunction(): m_d{NULL}, f_thresholds{NULL} {};
+        HashFunction(): m_d{NULL} {};
         HashFunction(int k, int dimension, int w);
         HashFunction<NumCDataType>& operator=(HashFunction<NumCDataType> other_hashFunction);
         ~HashFunction();

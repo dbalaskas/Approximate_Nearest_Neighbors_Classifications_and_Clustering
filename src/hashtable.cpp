@@ -9,7 +9,7 @@ using namespace std;
 
 template <typename NumCDataType>
 HashTable<NumCDataType>::HashTable(HashType _hashType, int _numOfBuckets, int k, int d, int w)
-: hashFunction(k, d, w), numOfBuckets{_numOfBuckets}, hashType{_hashType}, bucketList(_numOfBuckets)
+: bucketList(_numOfBuckets), numOfBuckets{_numOfBuckets}, hashFunction(k, d, w), hashType{_hashType}
 {}
 
 template <typename NumCDataType>
