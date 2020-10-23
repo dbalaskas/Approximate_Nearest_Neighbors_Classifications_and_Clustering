@@ -224,6 +224,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     // //     cout << hashTable->getBucket(i).size() << " ";
     // //     if (i > 0 && i%20 == 0) cout << endl;
     // // }
+    RA_ResultsComparator resultsComparator(this->data->getRows());
 
     double dist;
     int r = 1000; // test
@@ -231,10 +232,11 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     int maxVertices = 1000000;
     int clusteredPoints = 0;
     // Results* queryResults;
-    ResultsComparator resultsComparator(0);
+    // ResultsComparator resultsComparator(0);
     std::vector<Node<NumCDataType>> bucket;
     std::vector<unsigned int> hashList;
     while (clusterPoints < data->getRows()) {
+
         for (int cetroidIndex=0; centroidIndex < centroids->getRows(); centroidIndex++) {
             //return points in distance r
             // queryResults = this->predict_rs(centroids->getVector(cetroidIndex), r, maxPoints, maxVertices);
@@ -244,19 +246,20 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
                 // search and find the k with minimun distance
                 for (int j=0; j < (int) bucket.size(); j++) {
                     // add to results and the will figure out the best neighbors
-                    if (bucket[j].index in map) {
-                        // check if confliict
-                        if (map[bucket[j].index] != cetroidIndex) {
-                            dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(cetroidIndex), 1);
-                            if (dist < =map[bucket[j].index].distance) {
-                                //custom insert in map
-                                clusteredPoints++;
-                            }
-                        } // else continue
+                    if (resultsComparator.checkIndex(bucket[j].index)) {
+                        // // check if confliict
+                        // if (map[bucket[j].index] != cetroidIndex) {
+                        //     dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(cetroidIndex), 1);
+                        //     if (dist < =map[bucket[j].index].distance) {
+                        //         //custom insert in map
+                        //         clusteredPoints++;
+                        //     }
+                        // } // else continue
+                            resultsComparator.addResultConflict(bucket[j].index, cetroidIndex, dist);
                     } else {
                         dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(cetroidIndex), 1);
                         if (dist <= r){
-                            // resultsComparator.addResult(bucket[j].index, dist);
+                            resultsComparator.addResult(bucket[j].index, cetroidIndex, dist);
 
                             //custom insert in map
                             clusteredPoints++;

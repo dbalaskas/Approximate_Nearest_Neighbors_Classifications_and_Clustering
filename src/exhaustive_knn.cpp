@@ -90,6 +90,10 @@ Results* ExhaustiveKnn<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, 
     return totalResults;
 }
 
+
+
+
+
 // NumC<double> pipi(int input){
 //     NumC<double> nn(6,input);
 //     for (int i = 0; i < nn.getRows(); i++){

@@ -171,6 +171,62 @@ Results* ResultsComparator::getResults(){
 
 
 
+bool RA_ResultsComparator::checkIndex(int index){
+    if (cluster_map.count(index)>0)
+        return true;
+    else 
+        return false;
+}
+
+RA_ResultIndex RA_ResultsComparator::getResult(int index){
+    return cluster_map[index];
+}
+
+int RA_ResultsComparator::addResult(int index, int cluster_index, double dist){
+    RA_ResultIndex result;
+    result.first_cluster = cluster_index;
+    result.first_dist  = dist;
+    result.second_cluster = -1;
+    result.second_dist = -1.0;
+    cluster_map[index] = result;
+}
+
+int RA_ResultsComparator::addResultConflict(int index, int cluster_index, double dist){
+
+    
+    return 0;
+}
+
+Results* RA_ResultsComparator::getResults(){
+
+    // if comparatorr is initialized for range search then 
+    // the num of best resutls equal with the number of all the results
+    // if(this->numOfBestResults == 0){
+    //     this->numOfBestResults = priorityQueue.size();
+    // }
+
+
+    Results* results = new Results;
+    results->resultsIndexArray = NumC<NumCIndexType>(1, this->numOfBestResults);
+    results->resultsDistArray  = NumC<NumCDistType>(1, this->numOfBestResults);
+    // results->executionTimeArray  = NumC<double>(this->numOfBestResults, 1);
+    // NumC<NumCIndexType> resultsDistArray(1, this->numOfBestResults);
+
+    int resultsFilled = 0;
+
+    // add elements sorted in results numc array
+    // while (priorityQueue.empty() == false && resultsFilled < this->numOfBestResults){
+       
+        results->resultsIndexArray.addElement(priorityQueue.top().index, 0, resultsFilled);
+        results->resultsDistArray.addElement(priorityQueue.top().dist, 0, resultsFilled);
+        resultsFilled++;
+        priorityQueue.pop();
+
+    // }
+
+    return results;
+}
+
 
 /////////////// TEST ///////////////
 // int main(){
