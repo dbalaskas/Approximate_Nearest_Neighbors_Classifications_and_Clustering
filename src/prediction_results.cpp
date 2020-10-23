@@ -153,6 +153,7 @@ Results* ResultsComparator::getResults(){
     Results* results = new Results;
     results->resultsIndexArray = NumC<NumCIndexType>(1, this->numOfBestResults);
     results->resultsDistArray  = NumC<NumCDistType>(1, this->numOfBestResults);
+    results->executionTimeArray  = NumC<double>(1, this->numOfBestResults);
     // NumC<NumCIndexType> resultsDistArray(1, this->numOfBestResults);
 
     int resultsFilled = 0;

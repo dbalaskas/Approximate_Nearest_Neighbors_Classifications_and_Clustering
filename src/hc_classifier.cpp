@@ -122,7 +122,8 @@ Results* HyperCube<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int 
         queryResults = this->predict_knn(testData->getVector(query), k, maxPoints, maxVertices);
         totalResults->resultsIndexArray.addVector(queryResults->resultsIndexArray.getVector(0), query);
         totalResults->resultsDistArray.addVector(queryResults->resultsDistArray.getVector(0), query);
-
+        totalResults->executionTimeArray.addElement(queryResults->executionTime, query, 0);
+        
         // free query results
         delete queryResults;
 
