@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
+#include <vector>
 
 #include "../include/pandac.h"
 #include "../include/numc.h"
@@ -10,10 +11,8 @@
 
 using namespace std;
 
-// Extracts the results from KNN classification compared to Exhaustive Search to output file.
-void extractKNNresults(FILE *output, Results* results, Results *true_results);
-// Extracts the results from Range Search to output file.
-void extractRSresults(FILE *output, Results* results, double R);
+// Extracts the results to output file.
+void extractResults(FILE *output, Results* results, Results *true_results, vector<Results*> r_results, int R);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -110,7 +109,7 @@ int main(int argc, char** argv) {
 // Search for <-N> parameter.
     int N = 1;
 	for (i=1; i < argc - 1; i++)
-		if (strcmp(argv[i], "-L") == 0) break;
+		if (strcmp(argv[i], "-N") == 0) break;
 	if (i < argc - 1) {
       	if (!isNumber(argv[i+1])) {
         // <-N> parameter is invalid.
@@ -124,14 +123,14 @@ int main(int argc, char** argv) {
 // Search for <-R> parameter.
     double R = 1.0;
 	for (i=1; i < argc - 1; i++)
-		if (strcmp(argv[i], "-L") == 0) break;
+		if (strcmp(argv[i], "-R") == 0) break;
 	if (i < argc - 1) {
-      	if (!isNumber(argv[i+1])) {
-        // <-R> parameter is invalid.
-      	    cout << "\033[0;31mError!\033[0m Invalid value on '-R' parameter.\n" << endl;
-            cout << "\033[0;31mExit program.\033[0m" << endl;
-            return 1;        
-        }
+      	// if (!isNumber(argv[i+1])) {
+        // // <-R> parameter is invalid.
+      	//     cout << "\033[0;31mError!\033[0m Invalid value on '-R' parameter.\n" << endl;
+        //     cout << "\033[0;31mExit program.\033[0m" << endl;
+        //     return 1;        
+        // }
         R = atoi(argv[i+1]);
     }
 
@@ -144,6 +143,7 @@ int main(int argc, char** argv) {
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
+    cout << "\033[0;36mRunning Hypercube \033[0m" << endl;
     // Read input file with PandaC.
     NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile);
 
@@ -152,7 +152,8 @@ int main(int argc, char** argv) {
 
 char line[128], *answer;
 FILE *output;
-Results *results, *true_results;
+Results *knn_results, *true_results;
+vector<Results*> r_results;
 NumC<int>* queryData;
 
 do {
@@ -182,7 +183,7 @@ do {
 //------------------------------------------------------------------------------------
 // Call HyperCube classifier and train it.
 
-    HyperCube<int> cube;
+    HyperCube<int> cube(50000);
     cube.fit_transform(inputData, k);
 
 //------------------------------------------------------------------------------------
@@ -194,15 +195,15 @@ do {
 // Execute Predictions and extract results to output file.
 
     // Execute k-NN prediction.
-    results = cube.predict_knn(queryData, N, M, probes);
+    knn_results = cube.predict_knn(queryData, N, M, probes);
     // Execute Exhaustive KNN search.
     true_results = exhaustive_knn.predict_knn(queryData);
+    // Execute Range Search.
+    r_results = cube.predict_rs(queryData, R, M, probes);
     // Extract results on output file.
-    extractKNNresults(output, results, true_results);
-    // // Execute Range Search.
-    // results = cube.predict_rs(queryData->getVector(i), R, M, probes);
+    extractResults(output, knn_results, true_results, r_results, R);
     // // Extract results on output file.
-    extractRSresults(output, results, R);
+    // extractRSresults(output, results, R);
     cout << "Results are extracted in file: " << outputFile << endl;
 
 //------------------------------------------------------------------------------------
@@ -237,6 +238,11 @@ do {
 // End of program.
 
     //Free allocated Space.
+    delete knn_results;
+    delete true_results;
+    for (int i=0; i < (int) r_results.size(); i++) {
+        delete r_results[i];
+    }
 
 
     // cout << endl << "-----------------------------------------------------------------" << endl;
@@ -245,22 +251,24 @@ do {
     return 0;
 }
 
-void extractKNNresults(FILE *output, Results* results, Results *true_results) {
+void extractResults(FILE *output, Results* results, Results *true_results, vector<Results*> r_results, int R) {
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+
+
     for (int i=0; i < results->resultsIndexArray.getRows(); i++) {
         cout << "Query: " << i+1 << endl;
         for (int j=0; j < results->resultsIndexArray.getCols(); j++) {
-            cout << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << endl;
+            cout << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << " label: " << inputDatalabels->getElement(results->resultsIndexArray.getElement(i, j) ,0) << " true label: " << inputDatalabels->getElement(true_results->resultsIndexArray.getElement(i, j) ,0)<<endl;
             cout << "  distanceHypecube: " << results->resultsDistArray.getElement(i, j) << endl;
             cout << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
         }
+        cout << "  tHypercube: " << results->executionTime << endl;
+        cout << "  tTrue: " << true_results->executionTime << endl;
+        cout << "  " << R << "-near neighbors:" << endl;
+        for (int j=0; j < r_results[i]->resultsIndexArray.getCols(); j++) {
+            cout << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;
+        }
     }
-    cout << "tHypercube: " << results->executionTime << endl;
-    cout << "tTrue: " << true_results->executionTime << endl;
-    cout << results->resultsIndexArray.getRows() << " x " << results->resultsIndexArray.getCols() << endl;
-    cout << results->resultsDistArray.getRows() << " x " << results->resultsDistArray.getCols() << endl;
-    cout << true_results->resultsIndexArray.getRows() << " x " << true_results->resultsIndexArray.getCols() << endl;
-}
 
-void extractRSresults(FILE *output, Results* results, double R) {
-    cout << R << "-near neighbors:" << endl;
+    delete inputDatalabels;
 }

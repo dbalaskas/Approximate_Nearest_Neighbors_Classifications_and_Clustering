@@ -23,6 +23,7 @@ typedef struct Results{
     Results(NumCIndexType resultsRows, NumCIndexType resultsCol): resultsIndexArray(resultsRows, resultsCol), resultsDistArray(resultsRows, resultsCol) {};
     NumC<NumCIndexType> resultsIndexArray;
     NumC<NumCDistType> resultsDistArray;
+    NumC<double> executionTimeArray;
     double executionTime;
 
     // Results(){ 

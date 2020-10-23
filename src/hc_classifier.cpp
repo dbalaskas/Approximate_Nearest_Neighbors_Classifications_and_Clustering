@@ -13,6 +13,7 @@ HyperCube<NumCDataType>::~HyperCube() {
     }
     data = NULL;
     hashTableSize = 0;
+    w = 0;
 }
 
 template <typename NumCDataType>
@@ -20,7 +21,7 @@ void HyperCube<NumCDataType>::fit(NumC<NumCDataType>* _data, int k) {
     data = _data;
     if (k==-1) k = (int)HASH_SIZE;
     hashTableSize = 1<< k;
-    hashTable = new HashTable<NumCDataType>(HC, hashTableSize, k, data->getCols(), 10000);
+    hashTable = new HashTable<NumCDataType>(HC, hashTableSize, k, data->getCols(), w);
 }
 
 template <typename NumCDataType>
@@ -170,6 +171,24 @@ Results* HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r,
     Results* results = resultsComparator.getResults();
     results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
     return results;
+}
+
+template <typename NumCDataType>
+vector<Results*> HyperCube<NumCDataType>::predict_rs(NumC<NumCDataType>* testData, int r, int maxPoints, int maxVertices) {
+    int numOfQueries = testData->getRows();
+    // allocate results sruct for given k
+    vector<Results*> totalResults(numOfQueries); 
+    Results* queryResults;
+
+    // search every row data entry and find the k with minimun distance
+    for (int query = 0; query < numOfQueries; query++){
+        // add to results the results of every query
+        queryResults = this->predict_rs(testData->getVector(query), r, maxPoints, maxVertices);
+        totalResults[query] = queryResults;
+    }
+
+    // results
+    return totalResults;
 }
 
 // // g++ -g ./src/hashtable.cpp ./src/pandac.cpp ./src/numc.cpp ./src/hash_function.cpp ./src/hc_classifier.cpp ./src/prediction_results.cpp

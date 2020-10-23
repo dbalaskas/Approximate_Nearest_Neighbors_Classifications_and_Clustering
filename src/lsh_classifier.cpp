@@ -7,7 +7,7 @@ using namespace std;
 
 template <typename NumCDataType>
 LSHashing<NumCDataType>::LSHashing(int N, int L, int k, int w)
-: data{NULL}, N{N}, L{L}, k{k}, w{w}
+: N{N}, L{L}, k{k}, w{w}, data{NULL}
 {
     this->hashTableList = new HashTable<NumCDataType>*[this->L];
 }
@@ -67,7 +67,7 @@ Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N
         // get bucket
         bucket = hashTableList[i]->getBucket(vector);
 
-        for (int j=0; j < bucket.size(); j++) {
+        for (int j=0; j < (int) bucket.size(); j++) {
             dist = NumC<NumCDataType>::distSparse(vector, bucket[j].sVector, 1);
             resultsComparator.addResult(bucket[j].index, dist);
         }
@@ -145,7 +145,7 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
         // get bucket
         bucket = hashTableList[i]->getBucket(vector);
 
-        for (int j=0; j < bucket.size(); j++) {
+        for (int j=0; j < (int) bucket.size(); j++) {
             dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
             if (dist <= r){
                 resultsComparator.addResult(bucket[j].index, dist);
@@ -160,6 +160,24 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
     results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
 
     return results;
+}
+
+template <typename NumCDataType>
+vector<Results*> LSHashing<NumCDataType>::predict_rs(NumC<NumCDataType>* testData, int r) {
+    int numOfQueries = testData->getRows();
+    // allocate results sruct for given k
+    vector<Results*> totalResults(numOfQueries); 
+    Results* queryResults;
+
+    // search every row data entry and find the k with minimun distance
+    for (int query = 0; query < numOfQueries; query++){
+        // add to results the results of every query
+        queryResults = this->predict_rs(testData->getVector(query), r);
+        totalResults[query] = queryResults;
+    }
+
+    // results
+    return totalResults;
 }
 
 // #include "../include/pandac.h"
