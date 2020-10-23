@@ -17,6 +17,7 @@ template <typename NumCDataType>
 struct Node{
     int index;
     Vector<NumCDataType> sVector;
+    unsigned int hashValue;
 };
 
 

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <vector>
+#include <fstream>
 
 #include "../include/pandac.h"
 #include "../include/numc.h"
@@ -12,7 +13,7 @@
 using namespace std;
 
 // Extracts the results to output file.
-void extractResults(FILE *output, Results* results, Results *true_results, vector<Results*> r_results, int R);
+void extractResults(char* outputFile, Results* results, Results *true_results, vector<Results*> r_results, int R);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -143,43 +144,31 @@ int main(int argc, char** argv) {
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
-    cout << "\033[0;36mRunning Hypercube \033[0m" << endl << endl;
+    cout << "\033[0;36mRunning Hypercube :)\033[0m" << endl << endl;
     // Read input file with PandaC.
     NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile);
 
 //------------------------------------------------------------------------------------
-// Making predictions.
-
-char line[128], *answer;
-FILE *output;
-Results *knn_results, *true_results;
-vector<Results*> r_results;
-NumC<int>* queryData;
-
-do {
-//------------------------------------------------------------------------------------
 // Reading query file.
 
-    // Check that input file exists.
+    // Check that query file exists.
     if(access(queryFile, F_OK) == -1) {
         perror("\033[0;31mError\033[0m: Unable to open the query file");
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
-    // Read input file with PandaC.
-    queryData = PandaC<int>::fromMNIST(queryFile, 50);
+    // Read query file with PandaC.
+    NumC<int> *queryData = PandaC<int>::fromMNIST(queryFile, 50);
 
 //------------------------------------------------------------------------------------
-// Open output file.
+// Making predictions.
 
-    // Check that input file exists.
-    output = fopen(outputFile, "w");
-    if (output == NULL) {
-        perror("\033[0;31mError\033[0m: Unable to open the output file");
-        cout << "\033[0;31mexit program\033[0m" << endl;
-        return 1;
-    }
+char line[128], *answer;
+Results *knn_results, *true_results;
+vector<Results*> r_results;
 
+do {
+    cout << "\033[0;36mComputing predictions...\033[0m" << endl << endl;
 //------------------------------------------------------------------------------------
 // Call HyperCube classifier and train it.
 
@@ -200,21 +189,23 @@ do {
     // Execute Range Search.
     r_results = cube.predict_rs(queryData, R, M, probes);
     // Extract results on output file.
-    extractResults(output, knn_results, true_results, r_results, R);
-    // // Extract results on output file.
-    // extractRSresults(output, results, R);
-    cout << "Results are extracted in file: " << outputFile << endl;
+    extractResults(outputFile, knn_results, true_results, r_results, R);
+    cout << "\033[0;36mResults are extracted in file: \033[0m" << outputFile << endl;
 
 //------------------------------------------------------------------------------------
-// Close output file.
+// Free allocated Space.
 
-    fclose(output);
-    output = NULL;
+    delete queryData;
+    delete knn_results;
+    delete true_results;
+    for (int i=0; i < (int) r_results.size(); i++) {
+        delete r_results[i];
+    }
 
 //------------------------------------------------------------------------------------
 // Ask user if he wants to repeat the process with new query file.
 
-    cout << endl << "-----------------------------------------------------------------" << endl;
+    cout << "-----------------------------------------------------------------" << endl;
     do {
         cout << "\033[0;36mYou would like to repeat the process with new query? (answer y|n) \033[0m";
 		fgets(line,sizeof(line),stdin);
@@ -224,51 +215,67 @@ do {
     // User wants to repeat the process.
         cout << "\033[0;36mPlease enter a new query file: \033[0m";
 		fgets(line,sizeof(line),stdin);
-		queryFile = strtok(line,"\n");
+        if (strlen(line) > 1) {
+            queryFile = strtok(line,"\n");
+            // Check that query file exists.
+            if(access(queryFile, F_OK) == -1) {
+                perror("\033[0;31mError\033[0m: Unable to open the query file");
+                cout << "\033[0;31mexit program\033[0m" << endl;
+                return 1;
+            }
+            // Read query file with PandaC.
+            queryData = PandaC<int>::fromMNIST(queryFile, 50);
+        } else {
+            printf("\033[0;31mError\033[0m: Not imported query file");
+            cout << "\033[0;31mexit program\033[0m" << endl;
+        }
         cout << "\033[0;36mPlease enter ann output file (press Enter to use the old one): \033[0m";
 		fgets(line,sizeof(line),stdin);
+        cout << endl;
         if (strlen(line) > 1) {
     		outputFile = strtok(line,"\n");
         }
-        cout << endl;
-    }
+    }    
 } while (strcmp(answer, "n") && strcmp(answer, "N"));
 
 //------------------------------------------------------------------------------------
 // End of program.
 
-    // Free allocated Space.
-    delete knn_results;
-    delete true_results;
-    for (int i=0; i < (int) r_results.size(); i++) {
-        delete r_results[i];
-    }
-
+    delete inputData;
 
     // cout << endl << "-----------------------------------------------------------------" << endl;
     cout << "\033[0;36mExit program.\033[0m" << endl;
-
     return 0;
 }
 
-void extractResults(FILE *output, Results* results, Results *true_results, vector<Results*> r_results, int R) {
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte");
+void extractResults(char* outputFile, Results* results, Results *true_results, vector<Results*> r_results, int R) {
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels((char*) "./doc/input/train-labels-idx1-ubyte");
 
+    ofstream output(outputFile, ios::out);
+    // Check that output file exists.
+    if (!output.is_open()) {
+        perror("\033[0;31mError\033[0m: Unable to open output file");
+        return;
+    }
 
     for (int i=0; i < results->resultsIndexArray.getRows(); i++) {
-        cout << "Query: " << i+1 << endl;
+        output << "Query: " << i+1 << endl;
         for (int j=0; j < results->resultsIndexArray.getCols(); j++) {
-            cout << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << " label: " << inputDatalabels->getElement(results->resultsIndexArray.getElement(i, j) ,0) << " true label: " << inputDatalabels->getElement(true_results->resultsIndexArray.getElement(i, j) ,0)<<endl;
-            cout << "  distanceHypecube: " << results->resultsDistArray.getElement(i, j) << endl;
-            cout << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
+            // output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << endl;
+            output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << " label: " << inputDatalabels->getElement(results->resultsIndexArray.getElement(i, j) ,0) << " true label: " << inputDatalabels->getElement(true_results->resultsIndexArray.getElement(i, j) ,0)<<endl;
+            output << "  distanceHypecube: " << results->resultsDistArray.getElement(i, j) << endl;
+            output << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
         }
-        cout << "  tHypercube: " << results->executionTimeArray.getElement(i, 0) << endl;
-        cout << "  tTrue: " << true_results->executionTimeArray.getElement(i, 0) << endl;
-        cout << "  " << R << "-near neighbors:" << endl;
+        output << "  tHypercube: " << results->executionTimeArray.getElement(i, 0) << endl;
+        output << "  tTrue: " << true_results->executionTimeArray.getElement(i, 0) << endl;
+        output << "  " << R << "-near neighbors:" << endl;
         for (int j=0; j < r_results[i]->resultsIndexArray.getCols(); j++) {
-            cout << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;
+            // output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << endl;
+            output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;
         }
     }
 
+    // Close output file.
+    output.close();
     delete inputDatalabels;
 }

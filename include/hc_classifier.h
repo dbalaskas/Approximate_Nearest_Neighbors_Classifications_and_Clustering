@@ -27,6 +27,7 @@ class HyperCube {
         Results* predict_knn(NumC<NumCDataType>* testData, int k, int maxPoints, int maxVertices);
         Results* predict_rs(Vector<NumCDataType> vector, int r, int maxPoints, int maxVertices);
         std::vector<Results*> predict_rs(NumC<NumCDataType>* testData, int r, int maxPoints, int maxVertices);
+        Results* reverse_assignment(NumC<NumCDataType>* centroids);
 };
 
 template class HyperCube<int>;

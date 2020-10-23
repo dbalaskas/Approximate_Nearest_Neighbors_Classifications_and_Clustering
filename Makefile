@@ -33,8 +33,7 @@ SRC= $(wildcard $(SRCDIR)/*.$(CODETYPE))
 IDIR= include
 DEPS= $(wildcard $(IDIR)/*.h)
 ODIR= build
-DEMANDED_OBJECTS= $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/exhaustive_knn.o \
- $(ODIR)/hashtable.o $(ODIR)/hash_function.o $(ODIR)/numc.o $(ODIR)/pandac.o $(ODIR)/prediction_results.o
+DEMANDED_OBJECTS= $(ODIR)/exhaustive_knn.o $(ODIR)/hashtable.o $(ODIR)/hash_function.o $(ODIR)/numc.o $(ODIR)/pandac.o $(ODIR)/prediction_results.o
 
 default: $(CUBE_EXEC) $(LSH_EXEC) $(CLUSTER_EXEC)
 	@echo "============================================================================"
@@ -66,19 +65,19 @@ $(ODIR)/%.o: $(SRCDIR)/%.$(CODETYPE)
 %.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $(ODIR)/$@ "..."
 	$(CXX) -c -o $(ODIR)/$@ $< $(CXXFLAGS)
-$(CUBE_EXEC): $(DEMANDED_OBJECTS)
+$(CUBE_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/hc_classifier.o
 	@echo "============================================================================"
 	@echo "Creating $(CUBE_EXEC)..."
 	$(CXX) -c -o $(ODIR)/cube.o $(SRCDIR)/cube.$(CODETYPE) $(CXXFLAGS)
 	$(CXX) -o $(BDIR)/cube $(ODIR)/cube.o $^ $(LDLIBS) $(CXXFLAGS)
 
-$(LSH_EXEC): $(DEMANDED_OBJECTS)
+$(LSH_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o
 	@echo "============================================================================"
 	@echo "Creating $(LSH_EXEC)..."
 	$(CXX) -c -o $(ODIR)/lsh.o $(SRCDIR)/lsh.$(CODETYPE) $(CXXFLAGS)
 	$(CXX) -o $(BDIR)/lsh $(ODIR)/lsh.o $^ $(LDLIBS) $(CXXFLAGS)
 
-$(CLUSTER_EXEC): $(DEMANDED_OBJECTS)
+$(CLUSTER_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o
 	@echo "============================================================================"
 	@echo "Creating $(CLUSTER_EXEC)..."
 	$(CXX) -c -o $(ODIR)/cluster.o $(SRCDIR)/cluster.$(CODETYPE) $(CXXFLAGS)

@@ -38,9 +38,9 @@ template <typename NumCDataType>
 unsigned int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
     switch (hashType) {
         case LSH:
-            return (int)(hashFunction.lsh_hash(vector) % (unsigned int)numOfBuckets);
+            return hashFunction.lsh_hash(vector);
         case HC:
-            return (int)(hashFunction.hc_hash(vector) % (unsigned int)numOfBuckets);
+            return hashFunction.hc_hash(vector);
         default:
             return 0;
     }
@@ -85,7 +85,7 @@ vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(unsigned int buc
 
 template <typename NumCDataType>
 vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(Vector<NumCDataType> vector) {
-    return bucketList[hash(vector)];
+    return bucketList[hash(vector)%numOfBuckets];
 }
 
 template <typename NumCDataType>
@@ -93,7 +93,8 @@ void HashTable<NumCDataType>::fit(Vector<NumCDataType> vector, int index) {
     struct Node<NumCDataType> node;
     node.index = index;
     node.sVector = vector;
-    bucketList[hash(vector)].push_back(node);
+    node.hashValue = hash(vector);
+    bucketList[node.hashValue % (unsigned int)numOfBuckets].push_back(node);
 }
 
 template <typename NumCDataType>

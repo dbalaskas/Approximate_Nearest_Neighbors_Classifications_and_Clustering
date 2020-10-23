@@ -59,17 +59,21 @@ Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N
         N = this->N;
 
     ResultsComparator resultsComparator(N);
+    unsigned int hashValue;
     std::vector< Node<NumCDataType> > bucket;
     double dist;
 
     clock_t start = clock();
     for (int i=0; i < L; i++) {
         // get bucket
-        bucket = hashTableList[i]->getBucket(vector);
+        hashValue = hashTableList[i]->hash(vector);
+        bucket = hashTableList[i]->getBucket(hashValue%HASHTABLE_SIZE);
 
         for (int j=0; j < (int) bucket.size(); j++) {
-            dist = NumC<NumCDataType>::distSparse(vector, bucket[j].sVector, 1);
-            resultsComparator.addResult(bucket[j].index, dist);
+            if (hashValue == bucket[j].hashValue) {
+                dist = NumC<NumCDataType>::distSparse(vector, bucket[j].sVector, 1);
+                resultsComparator.addResult(bucket[j].index, dist);
+            }
         }
         // results.add(index, dist);
     }
@@ -138,18 +142,22 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
     ResultsComparator resultsComparator(0);
     // ResultIndex result;
     // std::vector<ResultIndex> results;
+    unsigned int hashValue;
     std::vector< Node<NumCDataType> > bucket;
     double dist;
 
     clock_t start = clock();
     for (int i=0; i < L; i++) {
         // get bucket
-        bucket = hashTableList[i]->getBucket(vector);
+        hashValue = hashTableList[i]->hash(vector);
+        bucket = hashTableList[i]->getBucket(hashValue%HASHTABLE_SIZE);
 
         for (int j=0; j < (int) bucket.size(); j++) {
-            dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
-            if (dist <= r){
-                resultsComparator.addResult(bucket[j].index, dist);
+            if (hashValue == bucket[j].hashValue) {
+                dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
+                if (dist <= r){
+                    resultsComparator.addResult(bucket[j].index, dist);
+                }
             }
         }
         // results.add(index, dist);
