@@ -1,6 +1,6 @@
 
 <p style="text-align: center;">
-    ![alt text](./doc/images/di_uoa.png?raw=true "UOA")
+    ![alt text](./doc/images/di_uoa.png?raw=true)
     <h1>University of Athens</h1>
     <h2>Department of Informatics and Telecomunications</h2>
 </p>
