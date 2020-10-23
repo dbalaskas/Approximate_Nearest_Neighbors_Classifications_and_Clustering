@@ -1,6 +1,6 @@
 
 <p style="text-align: center;">
-    ![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+    ![alt text](https://github.com/dbalaskas/Approximate-Nearest-Neighbors-Classifications-and-Clustering./blob/main/doc/images/di_uoa.png?raw=true)
     <h1>University of Athens</h1>
     <h2>Department of Informatics and Telecomunications</h2>
 </p>
