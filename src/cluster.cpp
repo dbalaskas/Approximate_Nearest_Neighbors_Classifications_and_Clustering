@@ -12,13 +12,26 @@
 
 using namespace std;
 
-typedef struct {
+typedef struct ConfigurationData{
     int number_of_clusters                  // K of K-medians
     int number_of_vector_hash_tables        // default: L=3
     int number_of_vector_hash_functions     // k of LSH for vectors, default: 4
     int max_number_M_hypercube              // M of Hypercube, default: 10
     int number_of_hypercube_dimensions      // k of Hypercube, default: 3
     int number_of_probes                    // probes of Hypercube, default: 2
+  
+    ConfigurationData()
+     :number_of_clusters{-1}, 
+     number_of_vector_hash_tables{3}, 
+     number_of_vector_hash_functions{4}, 
+     max_number_M_hypercube{10},
+     number_of_hypercube_dimensions{3}, 
+     number_of_probes{2} {};
+
+    ~ConfigurationData() {
+        number_of_clusters = -1;
+    };
+
 } ConfigurationData;
 
 // Extracts the results to output file.
@@ -114,12 +127,16 @@ int main(int argc, char** argv) {
 
     // Check that input file exists.
     if(access(configurationFile, F_OK) == -1) {
-        perror("\033[0;31mError\033[0m: Unable to open the query file");
+        perror("\033[0;31mError\033[0m: Unable to open configuration file");
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
     // Read configuration file.
     ConfigurationData* conf = readConfiguration(configurationFile);
+    if (conf->number_of_clusters == -1) {
+        cout << "\033[0;31mexit program\033[0m" << endl;
+        return 1;
+    }
 
 //------------------------------------------------------------------------------------
 // Making predictions.

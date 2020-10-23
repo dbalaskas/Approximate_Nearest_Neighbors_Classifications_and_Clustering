@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
 
     // Check that input file exists.
     if(access(inputFile, F_OK) == -1) {
-        perror("\033[0;31mError\033[0m: Unable to open the input file");
+        perror("\033[0;31mError\033[0m: Unable to open input file");
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
 
     // Check that query file exists.
     if(access(queryFile, F_OK) == -1) {
-        perror("\033[0;31mError\033[0m: Unable to open the query file");
+        perror("\033[0;31mError\033[0m: Unable to open query file");
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
@@ -219,7 +219,7 @@ do {
             queryFile = strtok(line,"\n");
             // Check that query file exists.
             if(access(queryFile, F_OK) == -1) {
-                perror("\033[0;31mError\033[0m: Unable to open the query file");
+                perror("\033[0;31mError\033[0m: Unable to open query file");
                 cout << "\033[0;31mexit program\033[0m" << endl;
                 return 1;
             }

@@ -27,6 +27,7 @@ README= README.md
 OUTPUT= ./doc/output
 INPUT= ./doc/input
 QUERY= ./doc/query
+CONF= ./doc/configuration
 BDIR= bin
 SRCDIR= src
 SRC= $(wildcard $(SRCDIR)/*.$(CODETYPE))
@@ -47,6 +48,7 @@ info:
 	@echo "input directory: $(INPUT)."
 	@echo "output directory: $(OUTPUT)."
 	@echo "query directory: $(QUERY)."
+	@echo "configuration directory: $(CONF)."
 	@echo "executable directory: $(BDIR)."
 	@echo "At compilation we are adding the libraries: $(LDLIBS)."
 	@echo "README path: $(README)."
@@ -55,7 +57,6 @@ info:
 	@echo "make <filename>.o: compiles the object file of $(SRCDIR)/<filename>.$(CODETYPE) on $(ODIR)/<filename>.o."
 	@echo "make clean: Clears the project from the executables and the object files."
 	@echo "make clean_cache: Clears the project from the output files."
-	@echo "make debug: compiles the project with $(GDBFLAGS) and runs gdb on the executable."
 	@echo "make README: Prints the README file of the project."
 	@echo "============================================================================"
 
@@ -93,19 +94,7 @@ clean:
 clean_cache:
 	@echo "============================================================================"
 	@echo "Removing cached outputs..."
-	$(RM) $(OUTPUT)/* 
-debug: $(DEMANDED_OBJECTS)
-	@echo "============================================================================"
-	@echo "Debugging..."
-	$(CXX) -c -o $(ODIR)/main.o $(SRCDIR)/main.$(CODETYPE) $(CXXFLAGS) $(GDBFLAGS)
-	$(CXX) -o $(BDIR)/$@ $(ODIR)/main.o $^ $(LDLIBS) $(CXXFLAGS) $(GDBFLAGS)
-	$(CXX) -c -o $(ODIR)/worker.o $(SRCDIR)/worker.$(CODETYPE) $(CXXFLAGS) $(GDBFLAGS)
-	$(CXX) -o $(BDIR)/worker $(ODIR)/worker.o $^ $(LDLIBS) $(CXXFLAGS) $(GDBFLAGS)
-	$(CXX) -c -o $(ODIR)/whoClient.o $(SRCDIR)/whoClient.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/whoClient $(ODIR)/whoClient.o $^ $(LDLIBS) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/whoServer.o $(SRCDIR)/whoServer.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/whoServer $(ODIR)/whoServer.o $^ $(LDLIBS) $(CXXFLAGS)
-	gdb $(BDIR)/master
+	$(RM) $(OUTPUT)/*
 README:
 	@echo "============================================================================"
 	@cat $(README)
