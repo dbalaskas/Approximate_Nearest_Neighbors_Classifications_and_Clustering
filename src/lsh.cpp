@@ -247,8 +247,8 @@ void extractResults(FILE *output, Results* results, Results *true_results, vecto
             cout << "  distanceLSH: " << results->resultsDistArray.getElement(i, j) << endl;
             cout << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
         }
-        cout << "  tLSH: " << results->executionTime << endl;
-        cout << "  tTrue: " << true_results->executionTime << endl;
+        cout << "  tHypercube: " << results->executionTimeArray.getElement(i, 0) << endl;
+        cout << "  tTrue: " << true_results->executionTimeArray.getElement(i, 0) << endl;
         cout << "  " << R << "-near neighbors:" << endl;
         for (int j=0; j < r_results[i]->resultsIndexArray.getCols(); j++) {
             cout << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;

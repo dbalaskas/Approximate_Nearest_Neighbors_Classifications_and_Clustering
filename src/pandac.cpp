@@ -73,6 +73,7 @@ NumC<NumCDataType>* PandaC<NumCDataType>::fromMNIST(char *filePath, int limit) {
     // Print file's info.
         cout << "Rows: " << number_of_images << endl;
         cout << "Pictures: " << n_rows_of_image << " x " << n_cols_of_image << endl;
+        cout << "----------------------------------------------------------" << endl;
         // data->print();
 
     // Free allocated space and return data's matrix.
