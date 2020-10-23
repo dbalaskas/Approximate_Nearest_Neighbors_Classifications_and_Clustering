@@ -9,7 +9,6 @@
 <h3>Andreas Giannoutsos - 111520170002</h3>
 <br>
 <br>
-Ooh hi...
 
 <h3>Introduction to our project (info, goals, complexity, speed, results, simplicity, abstractiveness)</h3>
 <h4>...</h4>
