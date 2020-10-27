@@ -17,19 +17,24 @@ class ExhaustiveKmeans {
     private:
         NumC<NumCDataType>* data;
         NumC<NumCDataType>* centroids;
-        NumC<NumCDataType>* centroidsMap;
-        ExhaustiveKnn<NumCDataType>* knnEstimator;
         std::vector<NumCDistType> silhouette;
         NumCDistType overallSilhouette;
+        NumCDistType objectiveCost;
         int numOfClusters;
         int numOfDimensions;
         int numOfPoints;
+
         NumCDistType calculateSilhouette(NumCDistType distA, NumCDistType distB);
         void getSilhouette(Results* results);
+        NumCDistType getObjectiveCost(Results* results);
         void randomInit();
         void kmeansInit();
 
-        Results* clustering();
+        void medianCentroidsUpdate(Results* results);
+
+        void transform_LLOYDS_CLUSTERING();
+        void transform_LSH_CLUSTERING();
+        void transform_HC_CLUSTERING();
 
     public:
         ExhaustiveKmeans(int numOfClusters);
@@ -40,7 +45,9 @@ class ExhaustiveKmeans {
         void transform(ClusteringType clusteringType);
         // Results* predict_knn(Vector<NumCDataType> vector);
         // Results* predict_knn(NumC<NumCDataType>* testData);
-        Results* get_centroids();
+        NumC<NumCDataType>* getCentroids();
+        std::vector<Results*>  getResults();
+        NumCDistType getObjectiveCost();
         
 };
 

@@ -236,6 +236,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
 
     //* GOOD MORNING BUDDY
     // r-Computation
+    //  <3 <3 <3 <3 
     int r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
     for (int i = 0; i < centroids->getRows(); i++){
         for (int j=i+1; j < centroids->getRows(); j++) {

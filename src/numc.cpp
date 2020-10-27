@@ -220,8 +220,24 @@ void NumC<NumCDataType>::cumulative(){
     }
 }
 
+template <typename NumCDataType>
+NumCDataType NumC<NumCDataType>::sum(){
+    // get the sum
+    NumCDataType sum = (NumCDataType)0;
+    for (int i = 0; i < this->size; i++){
+        sum += this->data[i];
+    }
+    return sum;
+}
 
 
+template <typename NumCDataType>
+void NumC<NumCDataType>::fill(NumCDataType fillValue){
+    // fill fill value
+    for (int i = 0; i < this->size; i++){
+        this->data[i] = fillValue;
+    }
+}
 
 template <typename NumCDataType>
 void NumC<NumCDataType>::transpose(){

@@ -4,6 +4,7 @@
 #include <queue>
 #include <unordered_set>
 #include <map> 
+#include <limits>
 
 #include "./numc.h"
 
@@ -20,7 +21,11 @@ typedef struct ResultIndex{
 typedef struct Results{
 
     Results() {};
-    Results(NumCIndexType resultsRows, NumCIndexType resultsCol): resultsIndexArray(resultsRows, resultsCol), resultsDistArray(resultsRows, resultsCol), executionTimeArray(resultsRows, 1) {};
+    Results(NumCIndexType resultsRows, NumCIndexType resultsCol): 
+        resultsIndexArray(resultsRows, resultsCol), 
+        resultsDistArray(resultsRows, resultsCol), 
+        executionTimeArray(resultsRows, 1) {};
+
     NumC<NumCIndexType> resultsIndexArray;
     NumC<NumCDistType> resultsDistArray;
     NumC<double> executionTimeArray;
@@ -67,13 +72,13 @@ class ResultsComparator{
         std::unordered_set<NumCIndexType> indexSet; 
 
     public:
-        ResultsComparator() {};
+        ResultsComparator(): numOfBestResults{0} {};
         ResultsComparator(int size);
         ~ResultsComparator();
         static void print(Results* results, NumC<int>* labels);
 
 
-        int addResult(int index, double dist);
+        int addResult(NumCIndexType index, NumCDistType dist);
 
         Results* getResults();
         // std::vector<ResultIndex> getResultList();
@@ -82,31 +87,29 @@ class ResultsComparator{
         void print();
 };
 
+
 typedef struct RA_ResultIndex {
-    int first_cluster;
-    double first_dist;
-    int second_cluster;
-    double second_dist;
+    NumCIndexType first_cluster;
+    NumCDistType first_dist;
+    NumCIndexType second_cluster;
+    NumCDistType second_dist;
 } RA_ResultIndex;
 
 class RA_ResultsComparator{
 
     private:
         int numOfBestResults;
-        // std::priority_queue <ResultIndex, std::vector<ResultIndex>, Compare > priorityQueue;
-        // std::unordered_set<NumCIndexType> indexSet;
-        std::map<int, RA_ResultIndex> cluster_map;
+        std::map<NumCIndexType, RA_ResultIndex> cluster_map;
 
     public:
-        RA_ResultsComparator() {};
         RA_ResultsComparator(int size): numOfBestResults{size} {};
         ~RA_ResultsComparator() {};
         // static void print(Results* results, NumC<int>* labels);
-        bool checkIndex(int index);
+        bool checkIndex(NumCIndexType index);
 
-        int addResult(int index, int cluster_index, double dist);
-        int addResultConflict(int index, int cluster_index, double dist);
-        RA_ResultIndex getResult(int index);
+        int addResult(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
+        int addResultConflict(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
+        RA_ResultIndex getResult(NumCIndexType index);
 
         Results* getResults();
         // std::vector<ResultIndex> getResultList();
