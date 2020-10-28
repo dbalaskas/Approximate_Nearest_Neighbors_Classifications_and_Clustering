@@ -183,6 +183,10 @@ RA_ResultIndex RA_ResultsComparator::getResult(NumCIndexType index){
     return cluster_map[index];
 }
 
+NumCIndexType RA_ResultsComparator::getResultsSize(){
+    return (NumCIndexType)cluster_map.size();
+}
+
 int RA_ResultsComparator::addResult(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist){
     RA_ResultIndex result;
     result.first_cluster = cluster_index;
@@ -238,7 +242,7 @@ Results* RA_ResultsComparator::getResults(){
 
 /////////////// TEST ///////////////
 // int main(){
-
+// // 
     
 //     std::map<int, int> mapp;
 
@@ -246,24 +250,27 @@ Results* RA_ResultsComparator::getResults(){
 
 
 //     RA_ResultsComparator ra(11);
+//     cout << "travel map"<< ra.getResultsSize()<< endl;
 //     ra.addResult(10, 0, 10.2);
 //     ra.addResult(9, 3, 10.2);
 //     ra.addResult(5, 5, 10.2);
 //     ra.addResult(10, 0, 10.2);
+//     ra.addResult(10, 0, 1000);
+//     ra.addResult(1000, 0, 10.2);
 //     cout << ra.checkIndex(10) <<endl;
 //     cout << ra.getResult(10).first_dist <<endl;
 //     ra.addResultConflict(10, 1, 10.3);
 //     cout << ra.getResult(10).second_cluster <<endl;
 //     cout << ra.getResult(10).first_dist <<endl;
 //     cout << ra.getResult(10).second_dist <<endl;
-//     cout << "travel map"<<endl;
+//     cout << "travel map"<< ra.getResultsSize()<< endl;
 //     // for (std::map<int, RA_ResultIndex>::iterator i = ra.cluster_map.begin(); i != ra.cluster_map.end(); i++){
 //     //     std::cout << i->first << " => " << i->second.first_cluster << '\n';
 //     // }
-//     Results* res = ra.getResults();
+//     // Results* res = ra.getResults();
 
-//     res->resultsIndexArray.print();
-//     res->resultsDistArray.print();
-//     delete res;
+//     // res->resultsIndexArray.print();
+//     // res->resultsDistArray.print();
+//     // delete res;
 
 // }

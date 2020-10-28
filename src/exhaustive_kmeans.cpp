@@ -206,6 +206,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     NumCDistType meanB = 0;
     NumCIndexType AcentroidIndex;
     NumCIndexType BcentroidIndex;
+    NumCIndexType indexForDist;
 
     clock_t start = clock();
     for (int point = 0; point < this->numOfPoints; point++){
@@ -216,12 +217,14 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
         meanDistB.clear();
         for (int resultsIndex = 0; resultsIndex < results->resultsIndexArray.getRows(); resultsIndex++){
 
-            if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  AcentroidIndex){
-                distA = results->resultsDistArray.getElement(resultsIndex, 0);
+            if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  AcentroidIndex && resultsIndex != point){
+                // distA = results->resultsDistArray.getElement(resultsIndex, 0);
+                distA = NumC<NumCDataType>::distSparse(this->data->getVector(resultsIndex), this->data->getVector(point), 1);
                 meanDistA.push_back(distA);
             }
-            if ( results->resultsIndexArray.getElement(resultsIndex, 1) ==  BcentroidIndex){
-                distB = results->resultsDistArray.getElement(resultsIndex, 1);
+            else if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  BcentroidIndex && resultsIndex != point){
+                // distB = results->resultsDistArray.getElement(resultsIndex, 1);
+                distB = NumC<NumCDataType>::distSparse(this->data->getVector(resultsIndex), this->data->getVector(point), 1);
                 meanDistB.push_back(distB);
             }
         }
@@ -320,7 +323,7 @@ void Kmedians<NumCDataType>::transform(ClusteringType clusteringType){
     } else if (clusteringType == LSH_CLUSTERING) {
         // transform_LSH_CLUSTERING();
     } else if (clusteringType == HC_CLUSTERING) {
-        // transform_HC_CLUSTERING();
+        transform_HC_CLUSTERING();
     }
 
 }
@@ -372,54 +375,100 @@ void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
     getSilhouettes();
 }
 
+template <typename NumCDataType> 
+void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
+
+    NumCDistType prev_objectiveCost = numeric_limits<NumCDistType>::max();
+    NumCDistType new_objectiveCost;
+    NumCDistType objectiveError = numeric_limits<NumCDistType>::max();
+    Results* results;
+
+    // start clock for trasform
+    clock_t start_median, end_median;
+    clock_t start = clock();
+    // init centroids
+    this->kmeansInit();
+
+    HyperCube<NumCDataType>* hcEstimator = new HyperCube<NumCDataType>;
+    hcEstimator->fit_transform(this->data);
+
+    for (int i = 0; i < 1; i++){
+
+        results = hcEstimator->reverse_assignment(this->centroids, 5, 1);
+        cout <<endl<<"HC TIME [" << results->executionTime <<"]"<<endl; 
+        results->resultsIndexArray.print();
+        // find the median for each centroid
+        // start_median = clock();
+        // medianCentroidsUpdate(results);
+        // end_median = clock();
+        // cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / CLOCKS_PER_SEC) <<"]"<<endl;
+
+        // new_objectiveCost = getObjectiveCost(results);
+        // cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
+
+        delete results;
+        
+        // if prev = new then optimization has converged
+        // by 0.1%
+        // objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
+        // prev_objectiveCost = new_objectiveCost;
+        // if (objectiveError < this->error){
+        //     this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+        //     cout << endl<<"Kmeans Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
+        //     break;
+        // }
+    }
+    delete hcEstimator;
+    // getSilhouettes();
+}
 
 
+int main(){
 
-// int main(){
-
-//     Kmedians<int> kmeans(10);
-
-
-//     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 6000);
-//     // NumC<int>::print(inputData->getVector(0));
-//     // NumC<int>::printSparse(inputData->getVector(1));
+    Kmedians<int> kmeans(10);
 
 
-//     NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 6000);
-// //     // NumC<int>::print(inputDatalabels->getVector(0));
+    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60);
+    // NumC<int>::print(inputData->getVector(0));
+    // NumC<int>::printSparse(inputData->getVector(1));
 
-//     kmeans.fit(inputData);
 
-//     NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
-//     for (int i = 0; i < 10; i++){
-//         inputData_->addVector(inputData->getVector(i), i);
-//     }
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60);
+//     // NumC<int>::print(inputDatalabels->getVector(0));
 
-//     kmeans.transform(LLOYDS_CLUSTERING);
+    kmeans.fit(inputData);
 
-//     std::vector<Results*> res;
-//     res = kmeans.getResults();
-//     for (int i = 0; i < res.size(); i++){
-//         // ResultsComparator::print(res[i], inputDatalabels);
-//         delete res[i];
-//     }
+    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+    for (int i = 0; i < 10; i++){
+        inputData_->addVector(inputData->getVector(i), i);
+    }
+
+    // kmeans.transform(LLOYDS_CLUSTERING);
+    kmeans.transform(HC_CLUSTERING);
+
+    std::vector<Results*> res;
+    res = kmeans.getResults();
+    for (int i = 0; i < res.size(); i++){
+        // ResultsComparator::print(res[i], inputDatalabels);
+        delete res[i];
+    }
     
-//     // std::vector<int> ve;
-//     // ve.reserve(10);
-//     // ve.push_back(-1);
-//     // ve.push_back(45);
-//     // for (int i = 0; i < ve.size(); i++){
-//     //     cout << ve[i] << endl;
-//     // }
+    // std::vector<int> ve;
+    // ve.reserve(10);
+    // ve.push_back(-1);
+    // ve.push_back(45);
+    // for (int i = 0; i < ve.size(); i++){
+    //     cout << ve[i] << endl;
+    // }
     
 
-//     // Results* results;
+    // Results* results;
     
-//     // ResultsComparator::print(results, inputDatalabels);
-//     // delete results;
+    // ResultsComparator::print(results, inputDatalabels);
+    // delete results;
 
-//     delete inputData_;
-//     delete inputData;
-//     delete inputDatalabels;
+    delete inputData_;
+    delete inputData;
+    delete inputDatalabels;
 
-// }
+}

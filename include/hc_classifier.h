@@ -5,6 +5,7 @@
 #include "./numc.h"
 #include "./hashtable.h"
 #include "./prediction_results.h"
+#include "./exhaustive_knn.h"
 
 template <typename NumCDataType>
 class HyperCube {
@@ -22,7 +23,7 @@ class HyperCube {
 
         void fit(NumC<NumCDataType>* _data, int k=-1);
         void transform();
-        void fit_transform(NumC<NumCDataType>* _data, int k);
+        void fit_transform(NumC<NumCDataType>* _data, int k=-1);
         Results* predict_knn(Vector<NumCDataType> vector, int k, int maxPoints, int maxVertices);
         Results* predict_knn(NumC<NumCDataType>* testData, int k, int maxPoints, int maxVertices);
         Results* predict_rs(Vector<NumCDataType> vector, int r, int maxPoints, int maxVertices);

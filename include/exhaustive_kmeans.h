@@ -4,6 +4,8 @@
 #include "./numc.h"
 #include "./prediction_results.h"
 #include "./exhaustive_knn.h"
+#include "./hc_classifier.h"
+#include "./lsh_classifier.h"
 #include <vector>
 #include <numeric>
 #include <random>

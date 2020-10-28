@@ -110,6 +110,7 @@ class RA_ResultsComparator{
         int addResult(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
         int addResultConflict(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
         RA_ResultIndex getResult(NumCIndexType index);
+        NumCIndexType getResultsSize();
 
         Results* getResults();
         // std::vector<ResultIndex> getResultList();
