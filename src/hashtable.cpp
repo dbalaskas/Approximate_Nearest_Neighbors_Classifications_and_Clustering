@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include "../include/hashtable.h"
 
-#define R_MULTIPLIER 100
-#define W 100
-
 using namespace std;
 
 template <typename NumCDataType>
@@ -46,38 +43,6 @@ unsigned int HashTable<NumCDataType>::hash(Vector<NumCDataType> vector) {
     }
 }
 
-// template <typename NumCDataType>
-// unsigned int HashTable<NumCDataType>::get_hammingDist(Vector<NumCDataType> vector, int i, int changesLeft, vector<unsigned int>* hashList, int numOfElements=0) {
-//     unsigned int hashValue = hash(vector);
-//     if (hashList->size() == numOfElements) return;
-//     if (changeLeft == 0) {
-//         hashList->pushBack(hashValue);
-//         numOfElements++;
-//         return;
-//     }
-//     if (i<0) return;
-//     mask = 1 << i-1;
-//     get_hammingDist(vector^mask, i-1, changesLeft-1, hashList, numOfElements);
-//     get_hammingDist(vector, i-1, changesLeft, hashList, numOfElements);
-//     // unsigned int mask = 0;
-//     // unsigned int start_pos = 0;
-//     // unsigned int steps = hashFunction.getk();
-//     // cout << numOfBuckets << " vs " << i << endl;
-//     // if (numOfBuckets <= i) return -1;
-//     // while (i > steps && steps > 0) {
-//     //     start_pos++;
-//     //     mask = (mask << 1) + 1;
-//     //     i -= steps;
-//     //     steps --;
-//     // }
-//     // cout << "continue aces until: " << start_pos << " and one ace at: " << i << endl;
-//     // if (i > 0)
-//     //     mask |= (1 << start_pos+i-1);
-//     // hashValue = hashValue ^ mask;
-
-//     return hashValue;
-// }
-
 template <typename NumCDataType>
 vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(unsigned int bucketNum) {
     return bucketList[bucketNum];
@@ -85,7 +50,7 @@ vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(unsigned int buc
 
 template <typename NumCDataType>
 vector< Node<NumCDataType> > HashTable<NumCDataType>::getBucket(Vector<NumCDataType> vector) {
-    return bucketList[hash(vector)%numOfBuckets];
+    return bucketList[hash(vector) % (unsigned int) numOfBuckets];
 }
 
 template <typename NumCDataType>
@@ -94,7 +59,7 @@ void HashTable<NumCDataType>::fit(Vector<NumCDataType> vector, int index) {
     node.index = index;
     node.sVector = vector;
     node.hashValue = hash(vector);
-    bucketList[node.hashValue % (unsigned int)numOfBuckets].push_back(node);
+    bucketList[node.hashValue % (unsigned int) numOfBuckets].push_back(node);
 }
 
 template <typename NumCDataType>

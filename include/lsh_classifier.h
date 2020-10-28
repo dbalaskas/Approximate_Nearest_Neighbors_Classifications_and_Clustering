@@ -13,7 +13,6 @@ template <typename NumCDataType>
 class LSHashing {
 
     private:
-        int N;
         int L;
         int k;
         int w;
@@ -21,16 +20,16 @@ class LSHashing {
         HashTable<NumCDataType>** hashTableList;
 
     public:
-        LSHashing(): N{1}, L{5}, k{4}, w{10}, data{NULL}, hashTableList{NULL} {};
-        LSHashing(int N, int L = 5, int k = 4, int w = 50000);
+        LSHashing(): L{5}, k{4}, w{10}, data{NULL}, hashTableList{NULL} {};
+        LSHashing(int L = 5, int k = 4, int w = 50000);
         ~LSHashing();
 
         void fit(NumC<NumCDataType>* _data);
         void transform();
         void fit_transform(NumC<NumCDataType>* _data);
 
-        Results* predict_knn(Vector<NumCDataType> vector, int N=0);
-        Results* predict_knn(NumC<NumCDataType>* testData, int N=0);
+        Results* predict_knn(Vector<NumCDataType> vector, int N);
+        Results* predict_knn(NumC<NumCDataType>* testData, int N);
 
         Results* predict_rs(Vector<NumCDataType> vector, double r);
         std::vector<Results*> predict_rs(NumC<NumCDataType>* testData, int r);

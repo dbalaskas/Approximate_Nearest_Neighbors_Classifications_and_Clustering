@@ -7,8 +7,6 @@
 
 using namespace std;
 
-#define LIMIT 1024
-
 template class PandaC<int>;
 template class PandaC<long>;
 template class PandaC<double>;

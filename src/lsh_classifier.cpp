@@ -1,13 +1,12 @@
 #include "../include/lsh_classifier.h"
 
-
 #define HASHTABLE_SIZE data->getRows()/8
 
 using namespace std;
 
 template <typename NumCDataType>
-LSHashing<NumCDataType>::LSHashing(int N, int L, int k, int w)
-: N{N}, L{L}, k{k}, w{w}, data{NULL}
+LSHashing<NumCDataType>::LSHashing(int L, int k, int w)
+: L{L}, k{k}, w{w}, data{NULL}
 {
     this->hashTableList = new HashTable<NumCDataType>*[this->L];
 }
@@ -25,7 +24,6 @@ LSHashing<NumCDataType>::~LSHashing() {
     delete[] hashTableList;
     data = NULL;
     L = 0;
-    N = 0;
     k = 0;
     w = 0;
 }
@@ -55,9 +53,6 @@ void LSHashing<NumCDataType>::fit_transform(NumC<NumCDataType>* _data) {
 
 template <typename NumCDataType>
 Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N) {
-    if (N == 0)
-        N = this->N;
-
     ResultsComparator resultsComparator(N);
     unsigned int hashValue;
     std::vector< Node<NumCDataType> > bucket;
@@ -67,8 +62,7 @@ Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N
     for (int i=0; i < L; i++) {
         // get bucket
         hashValue = hashTableList[i]->hash(vector);
-        bucket = hashTableList[i]->getBucket(hashValue%HASHTABLE_SIZE);
-
+        bucket = hashTableList[i]->getBucket(vector);
         for (int j=0; j < (int) bucket.size(); j++) {
             if (hashValue == bucket[j].hashValue) {
                 dist = NumC<NumCDataType>::distSparse(vector, bucket[j].sVector, 1);
@@ -88,9 +82,6 @@ Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N
 
 template <typename NumCDataType>
 Results* LSHashing<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int N) {
-    if (N == 0)
-        N = this->N;
-    
     int numOfQueries = testData->getRows();
     // allocate results sruct for given k
     Results* totalResults = new Results(numOfQueries, N); 
@@ -150,8 +141,7 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
     for (int i=0; i < L; i++) {
         // get bucket
         hashValue = hashTableList[i]->hash(vector);
-        bucket = hashTableList[i]->getBucket(hashValue%HASHTABLE_SIZE);
-
+        bucket = hashTableList[i]->getBucket(vector);
         for (int j=0; j < (int) bucket.size(); j++) {
             if (hashValue == bucket[j].hashValue) {
                 dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);

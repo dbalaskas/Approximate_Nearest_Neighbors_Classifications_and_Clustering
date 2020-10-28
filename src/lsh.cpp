@@ -36,8 +36,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-d") == 0) break;
 	if (i >= argc - 1) {
-      	cout << "\033[0;31mError!\033[0m Not included '-d' parameter.\n" << endl;
-        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -L <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-d' parameter." << endl;
+        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -L <int> -Ν <number_of_nearest> -R <radius>" << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -47,8 +47,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-q") == 0) break;
 	if (i >= argc - 1) {
-      	cout << "\033[0;31mError!\033[0m Not included '-q' parameter.\n" << endl;
-        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -L <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-q' parameter." << endl;
+        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -L <int> -Ν <number_of_nearest> -R <radius>" << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -58,8 +58,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-o") == 0) break;
 	if (i >= argc - 1) {
-      	cout << "\033[0;31mError!\033[0m Not included '-o' parameter.\n" << endl;
-        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -L <int> -Ν <number_of_nearest> -R <radius>" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-o' parameter." << endl;
+        cout << "Executable should be called with: " << argv[0] << " –d <input_file> –q <query_file> -ο <output_file> –k <int> -L <int> -Ν <number_of_nearest> -R <radius>" << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
         if (!isNumber(argv[i+1])) {
         // <-k> parameter is invalid.
-      	    cout << "\033[0;31mError!\033[0m Invalid value on '-k' parameter.\n" << endl;
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-k' parameter." << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
         if (!isNumber(argv[i+1])) {
         // <-L> parameter is invalid.
-      	    cout << "\033[0;31mError!\033[0m Invalid value on '-L' parameter.\n" << endl;
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-L' parameter." << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
       	if (!isNumber(argv[i+1])) {
         // <-N> parameter is invalid.
-      	    cout << "\033[0;31mError!\033[0m Invalid value on '-N' parameter.\n" << endl;
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-N' parameter." << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 	if (i < argc - 1) {
       	if (!isNumber(argv[i+1])) {
         // <-R> parameter is invalid.
-      	    cout << "\033[0;31mError!\033[0m Invalid value on '-R' parameter.\n" << endl;
+      	    cout << "\033[0;31mError!\033[0m Invalid value on '-R' parameter." << endl;
             cout << "\033[0;31mExit program.\033[0m" << endl;
             return 1;        
         }
@@ -158,7 +158,7 @@ do {
 //------------------------------------------------------------------------------------
 // Call LSHashing classifier and train it.
 
-    LSHashing<int> lsh(N, L, k, 50000);
+    LSHashing<int> lsh(L, k, 50000);
     lsh.fit_transform(inputData);
 
 //------------------------------------------------------------------------------------
@@ -200,7 +200,7 @@ do {
     } while (strcmp(answer, "n") && strcmp(answer, "N") && strcmp(answer, "y") && strcmp(answer, "Y"));
     if (!strcmp(answer, "y") || !strcmp(answer, "Y")) {
     // User wants to repeat the process.
-        cout << "\033[0;36mPlease enter a new query file: \033[0m";
+        cout << "\033[0;36mPlease enter a new query file (press Enter to use the old one): \033[0m";
 		fgets(line,sizeof(line),stdin);
         if (strlen(line) > 1) {
             queryFile = strtok(line,"\n");
@@ -213,8 +213,13 @@ do {
             // Read query file with PandaC.
             queryData = PandaC<int>::fromMNIST(queryFile, 50);
         } else {
-            printf("\033[0;31mError\033[0m: Not imported query file");
-            cout << "\033[0;31mexit program\033[0m" << endl;
+            if(access(queryFile, F_OK) == -1) {
+                perror("\033[0;31mError\033[0m: Unable to open query file");
+                cout << "\033[0;31mexit program\033[0m" << endl;
+                return 1;
+            }
+            // Read query file with PandaC.
+            queryData = PandaC<int>::fromMNIST(queryFile, 50);
         }
         cout << "\033[0;36mPlease enter an output file (press Enter to use the old one): \033[0m";
 		fgets(line,sizeof(line),stdin);
@@ -245,22 +250,48 @@ void extractResults(char* outputFile, Results* results, Results *true_results, v
         return;
     }
 
+    double sumDistanceLSH = 0;
+    double sumTimeLSH = 0;
+    double sumDistanceTrue = 0;
+    double sumTimeTrue = 0;
     for (int i=0; i < results->resultsIndexArray.getRows(); i++) {
         output << "Query: " << i+1 << endl;
         for (int j=0; j < results->resultsIndexArray.getCols(); j++) {
             // output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << endl;
             output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << " label: " << inputDatalabels->getElement(results->resultsIndexArray.getElement(i, j) ,0) << " true label: " << inputDatalabels->getElement(true_results->resultsIndexArray.getElement(i, j) ,0)<<endl;
             output << "  distanceLSH: " << results->resultsDistArray.getElement(i, j) << endl;
+            sumDistanceLSH += results->resultsDistArray.getElement(i, j);
             output << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
+            sumDistanceTrue += true_results->resultsDistArray.getElement(i, j);
         }
         output << "  tLSH: " << results->executionTimeArray.getElement(i, 0) << endl;
+        sumTimeLSH += results->executionTimeArray.getElement(i, 0);
         output << "  tTrue: " << true_results->executionTimeArray.getElement(i, 0) << endl;
+        sumTimeTrue += true_results->executionTimeArray.getElement(i, 0);
         output << "  " << R << "-near neighbors:" << endl;
         for (int j=0; j < r_results[i]->resultsIndexArray.getCols(); j++) {
             // output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << endl;
             output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;
         }
     }
+
+    // Printing Score of prediction.
+    cout << endl;
+    cout << "Final Exhaustive vs LSH Score:" << endl;
+    cout << "Average LSH distance: " << (double) sumDistanceLSH/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;
+    cout << "Average True distance: " << (double) sumDistanceTrue/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;
+    cout << "LSH/True distance: " << (double) sumDistanceLSH/sumDistanceTrue << ". (LSH has better accuracy when this number is inclined to 1)" << endl;
+    cout << "LSH's fault is " << (int) ((((double) sumDistanceLSH/sumDistanceTrue)-1)*100) << "% on average prediction." << endl;
+    cout << endl;
+    cout << "Average LSH Time: " << (double) sumTimeLSH/results->resultsIndexArray.getRows() << endl;
+    cout << "Average True Time: " << (double) sumTimeTrue/results->resultsIndexArray.getRows() << endl;
+    cout << "LSH/True Time: " << (double) sumTimeLSH/sumTimeTrue << ". (LSH is faster when this number is inclined to 0)" << endl;
+    if (sumTimeLSH > sumTimeTrue) {
+        cout << "LSH's time is " << (int) ((((double) sumTimeLSH/sumTimeTrue)-1)*100) << "% slower than true." << endl;
+    } else {
+        cout << "LSH's time is " << (int) ((1-((double) sumTimeLSH/sumTimeTrue))*100) << "% faster than true." << endl;
+    }
+    cout << endl;
 
     // Close output file.
     output.close();

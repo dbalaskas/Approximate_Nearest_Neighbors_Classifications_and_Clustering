@@ -38,7 +38,7 @@ DEMANDED_OBJECTS= $(ODIR)/exhaustive_knn.o $(ODIR)/hashtable.o $(ODIR)/hash_func
 
 default: $(CUBE_EXEC) $(LSH_EXEC) $(CLUSTER_EXEC)
 	@echo "============================================================================"
-	@echo "Compiled Project..."
+	@echo "Compiled Project!"
 info:
 	@echo "============================================================================"
 	@echo "source directory: $(SRCDIR)."

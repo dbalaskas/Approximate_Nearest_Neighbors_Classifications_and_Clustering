@@ -13,24 +13,37 @@
 using namespace std;
 
 typedef struct ConfigurationData{
-    int number_of_clusters                  // K of K-medians
-    int number_of_vector_hash_tables        // default: L=3
-    int number_of_vector_hash_functions     // k of LSH for vectors, default: 4
-    int max_number_M_hypercube              // M of Hypercube, default: 10
-    int number_of_hypercube_dimensions      // k of Hypercube, default: 3
-    int number_of_probes                    // probes of Hypercube, default: 2
+    int number_of_clusters; // K of K-medians
+    int L;                  // default: L=3
+    int k;                  // k of LSH for vectors, default: 4
+    int M;                  // M of Hypercube, default: 10
+    int d;                  // k of Hypercube, default: 3
+    int probes;             // probes of Hypercube, default: 2
   
     ConfigurationData()
      :number_of_clusters{-1}, 
-     number_of_vector_hash_tables{3}, 
-     number_of_vector_hash_functions{4}, 
-     max_number_M_hypercube{10},
-     number_of_hypercube_dimensions{3}, 
-     number_of_probes{2} {};
+     L{3}, 
+     k{4}, 
+     M{10},
+     d{3}, 
+     probes{2} {};
 
     ~ConfigurationData() {
         number_of_clusters = -1;
     };
+
+    bool isEmpty() { return number_of_clusters == -1; };
+    void print() {
+        cout << "-------------------------" << endl;
+        cout << "Configuration: " << endl;
+        cout << "  number_of_clusters: " << number_of_clusters << endl;
+        cout << "  L: " << L << endl;
+        cout << "  k: " << k << endl;
+        cout << "  M: " << M << endl;
+        cout << "  d: " << d << endl;
+        cout << "  probes: " << probes << endl;
+        cout << "-------------------------" << endl;
+    }
 
 } ConfigurationData;
 
@@ -59,8 +72,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-i") == 0) break;
 	if (i >= argc - 1) {
-      	cout << "\033[0;31mError!\033[0m Not included '-i' parameter.\n" << endl;
-        cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-i' parameter." << endl;
+        cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -70,8 +83,8 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-c") == 0) break;
 	if (i >= argc - 1) {
-      	cout << "\033[0;31mError!\033[0m Not included '-c' parameter.\n" << endl;
-        cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-c' parameter." << endl;
+        cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
@@ -81,24 +94,29 @@ int main(int argc, char** argv) {
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-o") == 0) break;
 	if (i >= argc - 1) {
-      	cout << "\033[0;31mError!\033[0m Not included '-o' parameter.\n" << endl;
-        cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl << endl;
+      	cout << "\033[0;31mError!\033[0m Not included '-o' parameter." << endl;
+        cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl;
         cout << "\033[0;31mExit program.\033[0m" << endl;
 		return 1;
 	}
 	char *outputFile = argv[i+1];
 
 // Search for <-m> parameter.
-    int k = 4;
 	for (i=1; i < argc - 1; i++)
 		if (strcmp(argv[i], "-m") == 0) break;
 	if (i < argc - 1) {
         if (i >= argc - 1) {
-      	cout << "\033[0;31mError!\033[0m Not included '-m' parameter.\n" << endl;
-        cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl << endl;
-        cout << "\033[0;31mExit program.\033[0m" << endl;
-		return 1;
+            cout << "\033[0;31mError!\033[0m Not included '-m' parameter." << endl;
+            cout << "Executable should be called with: " << argv[0] << " –i <input_file> –c <configuration_file> -o <output_file> -m <method: 'Classic' OR 'LSH' OR 'Hypercube'> -complete (optional)" << endl;
+            cout << "\033[0;31mExit program.\033[0m" << endl;
+            return 1;
+        }
 	}
+    if (!strcmp(argv[i+1], (char*) "Classic") && !strcmp(argv[i+1], (char*) "LSH") && !strcmp(argv[i+1], (char*) "Hypercube")) {
+        cout << "\033[0;31mError!\033[0m Invalid method.\n" << endl;
+        cout << "\033[0;31mExit program.\033[0m" << endl;
+        return 1;
+    }
 	char *method = argv[i+1];
 
 // Search for <-complete> parameter.
@@ -125,15 +143,15 @@ int main(int argc, char** argv) {
 //------------------------------------------------------------------------------------
 // Reading configuration file.
 
-    // Check that input file exists.
+    // Check that configurationn file exists.
     if(access(configurationFile, F_OK) == -1) {
-        perror("\033[0;31mError\033[0m: Unable to open configuration file");
+        perror("\033[0;31mError\033[0m: Unable to open the configurationn file");
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
     // Read configuration file.
-    ConfigurationData* conf = readConfiguration(configurationFile);
-    if (conf->number_of_clusters == -1) {
+    ConfigurationData conf = readConfiguration(configurationFile);
+    if (conf.isEmpty()) {
         cout << "\033[0;31mexit program\033[0m" << endl;
         return 1;
     }
@@ -141,46 +159,44 @@ int main(int argc, char** argv) {
 //------------------------------------------------------------------------------------
 // Making predictions.
 
-char line[128], *answer;
 Results *knn_results, *true_results;
-vector<Results*> r_results;
+// vector<Results*> r_results;
 
 cout << "\033[0;36mComputing clusters...\033[0m" << endl << endl;
 //------------------------------------------------------------------------------------
 // Call LSHashing classifier and train it.
 
-LSHashing<int> lsh(N, L, k, 50000);
+LSHashing<int> lsh(conf.L, conf.k, 50000);
 lsh.fit_transform(inputData);
 
-//------------------------------------------------------------------------------------
-// Call exhaustive knn classifier and train it.
+// //------------------------------------------------------------------------------------
+// // Call exhaustive knn classifier and train it.
 
-ExhaustiveKnn<int> exhaustive_knn(inputData, N);
+// ExhaustiveKnn<int> exhaustive_knn(inputData, N);
 
-//------------------------------------------------------------------------------------
-// Execute Predictions and extract results to output file.
+// //------------------------------------------------------------------------------------
+// // Execute Predictions and extract results to output file.
 
-// Execute k-NN prediction.
-knn_results = lsh.predict_knn(queryData, N);
-// Execute Exhaustive KNN search.
-true_results = exhaustive_knn.predict_knn(queryData);
-// Execute Range Search.
-r_results = lsh.predict_rs(queryData, R);
-// Extract results on output file.
-extractResults(outputFile, knn_results, true_results, r_results, R);
+// // Execute k-NN prediction.
+// knn_results = lsh.predict_knn(queryData, N);
+// // Execute Exhaustive KNN search.
+// true_results = exhaustive_knn.predict_knn(queryData);
+// // Execute Range Search.
+// r_results = lsh.predict_rs(queryData, R);
+// // Extract results on output file.
+extractResults(outputFile, method, complete, knn_results, true_results);
 cout << "Results are extracted in file: " << outputFile << endl;
 
 //------------------------------------------------------------------------------------
 // End of program.
 
     //Free allocated Space.
-    free(conf);
     delete inputData;
     delete knn_results;
     delete true_results;
-    for (int i=0; i < (int) r_results.size(); i++) {
-        delete r_results[i];
-    }
+    // for (int i=0; i < (int) r_results.size(); i++) {
+    //     delete r_results[i];
+    // }
 
     cout << "-----------------------------------------------------------------" << endl;
     cout << "\033[0;36mExit program.\033[0m" << endl;
@@ -197,19 +213,25 @@ void extractResults(char* outputFile, char* method, bool complete, Results* resu
         return;
     }
 
-    output << "Algorithm: " << method << endl;
-    for (int i=0; i < numOfClusters; i++) {
-        output << "  CLUSTER-" << j+1 << " {size: " << results->resultsIndexArray.getElement(i, j) << ", centroid: " << /*/*/ << "}" << endl;
-        output << "  distanceLSH: " << results->resultsDistArray.getElement(i, j) << endl;
-        output << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
+    
+    output << "Algorithm: ";
+    if (!strcmp(method, (char*) "Classic")) {
+        cout << "Lloyds" << endl;
+    } else if (!strcmp(method, (char*) "LSH")) {
+        cout << "Range Search LSH" << endl;
+    } else if (!strcmp(method, (char*) "Hypercube")) {
+        cout << "Range Search Hypercube" << endl;
     }
-    output << "  clustering_time: " << /*/*/ << endl;
-    output << "  Silhouette: [" << /*/*/ << "]" << endl;
+    // for (int i=0; i < numOfClusters; i++) {
+    //     output << "  CLUSTER-" << j+1 << " {size: " << /*/*/ << ", centroid: " << /*/*/ << "}" << endl; //!+++
+    // }
+    // output << "  clustering_time: " << /*/*/ << endl; //!+++
+    // output << "  Silhouette: [" << /*/*/ << "]" << endl; //!+++
     // if (complete == true) {
     //     for (int i=0; i < numOfClusters; i++) {
-    //         output << "  CLUSTER-" << j+1 << " {size: " << results->resultsIndexArray.getElement(i, j) << ", centroid: " << /*/*/;
-    //         // for (int j=0; j < cluster_contents; j++) {
-    //             cout << ... << ", ";
+    //         output << "  CLUSTER-" << j+1 << " {centroid: " << /*/*/ << ", "; //!+++
+    //         for (int j=0; j < cluster_contents; j++) {
+    //             cout << /*...*/ << ", "; //!+++
     //         }
     //         output << "}" << endl;
     //     }
@@ -220,39 +242,47 @@ void extractResults(char* outputFile, char* method, bool complete, Results* resu
     delete inputDatalabels;
 }
 
-ConfigurationData* readConfiguration(char* configurationFile) {
-    ConfigurationData *conf = NULL;
-    ofstream output(outputFile, ios::out);
-    // Check that output file exists.
-    if (!output.is_open()) {
-        perror("\033[0;31mError\033[0m: Unable to open output file");
-        return conf;
+ConfigurationData readConfiguration(char* configurationFile) {
+    ConfigurationData confData;
+    FILE *conf = fopen(configurationFile, "r");
+    
+    char line[128];
+    char *command;
+    int value;
+    while(fgets(line,sizeof(line),conf) != NULL) {
+        if (line[0] == '#') {
+            // Comment
+            continue;
+        }
+        if (strlen(line) > 1) {
+            // cout << line;
+    		command = strtok(line," : ");
+    		value = atoi(strtok(NULL,"\n"));
+        }
+        // cout << "<" << command << ">: " << value << endl;
+        if (!strcmp(command, (char*) "number_of_clusters")) {
+            confData.number_of_clusters = value;
+        } else if (!strcmp(command, (char*) "number_of_vector_hash_tables")) {
+            confData.L = value;
+        } else if (!strcmp(command, (char*) "number_of_vector_hash_functions")) {
+            confData.k = value;
+        } else if (!strcmp(command, (char*) "max_number_M_hypercube")) {
+            confData.M = value;
+        } else if (!strcmp(command, (char*) "number_of_hypercube_dimensions")) {
+            confData.d = value;
+        } else if (!strcmp(command, (char*) "number_of_probes")) {
+            confData.probes = value;
+        } else {
+            // Not accepted configuration
+        }
     }
-    conf = (ConfigurationData*) malloc(sizeof(ConfigurationData));
-    // read conf;
-    // switch (command) {
-    //     case (char*) "number_of_clusters":
-    //         conf.number_of_clusters = value;
-    //         break;
-    //     case (char*) "number_of_vector_hash_tables":
-    //         conf.number_of_vector_hash_tables = value;
-    //         break;
-    //     case (char*) "number_of_vector_hash_functions":
-    //         conf.number_of_vector_hash_functions = value;
-    //         break;
-    //     case (char*) "max_number_M_hypercube":
-    //         conf.max_number_M_hypercube = value;
-    //         break;
-    //     case (char*) "number_of_hypercube_dimensions":
-    //         conf.number_of_hypercube_dimensions = value;
-    //         break;
-    //     case (char*) "number_of_probes":
-    //         conf.number_of_probes = value;
-    //         break;
-    //     default:
-    //         break;
-    // }
+    if (!feof(conf)) {
+      	cout << "\033[0;31mError!\033[0m Bad configuration file." << endl;
+        fclose(conf);
+        return ConfigurationData();
+    }
 
-    output.close();
-    return conf;
+    fclose(conf);
+    confData.print();
+    return confData;
 }

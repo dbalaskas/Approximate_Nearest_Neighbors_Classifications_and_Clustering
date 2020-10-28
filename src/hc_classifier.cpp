@@ -80,7 +80,7 @@ std::vector<unsigned int> HyperCube<NumCDataType>::getHashList(Vector<NumCDataTy
 template <typename NumCDataType>
 Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k, int maxPoints, int maxVertices) {
     if (maxVertices > hashTableSize) maxVertices = hashTableSize;
-
+    if (k > maxPoints) k = maxPoints;
     // comparator to get best results distances
     ResultsComparator resultsComparator(k);
     std::vector<Node<NumCDataType>> bucket;
@@ -90,15 +90,19 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
     int pointsChecked = 0;
 
     for (int i = 0; i < maxVertices; i++){
-        bucket = hashTable->getBucket(hashList[i] % hashTableSize);
+        bucket = hashTable->getBucket(hashList[i]);
         // search and find the k with minimun distance
         for (int j=0; j < (int) bucket.size(); j++) {
             // add to results and the will figure out the best neighbors
             resultsComparator.addResult(bucket[j].index, NumC<NumCDataType>::distSparse(bucket[j].sVector, vector, 1));
             pointsChecked++;
+            if(pointsChecked >= maxPoints) {
+                break;
+            }
         }
-        if(pointsChecked >= maxPoints)
+        if(pointsChecked >= maxPoints) {
             break;
+        }
     }
     clock_t end = clock();
 
@@ -110,6 +114,8 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
 
 template <typename NumCDataType>
 Results* HyperCube<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int k, int maxPoints, int maxVertices) {
+    if (maxVertices > hashTableSize) maxVertices = hashTableSize;
+    if (k > maxPoints) k = maxPoints;
     int numOfQueries = testData->getRows();
     // allocate results sruct for given k
     Results* totalResults = new Results(numOfQueries, k); 
@@ -148,7 +154,7 @@ Results* HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r,
     double dist;
 
     for (int i = 0; i < maxVertices; i++){
-        bucket = hashTable->getBucket(hashList[i] % hashTableSize);
+        bucket = hashTable->getBucket(hashList[i]);
         // search and find the k with minimun distance
         for (int j=0; j < (int) bucket.size(); j++) {
             // add to results and the will figure out the best neighbors
@@ -157,7 +163,9 @@ Results* HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r,
                 resultsComparator.addResult(bucket[j].index, dist);
             }
             pointsChecked++;
-            // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
+            if(pointsChecked >= maxPoints) {
+                break;
+            }
         }
         if(pointsChecked >= maxPoints)
             break;
@@ -176,6 +184,7 @@ Results* HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r,
 
 template <typename NumCDataType>
 vector<Results*> HyperCube<NumCDataType>::predict_rs(NumC<NumCDataType>* testData, int r, int maxPoints, int maxVertices) {
+    if (maxVertices > hashTableSize) maxVertices = hashTableSize;
     int numOfQueries = testData->getRows();
     // allocate results sruct for given k
     vector<Results*> totalResults(numOfQueries); 
