@@ -200,7 +200,6 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     // std::vector<Node<NumCDataType>> bucket;
     // std::vector<unsigned int> hashList = getHashList(vector,  maxVertices); 
 
-    // clock_t start = clock();
     // int pointsChecked = 0;
     // double dist;
 
@@ -238,7 +237,8 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     //* GOOD MORNING BUDDY
     // r-Computation
     //  <3 <3 <3 <3 
-    int r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
+    clock_t start = clock();
+    NumCDistType r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
     for (int i = 0; i < centroids->getRows(); i++){
         for (int j=i+1; j < centroids->getRows(); j++) {
             dist = NumC<NumCDataType>::dist(centroids->getVector(i), centroids->getVector(j), 1);
@@ -279,7 +279,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
                         //     }
                         // } // else continue
                         dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
-                        cout << "Conflict centroid "<< centroidIndex << " vector " << bucket[j].index <<endl; 
+                        // cout << "Conflict centroid "<< centroidIndex << " vector " << bucket[j].index <<endl; 
                         if (dist <= r){
                             resultsComparator.addResultConflict(bucket[j].index, centroidIndex, dist);
                         }
@@ -295,20 +295,20 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
                     // pointsChecked++;
                     // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
                 }
-                // if(pointsChecked >= maxPoints)
-                //     break;
+                if(resultsComparator.getResultsSize() >= maxPoints)
+                    break;
             }
         }
         r *= 2;
         new_pointsChecked = resultsComparator.getResultsSize();
         cout << "NEW POINTS CHECKED [" << new_pointsChecked << "]" <<endl;
-    }while (new_pointsChecked != prev_pointsChecked);
+    }while (new_pointsChecked != prev_pointsChecked || new_pointsChecked == 0);
 
 
     // results 
     Results* results = resultsComparator.getResults();
     // results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
-    results->resultsDistArray.print();
+    // results->resultsDistArray.print();
     // do exhaustive search for the points that remained unassigned
     Results* knnResults;
     NumCIndexType centroidIndex;
@@ -335,6 +335,8 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     delete results;
     results = resultsComparator.getResults();
 
+    // set time to results
+    results->executionTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
 
     delete knnEstimator;
     return results;

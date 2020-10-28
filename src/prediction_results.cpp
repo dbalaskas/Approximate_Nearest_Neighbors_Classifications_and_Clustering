@@ -227,7 +227,7 @@ Results* RA_ResultsComparator::getResults(){
     results->resultsDistArray.fill(-1);
     for (std::map<int, RA_ResultIndex>::iterator iterator = cluster_map.begin(); iterator != cluster_map.end(); iterator++){
 
-        std::cout << iterator->first << " => " << iterator->second.first_cluster << '\n';
+        // std::cout << iterator->first << " => " << iterator->second.first_cluster << '\n';
         // fill the results arrays
         results->resultsIndexArray.addElement( iterator->second.first_cluster, iterator->first, 0);
         results->resultsIndexArray.addElement( iterator->second.second_cluster, iterator->first, 1);

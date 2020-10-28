@@ -321,7 +321,7 @@ void Kmedians<NumCDataType>::transform(ClusteringType clusteringType){
     if (clusteringType == LLOYDS_CLUSTERING) {
         transform_LLOYDS_CLUSTERING();
     } else if (clusteringType == LSH_CLUSTERING) {
-        // transform_LSH_CLUSTERING();
+        transform_LSH_CLUSTERING();
     } else if (clusteringType == HC_CLUSTERING) {
         transform_HC_CLUSTERING();
     }
@@ -360,7 +360,6 @@ void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
         cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
 
         delete results;
-        
         // if prev = new then optimization has converged
         // by 0.1%
         objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
@@ -392,83 +391,128 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
     HyperCube<NumCDataType>* hcEstimator = new HyperCube<NumCDataType>;
     hcEstimator->fit_transform(this->data);
 
-    for (int i = 0; i < 1; i++){
+    for (int i = 0; i < 10; i++){
 
-        results = hcEstimator->reverse_assignment(this->centroids, 5, 1);
+        results = hcEstimator->reverse_assignment(this->centroids, 10, 10);
         cout <<endl<<"HC TIME [" << results->executionTime <<"]"<<endl; 
-        results->resultsIndexArray.print();
-        // find the median for each centroid
-        // start_median = clock();
-        // medianCentroidsUpdate(results);
-        // end_median = clock();
-        // cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / CLOCKS_PER_SEC) <<"]"<<endl;
 
-        // new_objectiveCost = getObjectiveCost(results);
-        // cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
+        // find the median for each centroid
+        start_median = clock();
+        medianCentroidsUpdate(results);
+        end_median = clock();
+        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / CLOCKS_PER_SEC) <<"]"<<endl;
+
+        new_objectiveCost = getObjectiveCost(results);
+        cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
 
         delete results;
-        
         // if prev = new then optimization has converged
         // by 0.1%
-        // objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
-        // prev_objectiveCost = new_objectiveCost;
-        // if (objectiveError < this->error){
-        //     this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
-        //     cout << endl<<"Kmeans Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
-        //     break;
-        // }
+        objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
+        prev_objectiveCost = new_objectiveCost;
+        if (objectiveError < this->error){
+            this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+            cout << endl<<"Kmeans Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
+            break;
+        }
     }
     delete hcEstimator;
-    // getSilhouettes();
+    getSilhouettes();
 }
 
+template <typename NumCDataType> 
+void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
 
-int main(){
+    NumCDistType prev_objectiveCost = numeric_limits<NumCDistType>::max();
+    NumCDistType new_objectiveCost;
+    NumCDistType objectiveError = numeric_limits<NumCDistType>::max();
+    Results* results;
 
-    Kmedians<int> kmeans(10);
+    // start clock for trasform
+    clock_t start_median, end_median;
+    clock_t start = clock();
+    // init centroids
+    this->kmeansInit();
 
+    LSHashing<NumCDataType>* lshEstimator = new LSHashing<NumCDataType>(1);
+    lshEstimator->fit_transform(this->data);
 
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60);
-    // NumC<int>::print(inputData->getVector(0));
-    // NumC<int>::printSparse(inputData->getVector(1));
-
-
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60);
-//     // NumC<int>::print(inputDatalabels->getVector(0));
-
-    kmeans.fit(inputData);
-
-    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
     for (int i = 0; i < 10; i++){
-        inputData_->addVector(inputData->getVector(i), i);
+
+        results = lshEstimator->reverse_assignment(this->centroids);
+        cout <<endl<<"LSH TIME [" << results->executionTime <<"]"<<endl; 
+
+        // find the median for each centroid
+        start_median = clock();
+        medianCentroidsUpdate(results);
+        end_median = clock();
+        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / CLOCKS_PER_SEC) <<"]"<<endl;
+
+        new_objectiveCost = getObjectiveCost(results);
+        cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
+
+        delete results;
+        // if prev = new then optimization has converged
+        // by 0.1%
+        objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
+        prev_objectiveCost = new_objectiveCost;
+        if (objectiveError < this->error){
+            this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+            cout << endl<<"Kmeans Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
+            break;
+        }
     }
-
-    // kmeans.transform(LLOYDS_CLUSTERING);
-    kmeans.transform(HC_CLUSTERING);
-
-    std::vector<Results*> res;
-    res = kmeans.getResults();
-    for (int i = 0; i < res.size(); i++){
-        // ResultsComparator::print(res[i], inputDatalabels);
-        delete res[i];
-    }
-    
-    // std::vector<int> ve;
-    // ve.reserve(10);
-    // ve.push_back(-1);
-    // ve.push_back(45);
-    // for (int i = 0; i < ve.size(); i++){
-    //     cout << ve[i] << endl;
-    // }
-    
-
-    // Results* results;
-    
-    // ResultsComparator::print(results, inputDatalabels);
-    // delete results;
-
-    delete inputData_;
-    delete inputData;
-    delete inputDatalabels;
-
+    delete lshEstimator;
+    getSilhouettes();
 }
+
+
+// int main(){
+
+//     Kmedians<int> kmeans(10);
+
+
+//     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 6000);
+//     // NumC<int>::print(inputData->getVector(0));
+//     // NumC<int>::printSparse(inputData->getVector(1));
+
+
+//     NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 6000);
+// //     // NumC<int>::print(inputDatalabels->getVector(0));
+
+//     kmeans.fit(inputData);
+
+//     NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+//     for (int i = 0; i < 10; i++){
+//         inputData_->addVector(inputData->getVector(i), i);
+//     }
+
+//     // kmeans.transform(LLOYDS_CLUSTERING);
+//     kmeans.transform(LSH_CLUSTERING);
+
+//     std::vector<Results*> res;
+//     res = kmeans.getResults();
+//     for (int i = 0; i < res.size(); i++){
+//         // ResultsComparator::print(res[i], inputDatalabels);
+//         delete res[i];
+//     }
+    
+//     // std::vector<int> ve;
+//     // ve.reserve(10);
+//     // ve.push_back(-1);
+//     // ve.push_back(45);
+//     // for (int i = 0; i < ve.size(); i++){
+//     //     cout << ve[i] << endl;
+//     // }
+    
+
+//     // Results* results;
+    
+//     // ResultsComparator::print(results, inputDatalabels);
+//     // delete results;
+
+//     delete inputData_;
+//     delete inputData;
+//     delete inputDatalabels;
+
+// }

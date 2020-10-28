@@ -5,6 +5,7 @@
 #include "./numc.h"
 #include "./hashtable.h"
 #include "./prediction_results.h"
+#include "./exhaustive_knn.h"
 
 // typedef vector<HashTable<NumCDataType>> HashTableList;
 
@@ -34,6 +35,7 @@ class LSHashing {
 
         Results* predict_rs(Vector<NumCDataType> vector, double r);
         std::vector<Results*> predict_rs(NumC<NumCDataType>* testData, int r);
+        Results* reverse_assignment(NumC<NumCDataType>* centroids);
 };
 
 template class LSHashing<int>;
