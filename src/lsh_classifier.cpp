@@ -179,6 +179,122 @@ vector<Results*> LSHashing<NumCDataType>::predict_rs(NumC<NumCDataType>* testDat
     return totalResults;
 }
 
+
+template <typename NumCDataType>
+Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroids) {
+
+    unsigned int hashValue;
+    std::vector< Node<NumCDataType> > bucket;
+
+    RA_ResultsComparator resultsComparator(this->data->getRows());
+    NumCDistType dist;
+    int prev_pointsChecked = resultsComparator.getResultsSize();
+    int new_pointsChecked = 0;
+
+    clock_t start = clock();
+    NumCDistType r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
+    for (int i = 0; i < centroids->getRows(); i++){
+        for (int j=i+1; j < centroids->getRows(); j++) {
+            dist = NumC<NumCDataType>::dist(centroids->getVector(i), centroids->getVector(j), 1);
+            if (dist < r) {
+                r = dist;
+            }
+        }
+    }
+    r /= 2;
+    cout << r << endl;
+
+    // for (int i=0; i < L; i++) {
+    //     // get bucket
+    //     hashValue = hashTableList[i]->hash(vector);
+    //     bucket = hashTableList[i]->getBucket(hashValue%HASHTABLE_SIZE);
+
+    //     for (int j=0; j < (int) bucket.size(); j++) {
+    //         if (hashValue == bucket[j].hashValue) {
+
+    //             dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
+    //             if (dist <= r){
+    //                 resultsComparator.addResult(bucket[j].index, dist);
+    //             }
+
+    //         }
+    //     }
+    //     // results.add(index, dist);
+    // }
+    do{
+        prev_pointsChecked = resultsComparator.getResultsSize();
+
+        for (int centroidIndex=0; centroidIndex < centroids->getRows(); centroidIndex++) {
+            //return points in distance r
+            for (int i=0; i < L; i++) {
+
+                hashValue = hashTableList[i]->hash(centroids->getVector(centroidIndex));
+                bucket = hashTableList[i]->getBucket(centroids->getVector(centroidIndex));
+
+                for (int j=0; j < (int) bucket.size(); j++) {
+                // cout << "bucket size " <<bucket.size() <<" " <<bucket[j].hashValue << " "<< hashValue<<endl;
+                    if (hashValue == bucket[j].hashValue) {
+                        
+                        if (resultsComparator.checkIndex(bucket[j].index) && resultsComparator.getResult(bucket[j].index).first_cluster != centroidIndex) {
+
+                            dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
+                            if (dist <= r){
+                                resultsComparator.addResultConflict(bucket[j].index, centroidIndex, dist);
+                            }
+                        } else {
+                            dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
+                            if (dist <= r){
+                                resultsComparator.addResult(bucket[j].index, centroidIndex, dist);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        r *= 2;
+        new_pointsChecked = resultsComparator.getResultsSize();
+        cout << "NEW POINTS CHECKED [" << new_pointsChecked << "]" <<endl;
+    }while (new_pointsChecked != prev_pointsChecked || new_pointsChecked == 0);
+
+
+
+    // results 
+    Results* results = resultsComparator.getResults();
+    // do exhaustive search for the points that remained unassigned
+    Results* knnResults;
+    NumCIndexType centroidIndex;
+    ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
+    knnEstimator->fit(centroids);
+    
+    // find the unassigned with index -1
+    for (int resultIndex = 0; resultIndex < results->resultsIndexArray.getRows(); resultIndex++){
+        
+        // if found unassigned then do exhaustive search for it
+        if (results->resultsIndexArray.getElement(resultIndex,0) == -1){
+            knnResults = knnEstimator->predict_knn(this->data->getVector(resultIndex));
+            // add its results (centroids) to the total results
+            centroidIndex = knnResults->resultsIndexArray.getElement(0,0);
+            dist = knnResults->resultsDistArray.getElement(0,0);
+            resultsComparator.addResult(resultIndex, centroidIndex, dist);
+            // add second nearest centroid
+            centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
+            dist = knnResults->resultsDistArray.getElement(0,1);
+            resultsComparator.addResultConflict(resultIndex, centroidIndex, dist);
+            delete knnResults;
+        }
+    }
+    // delete previous results and gat the new one
+    delete results;
+    results = resultsComparator.getResults();
+
+    // set time to results
+    results->executionTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+
+    delete knnEstimator;
+    return results;
+}
+
 // #include "../include/pandac.h"
 // int main(){
 //     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte");

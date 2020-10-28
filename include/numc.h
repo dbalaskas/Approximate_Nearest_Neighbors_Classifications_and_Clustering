@@ -50,11 +50,13 @@ class NumC {
         void addVector(Vector<NumCDataType> vector, NumCIndexType index);
         void addArray(NumC<NumCDataType> array, NumCIndexType index);
         void appendVector(Vector<NumCDataType> vector);
+        void fill(NumCDataType fillValue);
 
         void print();
 
         NumC* median();
         NumCDataType max();
+        NumCDataType sum();
         void square();
         void normalize();
         void cumulative();

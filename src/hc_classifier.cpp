@@ -203,13 +203,12 @@ vector<Results*> HyperCube<NumCDataType>::predict_rs(NumC<NumCDataType>* testDat
 
 template <typename NumCDataType>
 Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroids, int maxPoints, int maxVertices) {
-    // if (maxVertices > hashTableSize) maxVertices = hashTableSize;
+    if (maxVertices > hashTableSize) maxVertices = hashTableSize;
     // // comparator to get best results distances
     // ResultsComparator resultsComparator(0);
     // std::vector<Node<NumCDataType>> bucket;
     // std::vector<unsigned int> hashList = getHashList(vector,  maxVertices); 
 
-    // clock_t start = clock();
     // int pointsChecked = 0;
     // double dist;
 
@@ -235,9 +234,10 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     // // }
     RA_ResultsComparator resultsComparator(this->data->getRows());
 
-    double dist;
-    int clusteredPoints = 0;
-    int pointsChecked;
+    NumCDistType dist;
+    // int clusteredPoints = 0;
+    int prev_pointsChecked = resultsComparator.getResultsSize();
+    int new_pointsChecked = 0;
     // Results* queryResults;
     // ResultsComparator resultsComparator(0);
     std::vector<Node<NumCDataType>> bucket;
@@ -245,7 +245,9 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
 
     //* GOOD MORNING BUDDY
     // r-Computation
-    int r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
+    //  <3 <3 <3 <3 
+    clock_t start = clock();
+    NumCDistType r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
     for (int i = 0; i < centroids->getRows(); i++){
         for (int j=i+1; j < centroids->getRows(); j++) {
             dist = NumC<NumCDataType>::dist(centroids->getVector(i), centroids->getVector(j), 1);
@@ -257,51 +259,96 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     r /= 2;
     cout << r << endl;
 //     //* ^^^^^^^^^ NOT TESTED ^^^^^^^^^
-    while (clusteredPoints < data->getRows()) {
+    // while (clusteredPoints < data->getRows()) {
+    do{
+        prev_pointsChecked = resultsComparator.getResultsSize();
 
         for (int centroidIndex=0; centroidIndex < centroids->getRows(); centroidIndex++) {
             //return points in distance r
             // queryResults = this->predict_rs(centroids->getVector(cetroidIndex), r, maxPoints, maxVertices);
             hashList = getHashList(centroids->getVector(centroidIndex),  maxVertices);
-            pointsChecked = 0;
+            // for (size_t i = 0; i < hashList.size(); i++){
+            //     cout<< "list " <<hashList[i]<<endl;
+            // }
+            
+            // pointsChecked = 0;
             for (int i = 0; i < maxVertices; i++){
                 bucket = hashTable->getBucket(hashList[i]);
+                // cout << "b size "<<bucket.size()<<endl;
                 // search and find the k with minimun distance
                 for (int j=0; j < (int) bucket.size(); j++) {
                     // add to results and the will figure out the best neighbors
-                    if (resultsComparator.checkIndex(bucket[j].index)) {
+                    // cout << "Index: [" << bucket[j].index << "]" << endl;
+                    if (resultsComparator.checkIndex(bucket[j].index) && resultsComparator.getResult(bucket[j].index).first_cluster != centroidIndex) {
                         // // check if confliict
                         // if (map[bucket[j].index] != cetroidIndex) {
-                        //     dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(cetroidIndex), 1);
                         //     if (dist < =map[bucket[j].index].distance) {
                         //         //custom insert in map
                         //         clusteredPoints++;
                         //     }
                         // } // else continue
+                        dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
+                        // cout << "Conflict centroid "<< centroidIndex << " vector " << bucket[j].index <<endl; 
+                        if (dist <= r){
                             resultsComparator.addResultConflict(bucket[j].index, centroidIndex, dist);
+                        }
                     } else {
                         dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
                         if (dist <= r){
                             resultsComparator.addResult(bucket[j].index, centroidIndex, dist);
 
                             //custom insert in map
-                            clusteredPoints++;
+                            // clusteredPoints++;
                         }
                     }
-                    pointsChecked++;
+                    // pointsChecked++;
                     // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
                 }
-                if(pointsChecked >= maxPoints)
+                if(resultsComparator.getResultsSize() >= maxPoints)
                     break;
             }
         }
         r *= 2;
-    }
+        new_pointsChecked = resultsComparator.getResultsSize();
+        cout << "NEW POINTS CHECKED [" << new_pointsChecked << "]" <<endl;
+    }while (new_pointsChecked != prev_pointsChecked || new_pointsChecked == 0);
 
 
     // results 
     Results* results = resultsComparator.getResults();
     // results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    // results->resultsDistArray.print();
+    // do exhaustive search for the points that remained unassigned
+    Results* knnResults;
+    NumCIndexType centroidIndex;
+    ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
+    knnEstimator->fit(centroids);
+    
+    // find the unassigned with index -1
+    for (int resultIndex = 0; resultIndex < results->resultsIndexArray.getRows(); resultIndex++){
+        
+        // if found unassigned then do exhaustive search for it
+        if (results->resultsIndexArray.getElement(resultIndex,0) == -1){
+            knnResults = knnEstimator->predict_knn(this->data->getVector(resultIndex));
+            // add its results (centroids) to the total results
+            centroidIndex = knnResults->resultsIndexArray.getElement(0,0);
+            dist = knnResults->resultsDistArray.getElement(0,0);
+            resultsComparator.addResult(resultIndex, centroidIndex, dist);
+            // add second nearest centroid
+            centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
+            dist = knnResults->resultsDistArray.getElement(0,1);
+            resultsComparator.addResultConflict(resultIndex, centroidIndex, dist);
+            delete knnResults;
+        }
+    }
+    // delete previous results and gat the new one
+    delete results;
+    results = resultsComparator.getResults();
+
+    // set time to results
+    results->executionTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+
+    delete knnEstimator;
     return results;
 }
 
