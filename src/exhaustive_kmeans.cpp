@@ -10,28 +10,37 @@
 using namespace std;
 
 template <typename NumCDataType> 
-ExhaustiveKmeans<NumCDataType>::ExhaustiveKmeans(int numOfClusters){
+Kmedians<NumCDataType>::Kmedians(int numOfClusters, int maxIterations, NumCDistType error){
     this->numOfClusters = numOfClusters;
     this->numOfDimensions = 0;
-    this->overallSilhouette = 0.0;
+    this->numOfPoints = 0;
+    this->maxIterations = maxIterations;
+    this->error = error;
+    this->transformTime = 0.0;
+    // this->overallSilhouette = 0.0;
     this->centroids = NULL;
-    this->objectiveCost = 0.0;
+    this->data = NULL;
+    // this->objectiveCost = 0.0;
 }
 
 template <typename NumCDataType> 
-ExhaustiveKmeans<NumCDataType>::ExhaustiveKmeans(NumC<NumCDataType>* data, int numOfClusters){
-    this->data = data;
+Kmedians<NumCDataType>::Kmedians(NumC<NumCDataType>* data, int numOfClusters, int maxIterations, NumCDistType error){
     this->numOfClusters = numOfClusters;
     this->numOfDimensions = this->data->getCols();
     this->numOfPoints = this->data->getRows();
-    this->silhouette.reserve(numOfClusters);
-    this->overallSilhouette = 0.0;
+    this->maxIterations = maxIterations;
+    this->error = error;
+    this->transformTime = 0.0;
+
+    this->data = data;
     this->centroids = NULL;
-    this->objectiveCost = 0.0;
+    // this->silhouette.reserve(this->numOfClusters);
+    // this->overallSilhouette = 0.0;
+    // this->objectiveCost = 0.0;
 }
 
 template <typename NumCDataType> 
-ExhaustiveKmeans<NumCDataType>::~ExhaustiveKmeans(){
+Kmedians<NumCDataType>::~Kmedians(){
     this->numOfClusters = 0;
 
     if (this->data != NULL) {
@@ -45,8 +54,17 @@ ExhaustiveKmeans<NumCDataType>::~ExhaustiveKmeans(){
 
 }
 
+
 template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::randomInit(){
+void Kmedians<NumCDataType>::fit(NumC<NumCDataType>* trainData){
+    this->data = trainData;
+    this->numOfDimensions = this->data->getCols();
+    this->numOfPoints = this->data->getRows();
+
+}
+
+template <typename NumCDataType> 
+void Kmedians<NumCDataType>::randomInit(){
     // allocate random for centroids
     if (this->centroids != NULL) {
         delete this->centroids;
@@ -58,7 +76,7 @@ void ExhaustiveKmeans<NumCDataType>::randomInit(){
 }
 
 template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::kmeansInit(){
+void Kmedians<NumCDataType>::kmeansInit(){
 
     srand(time(NULL));
     std::random_device randomDevice; 
@@ -119,26 +137,16 @@ void ExhaustiveKmeans<NumCDataType>::kmeansInit(){
 }
 
 
-template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::fit(NumC<NumCDataType>* trainData){
-    this->data = trainData;
-    this->numOfDimensions = this->data->getCols();
-    this->numOfPoints = this->data->getRows();
 
-    // init centroids
-    // this->randomInit();
-    this->kmeansInit();
-
-}
 
 template <typename NumCDataType> 
-NumC<NumCDataType>* ExhaustiveKmeans<NumCDataType>::getCentroids(){
+NumC<NumCDataType>* Kmedians<NumCDataType>::getCentroids(){
     return this->centroids;
 }
 
 // calculate and get the indexes of images that belong to known centroids
 template <typename NumCDataType> 
-vector<Results*> ExhaustiveKmeans<NumCDataType>::getResults(){
+vector<Results*> Kmedians<NumCDataType>::getResults(){
 
     // allocate space for new results
     vector<Results*> totalResults(this->numOfClusters); 
@@ -158,6 +166,7 @@ vector<Results*> ExhaustiveKmeans<NumCDataType>::getResults(){
             }
         }
         totalResults[centroidIndex] = resultsComparator->getResults();
+        totalResults[centroidIndex]->executionTime = this->transformTime;
         delete resultsComparator;
     }
 
@@ -167,7 +176,7 @@ vector<Results*> ExhaustiveKmeans<NumCDataType>::getResults(){
 }
 
 template <typename NumCDataType> 
-NumCDistType ExhaustiveKmeans<NumCDataType>::calculateSilhouette(NumCDistType distA, NumCDistType distB){
+NumCDistType Kmedians<NumCDataType>::calculateSilhouette(NumCDistType distA, NumCDistType distB){
 
     if (distA < distB){
         return 1.0 - (distA / distB);
@@ -182,44 +191,77 @@ NumCDistType ExhaustiveKmeans<NumCDataType>::calculateSilhouette(NumCDistType di
 }
 
 template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::getSilhouette(Results* results){
-    std::vector<NumCDistType> meanDistA(this->numOfPoints / this->numOfClusters);
-    std::vector<NumCDistType> meanDistB(this->numOfPoints / this->numOfClusters);
+vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
+
+    vector<NumCDistType> meanDistA;
+    meanDistA.reserve(this->numOfPoints / this->numOfClusters);
+    vector<NumCDistType> meanDistB;
+    meanDistB.reserve(this->numOfPoints / this->numOfClusters);
+    vector< vector<NumCDistType> > silhouettes(this->numOfClusters);
+    vector<NumCDistType> overallSilhouettes(this->numOfClusters);
+    NumCDistType meanSilhouettes;
     NumCDistType distA = 0;
     NumCDistType distB = 0;
     NumCDistType meanA = 0;
     NumCDistType meanB = 0;
+    NumCIndexType AcentroidIndex;
+    NumCIndexType BcentroidIndex;
 
-    this->silhouette.clear();
-
-    for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
+    clock_t start = clock();
+    for (int point = 0; point < this->numOfPoints; point++){
+        AcentroidIndex = results->resultsIndexArray.getElement(point, 0);
+        BcentroidIndex = results->resultsIndexArray.getElement(point, 1);
 
         meanDistA.clear();
         meanDistB.clear();
         for (int resultsIndex = 0; resultsIndex < results->resultsIndexArray.getRows(); resultsIndex++){
 
-            if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  centroidIndex){
+            if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  AcentroidIndex){
                 distA = results->resultsDistArray.getElement(resultsIndex, 0);
-                distB = results->resultsDistArray.getElement(resultsIndex, 1);
                 meanDistA.push_back(distA);
+            }
+            if ( results->resultsIndexArray.getElement(resultsIndex, 1) ==  BcentroidIndex){
+                distB = results->resultsDistArray.getElement(resultsIndex, 1);
                 meanDistB.push_back(distB);
             }
         }
         // get the silhouette
         meanA = std::accumulate(meanDistA.begin(), meanDistA.end(), 0.0) / (NumCDistType)meanDistA.size();
         meanB = std::accumulate(meanDistB.begin(), meanDistB.end(), 0.0) / (NumCDistType)meanDistB.size();
-        this->silhouette.push_back(calculateSilhouette( meanA, meanB));
+        // this->silhouette.push_back(calculateSilhouette( meanA, meanB));
+        silhouettes[AcentroidIndex].push_back(calculateSilhouette( meanA, meanB));
     }
-    overallSilhouette =  std::accumulate(this->silhouette.begin(), this->silhouette.end(), 0.0) / (NumCDistType)(this->numOfClusters);
-    for (int i = 0; i < 10; i++){
-            cout << this->silhouette[i] << ", ";
+
+    for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
+        meanSilhouettes = std::accumulate(silhouettes[centroidIndex].begin(), silhouettes[centroidIndex].end(), 0.0) / (NumCDistType)silhouettes[centroidIndex].size(); 
+        overallSilhouettes[centroidIndex] = meanSilhouettes;
     }
-    cout << "\n[" << this->overallSilhouette << "]"<<endl;
+    // get total mean of silouettes
+    meanSilhouettes = std::accumulate(overallSilhouettes.begin(), overallSilhouettes.end(), 0.0) / (NumCDistType)overallSilhouettes.size();
+    overallSilhouettes.push_back(meanSilhouettes);
+    
+
+    clock_t end = clock();
+    cout <<"SILHOUETTE TIME [" << ((double) (end - start) / CLOCKS_PER_SEC) <<"]"<<endl;
+    cout << "SILHOUETTE: [" << overallSilhouettes[overallSilhouettes.size()-1] << "]"<<endl;
+    return overallSilhouettes;
 }
 
 template <typename NumCDataType> 
-NumCDistType ExhaustiveKmeans<NumCDataType>::getObjectiveCost(Results* results){
-    NumCDistType sum;
+vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(){
+    ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
+    knnEstimator->fit(this->centroids);
+    Results* results = knnEstimator->predict_knn(this->data);
+
+    vector<NumCDistType> silouettes = getSilhouettes(results);
+    delete results;
+    delete knnEstimator;
+    return silouettes;
+}
+
+template <typename NumCDataType> 
+NumCDistType Kmedians<NumCDataType>::getObjectiveCost(Results* results){
+    NumCDistType sum = (NumCDistType)0;
     for (int i = 0; i < results->resultsDistArray.getRows(); i++){
         sum += results->resultsDistArray.getElement(i, 0);
     }
@@ -227,20 +269,30 @@ NumCDistType ExhaustiveKmeans<NumCDataType>::getObjectiveCost(Results* results){
 }
 
 template <typename NumCDataType> 
-NumCDistType ExhaustiveKmeans<NumCDataType>::getObjectiveCost(){
-    return this->objectiveCost;
+NumCDistType Kmedians<NumCDataType>::getObjectiveCost(){
+    ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
+    knnEstimator->fit(this->centroids);
+    Results* results = knnEstimator->predict_knn(this->data);
+
+    NumCDistType cost = getObjectiveCost(results);
+    delete results;
+    delete knnEstimator;
+    return cost;
 }
 
 template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::medianCentroidsUpdate(Results* results){
+void Kmedians<NumCDataType>::medianCentroidsUpdate(Results* results){
 
-    std::vector<NumCIndexType> medianVector(this->numOfPoints / this->numOfClusters);
+    std::vector<NumCIndexType> medianVector;
+    medianVector.reserve(this->numOfPoints / this->numOfClusters);
     NumCDataType medianElement = 0;
     NumCDataType median = 0;
     int size = 0;
 
     for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
+
         for (int dimension = 0; dimension < this->numOfDimensions; dimension++){  
+
             medianVector.clear();
             for (int resultsIndex = 0; resultsIndex < results->resultsIndexArray.getRows(); resultsIndex++){
                 if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  centroidIndex){
@@ -251,22 +303,17 @@ void ExhaustiveKmeans<NumCDataType>::medianCentroidsUpdate(Results* results){
             // calculate median for that dimension
             size = medianVector.size();
             if (size != 0){
+                // get the upper boud of the index (index start at 0)
                 std::sort(medianVector.begin(), medianVector.end());
-                if (size % 2 == 0){
-                    median = (medianVector[size/2 - 1] + medianVector[size/2]) / 2;}
-                else {
-                    median = medianVector[size/2];}
+                median = medianVector[size/2];
+                centroids->addElement( median, centroidIndex, dimension);      
             }
-            else{
-                median = 0;
-            }
-            centroids->addElement( median, centroidIndex, dimension);      
         }
     }
 }
 
 template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::transform(ClusteringType clusteringType){
+void Kmedians<NumCDataType>::transform(ClusteringType clusteringType){
 
     if (clusteringType == LLOYDS_CLUSTERING) {
         transform_LLOYDS_CLUSTERING();
@@ -279,45 +326,50 @@ void ExhaustiveKmeans<NumCDataType>::transform(ClusteringType clusteringType){
 }
 
 template <typename NumCDataType> 
-void ExhaustiveKmeans<NumCDataType>::transform_LLOYDS_CLUSTERING(){
+void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
 
-    NumCDistType prev_overallSilhouette;
-    NumCDistType silhouette_error;
+    NumCDistType prev_objectiveCost = numeric_limits<NumCDistType>::max();
+    NumCDistType new_objectiveCost;
+    NumCDistType objectiveError = numeric_limits<NumCDistType>::max();
     Results* results;
+
+    // start clock for trasform
+    clock_t start_median, end_median;
+    clock_t start = clock();
+    // init centroids
+    this->kmeansInit();
 
     ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
     knnEstimator->fit(this->centroids);
 
+    for (int i = 0; i < this->maxIterations; i++){
 
-    for (int i = 0; i < 100; i++){
-
-        clock_t start = clock();
         results = knnEstimator->predict_knn(this->data);
-        clock_t end_knn = clock();
-        cout <<endl<<"KNN TIME [" << ((double) (end_knn - start) / CLOCKS_PER_SEC) <<"]"<<endl; 
+        cout <<endl<<"KNN TIME [" << results->executionTime <<"]"<<endl; 
 
         // find the median for each centroid
+        start_median = clock();
         medianCentroidsUpdate(results);
-        clock_t end_median = clock();
-        cout <<"MEDIAN TIME [" << ((double) (end_median - end_knn) / CLOCKS_PER_SEC) <<"]"<<endl;
+        end_median = clock();
+        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / CLOCKS_PER_SEC) <<"]"<<endl;
 
-        prev_overallSilhouette = this->overallSilhouette;
-        getSilhouette(results);
-
-        this->objectiveCost = getObjectiveCost(results);
-        cout << "COST: [" << this->objectiveCost << "]" <<endl;
+        new_objectiveCost = getObjectiveCost(results);
+        cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
 
         delete results;
         
         // if prev = new then optimization has converged
         // by 0.1%
-        silhouette_error = abs(this->overallSilhouette - prev_overallSilhouette) / this->overallSilhouette;
-        if (silhouette_error < 0.001){
-            cout << "Kmeans Converged in [" << i<< "] iterations"<<endl;
+        objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
+        prev_objectiveCost = new_objectiveCost;
+        if (objectiveError < this->error){
+            this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+            cout << endl<<"Kmeans Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
             break;
         }
     }
     delete knnEstimator;
+    getSilhouettes();
 }
 
 
@@ -325,15 +377,15 @@ void ExhaustiveKmeans<NumCDataType>::transform_LLOYDS_CLUSTERING(){
 
 int main(){
 
-    ExhaustiveKmeans<int> kmeans(10);
+    Kmedians<int> kmeans(10);
 
 
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60000);
+    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60);
     // NumC<int>::print(inputData->getVector(0));
     // NumC<int>::printSparse(inputData->getVector(1));
 
 
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60000);
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60);
 //     // NumC<int>::print(inputDatalabels->getVector(0));
 
     kmeans.fit(inputData);
@@ -348,9 +400,17 @@ int main(){
     std::vector<Results*> res;
     res = kmeans.getResults();
     for (int i = 0; i < res.size(); i++){
-        // ResultsComparator::print(res[i], inputDatalabels);
+        ResultsComparator::print(res[i], inputDatalabels);
         delete res[i];
     }
+    
+    // std::vector<int> ve;
+    // ve.reserve(10);
+    // ve.push_back(-1);
+    // ve.push_back(45);
+    // for (int i = 0; i < ve.size(); i++){
+    //     cout << ve[i] << endl;
+    // }
     
 
     // Results* results;
