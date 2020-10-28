@@ -391,7 +391,7 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
     HyperCube<NumCDataType>* hcEstimator = new HyperCube<NumCDataType>;
     hcEstimator->fit_transform(this->data);
 
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < this->maxIterations; i++){
 
         results = hcEstimator->reverse_assignment(this->centroids, 10, 10);
         cout <<endl<<"HC TIME [" << results->executionTime <<"]"<<endl; 
@@ -437,7 +437,7 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
     LSHashing<NumCDataType>* lshEstimator = new LSHashing<NumCDataType>(1);
     lshEstimator->fit_transform(this->data);
 
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < this->maxIterations; i++){
 
         results = lshEstimator->reverse_assignment(this->centroids);
         cout <<endl<<"LSH TIME [" << results->executionTime <<"]"<<endl; 
@@ -467,52 +467,52 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
 }
 
 
-// int main(){
+int main(){
 
-//     Kmedians<int> kmeans(10);
-
-
-//     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 6000);
-//     // NumC<int>::print(inputData->getVector(0));
-//     // NumC<int>::printSparse(inputData->getVector(1));
+    Kmedians<int> kmeans(10);
 
 
-//     NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 6000);
-// //     // NumC<int>::print(inputDatalabels->getVector(0));
+    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60);
+    // NumC<int>::print(inputData->getVector(0));
+    // NumC<int>::printSparse(inputData->getVector(1));
 
-//     kmeans.fit(inputData);
 
-//     NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
-//     for (int i = 0; i < 10; i++){
-//         inputData_->addVector(inputData->getVector(i), i);
-//     }
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60);
+//     // NumC<int>::print(inputDatalabels->getVector(0));
 
-//     // kmeans.transform(LLOYDS_CLUSTERING);
-//     kmeans.transform(LSH_CLUSTERING);
+    kmeans.fit(inputData);
 
-//     std::vector<Results*> res;
-//     res = kmeans.getResults();
-//     for (int i = 0; i < res.size(); i++){
-//         // ResultsComparator::print(res[i], inputDatalabels);
-//         delete res[i];
-//     }
+    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+    for (int i = 0; i < 10; i++){
+        inputData_->addVector(inputData->getVector(i), i);
+    }
+
+    // kmeans.transform(LLOYDS_CLUSTERING);
+    kmeans.transform(LSH_CLUSTERING);
+
+    std::vector<Results*> res;
+    res = kmeans.getResults();
+    for (int i = 0; i < res.size(); i++){
+        // ResultsComparator::print(res[i], inputDatalabels);
+        delete res[i];
+    }
     
-//     // std::vector<int> ve;
-//     // ve.reserve(10);
-//     // ve.push_back(-1);
-//     // ve.push_back(45);
-//     // for (int i = 0; i < ve.size(); i++){
-//     //     cout << ve[i] << endl;
-//     // }
+    // std::vector<int> ve;
+    // ve.reserve(10);
+    // ve.push_back(-1);
+    // ve.push_back(45);
+    // for (int i = 0; i < ve.size(); i++){
+    //     cout << ve[i] << endl;
+    // }
     
 
-//     // Results* results;
+    // Results* results;
     
-//     // ResultsComparator::print(results, inputDatalabels);
-//     // delete results;
+    // ResultsComparator::print(results, inputDatalabels);
+    // delete results;
 
-//     delete inputData_;
-//     delete inputData;
-//     delete inputDatalabels;
+    delete inputData_;
+    delete inputData;
+    delete inputDatalabels;
 
-// }
+}

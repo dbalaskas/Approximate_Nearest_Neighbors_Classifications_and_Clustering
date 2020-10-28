@@ -329,6 +329,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
             centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
             dist = knnResults->resultsDistArray.getElement(0,1);
             resultsComparator.addResultConflict(resultIndex, centroidIndex, dist);
+            delete knnResults;
         }
     }
     // delete previous results and gat the new one
