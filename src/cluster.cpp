@@ -13,44 +13,44 @@
 
 using namespace std;
 
-typedef struct ConfigurationData{
-    int number_of_clusters; // K of K-medians
-    int L;                  // default: L=3
-    int k;                  // k of LSH for vectors, default: 4
-    int M;                  // M of Hypercube, default: 10
-    int d;                  // k of Hypercube, default: 3
-    int probes;             // probes of Hypercube, default: 2
+// typedef struct ConfigurationData{
+//     int number_of_clusters; // K of K-medians
+//     int L;                  // default: L=3
+//     int k;                  // k of LSH for vectors, default: 4
+//     int M;                  // M of Hypercube, default: 10
+//     int d;                  // k of Hypercube, default: 3
+//     int probes;             // probes of Hypercube, default: 2
   
-    ConfigurationData()
-     :number_of_clusters{-1}, 
-     L{3}, 
-     k{4}, 
-     M{10},
-     d{3}, 
-     probes{2} {};
+//     ConfigurationData()
+//      :number_of_clusters{-1}, 
+//      L{3}, 
+//      k{4}, 
+//      M{10},
+//      d{3}, 
+//      probes{2} {};
 
-    ~ConfigurationData() {
-        number_of_clusters = -1;
-    };
+//     ~ConfigurationData() {
+//         number_of_clusters = -1;
+//     };
 
-    bool isEmpty() { return number_of_clusters == -1; };
-    void print() {
-        cout << "-------------------------" << endl;
-        cout << "Configuration: " << endl;
-        cout << "  number_of_clusters: " << number_of_clusters << endl;
-        cout << "  L: " << L << endl;
-        cout << "  k: " << k << endl;
-        cout << "  M: " << M << endl;
-        cout << "  d: " << d << endl;
-        cout << "  probes: " << probes << endl;
-        cout << "-------------------------" << endl;
-    }
+//     bool isEmpty() { return number_of_clusters == -1; };
+//     void print() {
+//         cout << "-------------------------" << endl;
+//         cout << "Configuration: " << endl;
+//         cout << "  number_of_clusters: " << number_of_clusters << endl;
+//         cout << "  L: " << L << endl;
+//         cout << "  k: " << k << endl;
+//         cout << "  M: " << M << endl;
+//         cout << "  d: " << d << endl;
+//         cout << "  probes: " << probes << endl;
+//         cout << "-------------------------" << endl;
+//     }
 
-} ConfigurationData;
+// } ConfigurationData;
 
 // Extracts the results to output file.
 void extractResults(char* outputFile, char* method, bool complete, Results* results, Results *true_results);
-ConfigurationData readConfiguration(char* configurationFile);
+// ConfigurationData readConfiguration(char* configurationFile);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -238,47 +238,47 @@ void extractResults(char* outputFile, char* method, bool complete, Results* resu
     delete inputDatalabels;
 }
 
-ConfigurationData readConfiguration(char* configurationFile) {
-    ConfigurationData confData;
-    FILE *conf = fopen(configurationFile, "r");
+// ConfigurationData readConfiguration(char* configurationFile) {
+//     ConfigurationData confData;
+//     FILE *conf = fopen(configurationFile, "r");
     
-    char line[128];
-    char *command;
-    int value;
-    while(fgets(line,sizeof(line),conf) != NULL) {
-        if (line[0] == '#') {
-            // Comment
-            continue;
-        }
-        if (strlen(line) > 1) {
-            // cout << line;
-    		command = strtok(line," : ");
-    		value = atoi(strtok(NULL,"\n"));
-        }
-        // cout << "<" << command << ">: " << value << endl;
-        if (!strcmp(command, (char*) "number_of_clusters")) {
-            confData.number_of_clusters = value;
-        } else if (!strcmp(command, (char*) "number_of_vector_hash_tables")) {
-            confData.L = value;
-        } else if (!strcmp(command, (char*) "number_of_vector_hash_functions")) {
-            confData.k = value;
-        } else if (!strcmp(command, (char*) "max_number_M_hypercube")) {
-            confData.M = value;
-        } else if (!strcmp(command, (char*) "number_of_hypercube_dimensions")) {
-            confData.d = value;
-        } else if (!strcmp(command, (char*) "number_of_probes")) {
-            confData.probes = value;
-        } else {
-            // Not accepted configuration
-        }
-    }
-    if (!feof(conf)) {
-      	cout << "\033[0;31mError!\033[0m Bad configuration file." << endl;
-        fclose(conf);
-        return ConfigurationData();
-    }
+//     char line[128];
+//     char *command;
+//     int value;
+//     while(fgets(line,sizeof(line),conf) != NULL) {
+//         if (line[0] == '#') {
+//             // Comment
+//             continue;
+//         }
+//         if (strlen(line) > 1) {
+//             // cout << line;
+//     		command = strtok(line," : ");
+//     		value = atoi(strtok(NULL,"\n"));
+//         }
+//         // cout << "<" << command << ">: " << value << endl;
+//         if (!strcmp(command, (char*) "number_of_clusters")) {
+//             confData.number_of_clusters = value;
+//         } else if (!strcmp(command, (char*) "number_of_vector_hash_tables")) {
+//             confData.L = value;
+//         } else if (!strcmp(command, (char*) "number_of_vector_hash_functions")) {
+//             confData.k = value;
+//         } else if (!strcmp(command, (char*) "max_number_M_hypercube")) {
+//             confData.M = value;
+//         } else if (!strcmp(command, (char*) "number_of_hypercube_dimensions")) {
+//             confData.d = value;
+//         } else if (!strcmp(command, (char*) "number_of_probes")) {
+//             confData.probes = value;
+//         } else {
+//             // Not accepted configuration
+//         }
+//     }
+//     if (!feof(conf)) {
+//       	cout << "\033[0;31mError!\033[0m Bad configuration file." << endl;
+//         fclose(conf);
+//         return ConfigurationData();
+//     }
 
-    fclose(conf);
-    confData.print();
-    return confData;
-}
+//     fclose(conf);
+//     confData.print();
+//     return confData;
+// }
