@@ -7,6 +7,7 @@
 #include "../include/pandac.h"
 #include "../include/numc.h"
 #include "../include/prediction_results.h"
+#include "../include/kmedians.h"
 #include "../include/exhaustive_knn.h"
 #include "../include/lsh_classifier.h"
 
@@ -163,27 +164,22 @@ Results *knn_results, *true_results;
 // vector<Results*> r_results;
 
 cout << "\033[0;36mComputing clusters...\033[0m" << endl << endl;
+
 //------------------------------------------------------------------------------------
-// Call LSHashing classifier and train it.
+// Call K-Medians and train it.
 
-LSHashing<int> lsh(conf.L, conf.k, 50000);
-lsh.fit_transform(inputData);
+Kmedians<int> kMedians(conf.number_of_clusters);
+if (!strcmp(method, (char*) "Classic")) {
+    kMedians.fit_transform(inputData, LLOYDS_CLUSTERING);
+} else if (!strcmp(method, (char*) "LSH")) {
+    kMedians.fit_transform(inputData, LSH_CLUSTERING);
+} else if (!strcmp(method, (char*) "Hypercube")) {
+    kMedians.fit_transform(inputData, HC_CLUSTERING);
+}
 
-// //------------------------------------------------------------------------------------
-// // Call exhaustive knn classifier and train it.
+//------------------------------------------------------------------------------------
+// Execute Predictions and extract results to output file.
 
-// ExhaustiveKnn<int> exhaustive_knn(inputData, N);
-
-// //------------------------------------------------------------------------------------
-// // Execute Predictions and extract results to output file.
-
-// // Execute k-NN prediction.
-// knn_results = lsh.predict_knn(queryData, N);
-// // Execute Exhaustive KNN search.
-// true_results = exhaustive_knn.predict_knn(queryData);
-// // Execute Range Search.
-// r_results = lsh.predict_rs(queryData, R);
-// // Extract results on output file.
 extractResults(outputFile, method, complete, knn_results, true_results);
 cout << "Results are extracted in file: " << outputFile << endl;
 

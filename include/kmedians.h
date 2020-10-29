@@ -1,5 +1,5 @@
-#ifndef EXHAUSTIVE_KMEANS_H
-#define EXHAUSTIVE_KMEANS_H
+#ifndef KMEDIANS_H
+#define KMEDIANS_H
 
 #include "./numc.h"
 #include "./prediction_results.h"
@@ -47,6 +47,7 @@ class Kmedians {
 
         void fit(NumC<NumCDataType>* trainData);
         void transform(ClusteringType clusteringType);
+        void fit_transform(NumC<NumCDataType>* trainData, ClusteringType clusteringType);
 
         NumC<NumCDataType>* getCentroids();
         std::vector<Results*>  getResults();

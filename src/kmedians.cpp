@@ -1,4 +1,4 @@
-#include "../include/exhaustive_kmeans.h"
+#include "../include/kmedians.h"
 #include "../include/pandac.h"
 
 #include <stdio.h>
@@ -314,6 +314,13 @@ void Kmedians<NumCDataType>::medianCentroidsUpdate(Results* results){
         }
     }
 }
+
+template <typename NumCDataType> 
+void Kmedians<NumCDataType>::fit_transform(NumC<NumCDataType>* trainData, ClusteringType clusteringType) {
+    fit(trainData);
+    transform(clusteringType);
+}
+
 
 template <typename NumCDataType> 
 void Kmedians<NumCDataType>::transform(ClusteringType clusteringType){
