@@ -13,44 +13,8 @@
 
 using namespace std;
 
-// typedef struct ConfigurationData{
-//     int number_of_clusters; // K of K-medians
-//     int L;                  // default: L=3
-//     int k;                  // k of LSH for vectors, default: 4
-//     int M;                  // M of Hypercube, default: 10
-//     int d;                  // k of Hypercube, default: 3
-//     int probes;             // probes of Hypercube, default: 2
-  
-//     ConfigurationData()
-//      :number_of_clusters{-1}, 
-//      L{3}, 
-//      k{4}, 
-//      M{10},
-//      d{3}, 
-//      probes{2} {};
-
-//     ~ConfigurationData() {
-//         number_of_clusters = -1;
-//     };
-
-//     bool isEmpty() { return number_of_clusters == -1; };
-//     void print() {
-//         cout << "-------------------------" << endl;
-//         cout << "Configuration: " << endl;
-//         cout << "  number_of_clusters: " << number_of_clusters << endl;
-//         cout << "  L: " << L << endl;
-//         cout << "  k: " << k << endl;
-//         cout << "  M: " << M << endl;
-//         cout << "  d: " << d << endl;
-//         cout << "  probes: " << probes << endl;
-//         cout << "-------------------------" << endl;
-//     }
-
-// } ConfigurationData;
-
 // Extracts the results to output file.
-void extractResults(char* outputFile, char* method, bool complete, Results* results, Results *true_results);
-// ConfigurationData readConfiguration(char* configurationFile);
+void extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -160,9 +124,6 @@ int main(int argc, char** argv) {
 //------------------------------------------------------------------------------------
 // Making predictions.
 
-Results *knn_results, *true_results;
-// vector<Results*> r_results;
-
 cout << "\033[0;36mComputing clusters...\033[0m" << endl << endl;
 
 //------------------------------------------------------------------------------------
@@ -180,27 +141,20 @@ if (!strcmp(method, (char*) "Classic")) {
 //------------------------------------------------------------------------------------
 // Execute Predictions and extract results to output file.
 
-extractResults(outputFile, method, complete, knn_results, true_results);
-cout << "Results are extracted in file: " << outputFile << endl;
+extractResults(outputFile, method, complete, &kMedians);
+cout << "\033[0;36mResults are extracted in file: \033[0m" << outputFile << endl;
 
 //------------------------------------------------------------------------------------
 // End of program.
 
     //Free allocated Space.
-    delete inputData;
-    delete knn_results;
-    delete true_results;
-    // for (int i=0; i < (int) r_results.size(); i++) {
-    //     delete r_results[i];
-    // }
 
     cout << "-----------------------------------------------------------------" << endl;
     cout << "\033[0;36mExit program.\033[0m" << endl;
     return 0;
 }
 
-void extractResults(char* outputFile, char* method, bool complete, Results* results, Results *true_results) {
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels((char*) "./doc/input/train-labels-idx1-ubyte");
+void extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians) {
 
     ofstream output(outputFile, ios::out);
     // Check that output file exists.
@@ -209,76 +163,47 @@ void extractResults(char* outputFile, char* method, bool complete, Results* resu
         return;
     }
 
-    
     output << "Algorithm: ";
     if (!strcmp(method, (char*) "Classic")) {
-        cout << "Lloyds" << endl;
+        output << "Lloyds" << endl;
     } else if (!strcmp(method, (char*) "LSH")) {
-        cout << "Range Search LSH" << endl;
+        output << "Range Search LSH" << endl;
     } else if (!strcmp(method, (char*) "Hypercube")) {
-        cout << "Range Search Hypercube" << endl;
+        output << "Range Search Hypercube" << endl;
     }
-    // for (int i=0; i < numOfClusters; i++) {
-    //     output << "  CLUSTER-" << j+1 << " {size: " << /*/*/ << ", centroid: " << /*/*/ << "}" << endl; //!+++
-    // }
-    // output << "  clustering_time: " << /*/*/ << endl; //!+++
-    // output << "  Silhouette: [" << /*/*/ << "]" << endl; //!+++
-    // if (complete == true) {
-    //     for (int i=0; i < numOfClusters; i++) {
-    //         output << "  CLUSTER-" << j+1 << " {centroid: " << /*/*/ << ", "; //!+++
-    //         for (int j=0; j < cluster_contents; j++) {
-    //             cout << /*...*/ << ", "; //!+++
-    //         }
-    //         output << "}" << endl;
-    //     }
-    // }
+
+    NumC<int>* centroids = kMedians->getCentroids();
+    vector<Results*> clusters = kMedians->getResults();
+    vector<NumCDistType> silhouette = kMedians->getSilhouettes();
+    for (int i=0; i < centroids->getRows(); i++) {
+        output << "  CLUSTER-" << i+1 << " {size: " << clusters[i]->resultsIndexArray.getCols() << ", centroid: ";
+        NumC<int>::print(centroids->getVector(i), output);
+        output << "}" << endl; //!+++
+    }
+    output << "  clustering_time: " << clusters[0]->executionTime << endl; //!+++
+    output << "  Silhouette: [ ";
+    for (int i=0; i < centroids->getRows(); i++) {
+        output << silhouette[i] << ", ";
+    }
+    output << silhouette[centroids->getRows()] << "]" << endl; //!+++
+    if (complete == true) {
+        for (int i=0; i < centroids->getRows(); i++) {
+            output << "  CLUSTER-" << i+1 << " {centroid: ";
+            NumC<int>::print(centroids->getVector(i), output);
+            output << ", "; //!+++
+            for (int j=0; j < clusters[i]->resultsIndexArray.getCols(); j++) {
+                output << clusters[i]->resultsIndexArray.getElement(0, j);
+                if (j+1 < clusters[i]->resultsIndexArray.getCols()) output << ", "; //!+++
+            }
+            output << "}" << endl;
+        }
+    }
 
     // Close output file.
     output.close();
-    delete inputDatalabels;
+    // Free allocated Space.
+    delete centroids;
+    for (int i=0; i < (int) clusters.size(); i++) {
+        delete clusters[i];
+    }
 }
-
-// ConfigurationData readConfiguration(char* configurationFile) {
-//     ConfigurationData confData;
-//     FILE *conf = fopen(configurationFile, "r");
-    
-//     char line[128];
-//     char *command;
-//     int value;
-//     while(fgets(line,sizeof(line),conf) != NULL) {
-//         if (line[0] == '#') {
-//             // Comment
-//             continue;
-//         }
-//         if (strlen(line) > 1) {
-//             // cout << line;
-//     		command = strtok(line," : ");
-//     		value = atoi(strtok(NULL,"\n"));
-//         }
-//         // cout << "<" << command << ">: " << value << endl;
-//         if (!strcmp(command, (char*) "number_of_clusters")) {
-//             confData.number_of_clusters = value;
-//         } else if (!strcmp(command, (char*) "number_of_vector_hash_tables")) {
-//             confData.L = value;
-//         } else if (!strcmp(command, (char*) "number_of_vector_hash_functions")) {
-//             confData.k = value;
-//         } else if (!strcmp(command, (char*) "max_number_M_hypercube")) {
-//             confData.M = value;
-//         } else if (!strcmp(command, (char*) "number_of_hypercube_dimensions")) {
-//             confData.d = value;
-//         } else if (!strcmp(command, (char*) "number_of_probes")) {
-//             confData.probes = value;
-//         } else {
-//             // Not accepted configuration
-//         }
-//     }
-//     if (!feof(conf)) {
-//       	cout << "\033[0;31mError!\033[0m Bad configuration file." << endl;
-//         fclose(conf);
-//         return ConfigurationData();
-//     }
-
-//     fclose(conf);
-//     confData.print();
-//     return confData;
-// }

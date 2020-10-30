@@ -1,6 +1,9 @@
 #ifndef NUMC_H
 #define NUMC_H
 
+#include <fstream>
+#include <iostream>
+
 typedef int NumCIndexType;
 typedef double NumCDistType;
 
@@ -52,7 +55,7 @@ class NumC {
         void appendVector(Vector<NumCDataType> vector);
         void fill(NumCDataType fillValue);
 
-        void print();
+        void print(std::ofstream& output=std::cout);
 
         NumC* median();
         NumCDataType max();
@@ -61,8 +64,8 @@ class NumC {
         void normalize();
         void cumulative();
 
-        static void print(Vector<NumCDataType> vector);
-        static void printSparse(Vector<NumCDataType> vector);
+        static void print(Vector<NumCDataType> vector, std::ofstream& output=std::cout);
+        static void printSparse(Vector<NumCDataType> vector, std::ofstream& output=std::cout);
         static NumCDistType dist(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d);
         static NumCDistType distSparse(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d);
 

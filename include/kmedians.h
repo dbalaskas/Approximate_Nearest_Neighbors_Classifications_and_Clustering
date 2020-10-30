@@ -1,21 +1,9 @@
 #ifndef KMEDIANS_H
 #define KMEDIANS_H
 
+#include <vector>
 #include "./numc.h"
 #include "./prediction_results.h"
-#include "./exhaustive_knn.h"
-#include "./hc_classifier.h"
-#include "./lsh_classifier.h"
-#include <vector>
-#include <numeric>
-#include <random>
-#include <queue>
-#include <limits>
-#include <stdio.h>
-#include <string.h>
-#include <cstdlib>
-#include <iostream>
-#include <algorithm>
 
 #define ERROR 1e-3
 #define MAX_ITER 100
