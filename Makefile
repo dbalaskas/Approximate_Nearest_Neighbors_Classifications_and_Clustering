@@ -69,28 +69,20 @@ $(ODIR)/%.o: $(SRCDIR)/%.$(CODETYPE)
 %.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $(ODIR)/$@ "..."
 	$(CXX) -c -o $(ODIR)/$@ $< $(CXXFLAGS)
-$(CUBE_EXEC): $(DEMANDED_OBJECTS)
+$(CUBE_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/hc_classifier.o $(ODIR)/cube.o
 	@echo "============================================================================"
 	@echo "Creating $(CUBE_EXEC)..."
-	$(CXX) -c -o $(ODIR)/hc_classifier.o $(SRCDIR)/hc_classifier.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/cube.o $(SRCDIR)/cube.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/cube $(ODIR)/cube.o $(ODIR)/hc_classifier.o $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/cube $^ $(LDLIBS) $(CXXFLAGS)
 
-$(LSH_EXEC): $(DEMANDED_OBJECTS)
+$(LSH_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/lsh.o
 	@echo "============================================================================"
 	@echo "Creating $(LSH_EXEC)..."
-	$(CXX) -c -o $(ODIR)/lsh_classifier.o $(SRCDIR)/lsh_classifier.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/lsh.o $(SRCDIR)/lsh.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/lsh $(ODIR)/lsh.o $(ODIR)/lsh_classifier.o $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/lsh $^ $(LDLIBS) $(CXXFLAGS)
 
-$(CLUSTER_EXEC): $(DEMANDED_OBJECTS)
+$(CLUSTER_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/kmedians.o $(ODIR)/cluster.o
 	@echo "============================================================================"
 	@echo "Creating $(CLUSTER_EXEC)..."
-	$(CXX) -c -o $(ODIR)/lsh_classifier.o $(SRCDIR)/lsh_classifier.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/hc_classifier.o $(SRCDIR)/hc_classifier.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/kmedians.o $(SRCDIR)/kmedians.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -c -o $(ODIR)/cluster.o $(SRCDIR)/cluster.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/cluster $(ODIR)/cluster.o $(ODIR)/kmedians.o $(ODIR)/hc_classifier.o $(ODIR)/lsh_classifier.o $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/cluster $^ $(LDLIBS) $(CXXFLAGS)
 clean:
 	@echo "============================================================================"
 	@echo "Cleaning up..."
