@@ -14,7 +14,7 @@
 using namespace std;
 
 // Extracts the results to output file.
-void extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians);
+bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
     bool complete = false;
 	for (i=1; i < argc; i++)
 		if (strcmp(argv[i], "-complete") == 0) break;
-	if (i < argc - 1) {
+	if (i < argc) {
         complete = true;
     }
 
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     }
     cout << "\033[0;36mRunning Cluster :)\033[0m" << endl << endl;
     // Read input file with PandaC.
-    NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile);
+    NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile, 50);
 
 //------------------------------------------------------------------------------------
 // Reading configuration file.
@@ -124,43 +124,45 @@ int main(int argc, char** argv) {
 //------------------------------------------------------------------------------------
 // Making predictions.
 
-cout << "\033[0;36mComputing clusters...\033[0m" << endl << endl;
+    cout << "\033[0;36mComputing clusters...\033[0m" << endl << endl;
 
 //------------------------------------------------------------------------------------
 // Call K-Medians and train it.
 
-Kmedians<int> kMedians(conf.number_of_clusters);
-if (!strcmp(method, (char*) "Classic")) {
-    kMedians.fit_transform(inputData, LLOYDS_CLUSTERING);
-} else if (!strcmp(method, (char*) "LSH")) {
-    kMedians.fit_transform(inputData, LSH_CLUSTERING);
-} else if (!strcmp(method, (char*) "Hypercube")) {
-    kMedians.fit_transform(inputData, HC_CLUSTERING);
-}
+    Kmedians<int> kMedians(conf.number_of_clusters);
+    if (!strcmp(method, (char*) "Classic")) {
+        kMedians.fit_transform(inputData, LLOYDS_CLUSTERING);
+    } else if (!strcmp(method, (char*) "LSH")) {
+        kMedians.fit_transform(inputData, LSH_CLUSTERING);
+    } else if (!strcmp(method, (char*) "Hypercube")) {
+        kMedians.fit_transform(inputData, HC_CLUSTERING);
+    }
 
 //------------------------------------------------------------------------------------
 // Execute Predictions and extract results to output file.
 
-extractResults(outputFile, method, complete, &kMedians);
-cout << "\033[0;36mResults are extracted in file: \033[0m" << outputFile << endl;
+    if (extractResults(outputFile, method, complete, &kMedians)) {
+        cout << "\033[0;36mResults are extracted in file: \033[0m" << outputFile << endl;
+    }
 
 //------------------------------------------------------------------------------------
 // End of program.
 
     //Free allocated Space.
+    delete inputData;
 
     cout << "-----------------------------------------------------------------" << endl;
     cout << "\033[0;36mExit program.\033[0m" << endl;
     return 0;
 }
 
-void extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians) {
+bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians) {
 
-    ofstream output(outputFile, ios::out);
     // Check that output file exists.
+    ofstream output(outputFile, fstream::out);
     if (!output.is_open()) {
         perror("\033[0;31mError\033[0m: Unable to open output file");
-        return;
+        return false;
     }
 
     output << "Algorithm: ";
@@ -202,8 +204,10 @@ void extractResults(char* outputFile, char* method, bool complete, Kmedians<int>
     // Close output file.
     output.close();
     // Free allocated Space.
-    delete centroids;
+    // delete centroids;
     for (int i=0; i < (int) clusters.size(); i++) {
         delete clusters[i];
     }
+
+    return true;
 }

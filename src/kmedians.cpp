@@ -55,7 +55,6 @@ ConfigurationData readConfiguration(char* configurationFile) {
     }
 
     fclose(conf);
-    confData.print();
     return confData;
 }
 
@@ -290,7 +289,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     NumCDistType meanB = 0;
     NumCIndexType AcentroidIndex;
     NumCIndexType BcentroidIndex;
-    NumCIndexType indexForDist;
+    // NumCIndexType indexForDist;
     NumCDistType meanA_ = 0;
     NumCDistType meanB_ = 0;
     NumCIndexType sizeA = 0;
@@ -347,7 +346,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     clock_t end = clock();
     cout <<"SILHOUETTE TIME [" << ((double) (end - start) / CLOCKS_PER_SEC) <<"]"<<endl;
     cout << "SILHOUETTE: [" << overallSilhouettes[overallSilhouettes.size()-1] << "]"<<endl;
-    for (int i = 0; i < overallSilhouettes.size(); i++){
+    for (int i = 0; i < (int) overallSilhouettes.size(); i++){
         cout << overallSilhouettes[i] << ", ";
     }
     

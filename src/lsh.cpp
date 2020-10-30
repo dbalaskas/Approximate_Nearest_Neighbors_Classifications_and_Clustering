@@ -13,7 +13,7 @@
 using namespace std;
 
 // Extracts the results to output file.
-void extractResults(char* outputFile, Results* results, Results *true_results, vector<Results*> r_results, int R);
+bool extractResults(char* outputFile, Results* results, Results *true_results, vector<Results*> r_results, int R);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -153,82 +153,83 @@ char line[128], *answer;
 Results *knn_results, *true_results;
 vector<Results*> r_results;
 
-do {
-    cout << "\033[0;36mComputing predictions...\033[0m" << endl << endl;
-//------------------------------------------------------------------------------------
-// Call LSHashing classifier and train it.
-
-    LSHashing<int> lsh(L, k, 50000);
-    lsh.fit_transform(inputData);
-
-//------------------------------------------------------------------------------------
-// Call exhaustive knn classifier and train it.
-
-    ExhaustiveKnn<int> exhaustive_knn(inputData, N);
-
-//------------------------------------------------------------------------------------
-// Execute Predictions and extract results to output file.
-
-    // Execute k-NN prediction.
-    knn_results = lsh.predict_knn(queryData, N);
-    // Execute Exhaustive KNN search.
-    true_results = exhaustive_knn.predict_knn(queryData);
-    // Execute Range Search.
-    r_results = lsh.predict_rs(queryData, R);
-    // Extract results on output file.
-    extractResults(outputFile, knn_results, true_results, r_results, R);
-    cout << "Results are extracted in file: " << outputFile << endl;
-
-//------------------------------------------------------------------------------------
-// Free allocated Space.
-
-    delete queryData;
-    delete knn_results;
-    delete true_results;
-    for (int i=0; i < (int) r_results.size(); i++) {
-        delete r_results[i];
-    }
-
-//------------------------------------------------------------------------------------
-// Ask user if he wants to repeat the process with new query file.
-
-    cout << "-----------------------------------------------------------------" << endl;
     do {
-        cout << "\033[0;36mYou would like to repeat the process with new query? (answer y|n) \033[0m";
-		fgets(line,sizeof(line),stdin);
-		answer = strtok(line,"\n");
-    } while (strcmp(answer, "n") && strcmp(answer, "N") && strcmp(answer, "y") && strcmp(answer, "Y"));
-    if (!strcmp(answer, "y") || !strcmp(answer, "Y")) {
-    // User wants to repeat the process.
-        cout << "\033[0;36mPlease enter a new query file (press Enter to use the old one): \033[0m";
-		fgets(line,sizeof(line),stdin);
-        if (strlen(line) > 1) {
-            queryFile = strtok(line,"\n");
-            // Check that query file exists.
-            if(access(queryFile, F_OK) == -1) {
-                perror("\033[0;31mError\033[0m: Unable to open query file");
-                cout << "\033[0;31mexit program\033[0m" << endl;
-                return 1;
-            }
-            // Read query file with PandaC.
-            queryData = PandaC<int>::fromMNIST(queryFile, 50);
-        } else {
-            if(access(queryFile, F_OK) == -1) {
-                perror("\033[0;31mError\033[0m: Unable to open query file");
-                cout << "\033[0;31mexit program\033[0m" << endl;
-                return 1;
-            }
-            // Read query file with PandaC.
-            queryData = PandaC<int>::fromMNIST(queryFile, 50);
+        cout << "\033[0;36mComputing predictions...\033[0m" << endl << endl;
+    //------------------------------------------------------------------------------------
+    // Call LSHashing classifier and train it.
+
+        LSHashing<int> lsh(L, k, 50000);
+        lsh.fit_transform(inputData);
+
+    //------------------------------------------------------------------------------------
+    // Call exhaustive knn classifier and train it.
+
+        ExhaustiveKnn<int> exhaustive_knn(inputData, N);
+
+    //------------------------------------------------------------------------------------
+    // Execute Predictions and extract results to output file.
+
+        // Execute k-NN prediction.
+        knn_results = lsh.predict_knn(queryData, N);
+        // Execute Exhaustive KNN search.
+        true_results = exhaustive_knn.predict_knn(queryData);
+        // Execute Range Search.
+        r_results = lsh.predict_rs(queryData, R);
+        // Extract results on output file.
+        if (extractResults(outputFile, knn_results, true_results, r_results, R)) {
+            cout << "Results are extracted in file: " << outputFile << endl;
         }
-        cout << "\033[0;36mPlease enter an output file (press Enter to use the old one): \033[0m";
-		fgets(line,sizeof(line),stdin);
-        cout << endl;
-        if (strlen(line) > 1) {
-    		outputFile = strtok(line,"\n");
+
+    //------------------------------------------------------------------------------------
+    // Free allocated Space.
+
+        delete queryData;
+        delete knn_results;
+        delete true_results;
+        for (int i=0; i < (int) r_results.size(); i++) {
+            delete r_results[i];
         }
-    }
-} while (strcmp(answer, "n") && strcmp(answer, "N"));
+
+    //------------------------------------------------------------------------------------
+    // Ask user if he wants to repeat the process with new query file.
+
+        cout << "-----------------------------------------------------------------" << endl;
+        do {
+            cout << "\033[0;36mYou would like to repeat the process with new query? (answer y|n) \033[0m";
+    		fgets(line,sizeof(line),stdin);
+    		answer = strtok(line,"\n");
+        } while (strcmp(answer, "n") && strcmp(answer, "N") && strcmp(answer, "y") && strcmp(answer, "Y"));
+        if (!strcmp(answer, "y") || !strcmp(answer, "Y")) {
+        // User wants to repeat the process.
+            cout << "\033[0;36mPlease enter a new query file (press Enter to use the old one): \033[0m";
+    		fgets(line,sizeof(line),stdin);
+            if (strlen(line) > 1) {
+                queryFile = strtok(line,"\n");
+                // Check that query file exists.
+                if(access(queryFile, F_OK) == -1) {
+                    perror("\033[0;31mError\033[0m: Unable to open query file");
+                    cout << "\033[0;31mexit program\033[0m" << endl;
+                    return 1;
+                }
+                // Read query file with PandaC.
+                queryData = PandaC<int>::fromMNIST(queryFile, 50);
+            } else {
+                if(access(queryFile, F_OK) == -1) {
+                    perror("\033[0;31mError\033[0m: Unable to open query file");
+                    cout << "\033[0;31mexit program\033[0m" << endl;
+                    return 1;
+                }
+                // Read query file with PandaC.
+                queryData = PandaC<int>::fromMNIST(queryFile, 50);
+            }
+            cout << "\033[0;36mPlease enter an output file (press Enter to use the old one): \033[0m";
+    		fgets(line,sizeof(line),stdin);
+            cout << endl;
+            if (strlen(line) > 1) {
+        		outputFile = strtok(line,"\n");
+            }
+        }
+    } while (strcmp(answer, "n") && strcmp(answer, "N"));
 
 //------------------------------------------------------------------------------------
 // End of program.
@@ -240,14 +241,14 @@ do {
     return 0;
 }
 
-void extractResults(char* outputFile, Results* results, Results *true_results, vector<Results*> r_results, int R) {
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels((char*) "./doc/input/train-labels-idx1-ubyte");
+bool extractResults(char* outputFile, Results* results, Results *true_results, vector<Results*> r_results, int R) {
+    // NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels((char*) "./doc/input/train-labels-idx1-ubyte");
 
-    ofstream output(outputFile, ios::out);
     // Check that output file exists.
+    ofstream output(outputFile, fstream::out);
     if (!output.is_open()) {
         perror("\033[0;31mError\033[0m: Unable to open output file");
-        return;
+        return false;
     }
 
     double sumDistanceLSH = 0;
@@ -257,8 +258,8 @@ void extractResults(char* outputFile, Results* results, Results *true_results, v
     for (int i=0; i < results->resultsIndexArray.getRows(); i++) {
         output << "Query: " << i+1 << endl;
         for (int j=0; j < results->resultsIndexArray.getCols(); j++) {
-            // output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << endl;
-            output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << " label: " << inputDatalabels->getElement(results->resultsIndexArray.getElement(i, j) ,0) << " true label: " << inputDatalabels->getElement(true_results->resultsIndexArray.getElement(i, j) ,0)<<endl;
+            output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << endl;
+            // output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << " label: " << inputDatalabels->getElement(results->resultsIndexArray.getElement(i, j) ,0) << " true label: " << inputDatalabels->getElement(true_results->resultsIndexArray.getElement(i, j) ,0)<<endl;
             output << "  distanceLSH: " << results->resultsDistArray.getElement(i, j) << endl;
             sumDistanceLSH += results->resultsDistArray.getElement(i, j);
             output << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
@@ -270,8 +271,8 @@ void extractResults(char* outputFile, Results* results, Results *true_results, v
         sumTimeTrue += true_results->executionTimeArray.getElement(i, 0);
         output << "  " << R << "-near neighbors:" << endl;
         for (int j=0; j < r_results[i]->resultsIndexArray.getCols(); j++) {
-            // output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << endl;
-            output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;
+            output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << endl;
+            // output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;
         }
     }
 
@@ -280,12 +281,12 @@ void extractResults(char* outputFile, Results* results, Results *true_results, v
     cout << "Final Exhaustive vs LSH Score:" << endl;
     cout << "Average LSH distance: " << (double) sumDistanceLSH/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;
     cout << "Average True distance: " << (double) sumDistanceTrue/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;
-    cout << "LSH/True distance: " << (double) sumDistanceLSH/sumDistanceTrue << ". (LSH has better accuracy when this number is inclined to 1)" << endl;
+    cout << "LSH/True distance: " << (double) sumDistanceLSH/sumDistanceTrue << " (LSH has better accuracy when this number is inclined to 1)" << endl;
     cout << "LSH's fault is " << (int) ((((double) sumDistanceLSH/sumDistanceTrue)-1)*100) << "% on average prediction." << endl;
     cout << endl;
     cout << "Average LSH Time: " << (double) sumTimeLSH/results->resultsIndexArray.getRows() << endl;
     cout << "Average True Time: " << (double) sumTimeTrue/results->resultsIndexArray.getRows() << endl;
-    cout << "LSH/True Time: " << (double) sumTimeLSH/sumTimeTrue << ". (LSH is faster when this number is inclined to 0)" << endl;
+    cout << "LSH/True Time: " << (double) sumTimeLSH/sumTimeTrue << " (LSH is faster when this number is inclined to 0)" << endl;
     if (sumTimeLSH > sumTimeTrue) {
         cout << "LSH's time is " << (int) ((((double) sumTimeLSH/sumTimeTrue)-1)*100) << "% slower than true." << endl;
     } else {
@@ -295,5 +296,7 @@ void extractResults(char* outputFile, Results* results, Results *true_results, v
 
     // Close output file.
     output.close();
-    delete inputDatalabels;
+    // delete inputDatalabels;
+
+    return true;
 }
