@@ -286,6 +286,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     NumCDistType meanB_ = 0;
     NumCIndexType sizeA = 0;
     NumCIndexType sizeB = 0;
+    NumCDistType sumSi = 0;
 
     clock_t start = clock();
     for (int point = 0; point < this->numOfPoints; point++){
@@ -323,6 +324,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
 
         // this->silhouette.push_back(calculateSilhouette( meanA, meanB));
         silhouettes[AcentroidIndex].push_back(calculateSilhouette( meanA, meanB));
+        sumSi += calculateSilhouette( meanA, meanB);
         // cout<< calculateSilhouette( meanA, meanB)<<" " << AcentroidIndex << " " << silhouettes[AcentroidIndex].size() <<endl;
     }
 
@@ -338,6 +340,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     clock_t end = clock();
     cout <<"SILHOUETTE TIME [" << ((double) (end - start) / CLOCKS_PER_SEC) <<"]"<<endl;
     cout << "SILHOUETTE: [" << overallSilhouettes[overallSilhouettes.size()-1] << "]"<<endl;
+    cout << "SILHOUETTE: [" << sumSi/60000.0 << "]"<<endl;
     for (int i = 0; i < overallSilhouettes.size(); i++){
         cout << overallSilhouettes[i] << ", ";
     }
@@ -492,11 +495,11 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
     this->kmeansInit();
 
     HyperCube<NumCDataType>* hcEstimator = new HyperCube<NumCDataType>;
-    hcEstimator->fit_transform(this->data);
+    hcEstimator->fit_transform(this->data, this->k);
 
     for (int i = 0; i < this->maxIterations; i++){
 
-        results = hcEstimator->reverse_assignment(this->centroids, 10, 10);
+        results = hcEstimator->reverse_assignment(this->centroids, this->M, this->probes);
         cout <<endl<<"HC TIME [" << results->executionTime <<"]"<<endl; 
 
         // find the median for each centroid
@@ -537,7 +540,7 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
     // init centroids
     this->kmeansInit();
 
-    LSHashing<NumCDataType>* lshEstimator = new LSHashing<NumCDataType>(1);
+    LSHashing<NumCDataType>* lshEstimator = new LSHashing<NumCDataType>(this->L, this->k);
     lshEstimator->fit_transform(this->data);
 
     for (int i = 0; i < this->maxIterations; i++){
@@ -575,12 +578,12 @@ int main(){
     Kmedians<int> kmeans(configurationData);
 
 
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 6000);
+    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 5000);
     // NumC<int>::print(inputData->getVector(0));
     // NumC<int>::printSparse(inputData->getVector(1));
 
 
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 6000);
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 5000);
 //     // NumC<int>::print(inputDatalabels->getVector(0));
 
     kmeans.fit(inputData);
@@ -590,8 +593,8 @@ int main(){
         inputData_->addVector(inputData->getVector(i), i);
     }
 
-    kmeans.transform(LLOYDS_CLUSTERING);
-    // kmeans.transform(LSH_CLUSTERING);
+    // kmeans.transform(LLOYDS_CLUSTERING);
+    kmeans.transform(LSH_CLUSTERING);
 
     std::vector<Results*> res;
     res = kmeans.getResults();
