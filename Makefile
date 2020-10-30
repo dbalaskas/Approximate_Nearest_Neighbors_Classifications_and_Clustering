@@ -64,25 +64,33 @@ info:
 	@echo "============================================================================"
 
 $(ODIR)/%.o: $(SRCDIR)/%.$(CODETYPE)
-	@echo "Creating object" $(ODIR)/$@ "..."
+	@echo "Creating object" $@ "..."
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 %.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $(ODIR)/$@ "..."
 	$(CXX) -c -o $(ODIR)/$@ $< $(CXXFLAGS)
-$(CUBE_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/hc_classifier.o $(ODIR)/cube.o
+$(CUBE_EXEC): $(DEMANDED_OBJECTS)
 	@echo "============================================================================"
 	@echo "Creating $(CUBE_EXEC)..."
-	$(CXX) -o $(BDIR)/cube $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/hc_classifier.o $(SRCDIR)/hc_classifier.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/cube.o $(SRCDIR)/cube.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/cube $(ODIR)/cube.o $(ODIR)/hc_classifier.o $^ $(LDLIBS) $(CXXFLAGS)
 
-$(LSH_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/lsh.o
+$(LSH_EXEC): $(DEMANDED_OBJECTS)
 	@echo "============================================================================"
 	@echo "Creating $(LSH_EXEC)..."
-	$(CXX) -o $(BDIR)/lsh $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/lsh_classifier.o $(SRCDIR)/lsh_classifier.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/lsh.o $(SRCDIR)/lsh.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/lsh $(ODIR)/lsh.o $(ODIR)/lsh_classifier.o $^ $(LDLIBS) $(CXXFLAGS)
 
-$(CLUSTER_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/kmedians.o $(ODIR)/cluster.o
+$(CLUSTER_EXEC): $(DEMANDED_OBJECTS)
 	@echo "============================================================================"
 	@echo "Creating $(CLUSTER_EXEC)..."
-	$(CXX) -o $(BDIR)/cluster $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/lsh_classifier.o $(SRCDIR)/lsh_classifier.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/hc_classifier.o $(SRCDIR)/hc_classifier.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/kmedians.o $(SRCDIR)/kmedians.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -c -o $(ODIR)/cluster.o $(SRCDIR)/cluster.$(CODETYPE) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/cluster $(ODIR)/cluster.o $(ODIR)/kmedians.o $(ODIR)/hc_classifier.o $(ODIR)/lsh_classifier.o $^ $(LDLIBS) $(CXXFLAGS)
 clean:
 	@echo "============================================================================"
 	@echo "Cleaning up..."

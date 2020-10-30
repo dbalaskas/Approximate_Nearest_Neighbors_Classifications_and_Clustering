@@ -261,13 +261,14 @@ vector<Results*> Kmedians<NumCDataType>::getResults(){
 template <typename NumCDataType> 
 NumCDistType Kmedians<NumCDataType>::calculateSilhouette(NumCDistType distA, NumCDistType distB){
 
+    if (distA == 0) return 1.0;
     if (distA < distB){
         return (1.0 - (distA / distB));
     }
     else if (distA == distB){
         return 0;
     }
-    else if (distA > distB){
+    else {
         return  ((distB / distA) - 1.0);
     }
 

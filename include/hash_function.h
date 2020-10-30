@@ -3,7 +3,6 @@
 
 
 #include "./numc.h"
-#include <iostream>
 
 template <typename NumCDataType>
 class HashFunction{
@@ -15,13 +14,13 @@ class HashFunction{
         int M;
         int m;
         int* m_d;
-        // int* f_thresholds;
         NumC<NumCDataType> s;
         NumC<NumCDataType> f_thresholds;
+
+        // Definition of modular on varius mathematical operations.
         int modularExponentiation(int base, int exponent, int mod);
         int modularAddition(int base, int exponent, int mod);
         int modularMultiplication(int base, int exponent, int mod);
-        int* initThreasholds(int k);
 
     public:
         HashFunction(): m_d{NULL} {};
@@ -33,13 +32,17 @@ class HashFunction{
         int getw() {return w;};
         int getM() {return M;};
 
+        // Returns the 'h' value of 'v'.
         int h(Vector<NumCDataType> v, int hi);
 
+        // Returns the LSH hash value of 'v'.
         unsigned int lsh_hash(Vector<NumCDataType> v);
+        // Returns the Hypercube hash value of 'v'.
         unsigned int hc_hash(Vector<NumCDataType> v);
 
 };
 
+// Define the templates of Hypercube
 template class HashFunction<int>;
 template class HashFunction<long>;
 template class HashFunction<double>;
