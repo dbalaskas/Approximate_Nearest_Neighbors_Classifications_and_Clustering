@@ -277,7 +277,6 @@ bool extractResults(char* outputFile, Results* results, Results *true_results, v
     }
 
     // Printing Score of prediction.
-    cout << endl;
     cout << "Final Exhaustive vs LSH Score:" << endl;
     cout << "Average LSH distance: " << (double) sumDistanceLSH/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;
     cout << "Average True distance: " << (double) sumDistanceTrue/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;

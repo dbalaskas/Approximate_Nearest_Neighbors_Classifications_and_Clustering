@@ -67,11 +67,9 @@ Kmedians<NumCDataType>::Kmedians(int numOfClusters, int maxIterations, NumCDistT
     this->maxIterations = maxIterations;
     this->error = error;
     this->transformTime = 0.0;
-    // this->overallSilhouette = 0.0;
     this->centroids = NULL;
     this->data = NULL;
     this->lastResults = NULL;
-    // this->objectiveCost = 0.0;
 }
 
 template <typename NumCDataType> 
@@ -92,9 +90,7 @@ Kmedians<NumCDataType>::Kmedians(ConfigurationData configurationData, int maxIte
     this->data = data;
     this->centroids = NULL;
     this->lastResults = NULL;
-    // this->silhouette.reserve(this->numOfClusters);
-    // this->overallSilhouette = 0.0;
-    // this->objectiveCost = 0.0;
+
 }
 
 template <typename NumCDataType> 
@@ -109,9 +105,7 @@ Kmedians<NumCDataType>::Kmedians(NumC<NumCDataType>* data, int numOfClusters, in
     this->data = data;
     this->centroids = NULL;
     this->lastResults = NULL;
-    // this->silhouette.reserve(this->numOfClusters);
-    // this->overallSilhouette = 0.0;
-    // this->objectiveCost = 0.0;
+
 }
 
 template <typename NumCDataType> 
@@ -328,7 +322,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     
 
     clock_t end = clock();
-    cout <<"SILHOUETTE TIME [" << ((double) (end - start) / ((CLOCKS_PER_SEC/1000)/1000)) <<"]"<<endl;
+    cout <<"SILHOUETTE TIME [" << ((double) (end - start) / (CLOCKS_PER_SEC/1000)) <<"]"<<endl;
     cout << "SILHOUETTE: [" << overallSilhouettes[overallSilhouettes.size()-1] << "]"<<endl;
 
     return overallSilhouettes;
@@ -472,7 +466,7 @@ void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
         start_median = clock();
         medianCentroidsUpdate(results);
         end_median = clock();
-        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / ((CLOCKS_PER_SEC/1000)/1000)) <<"]"<<endl;
+        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / (CLOCKS_PER_SEC/1000)) <<"]"<<endl;
 
         new_objectiveCost = getObjectiveCost(results);
         cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
@@ -483,7 +477,7 @@ void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
         objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
         prev_objectiveCost = new_objectiveCost;
         if (objectiveError < this->error || i >= this->maxIterations-1){
-            this->transformTime = ((double) (clock() - start) / ((CLOCKS_PER_SEC/1000)/1000));
+            this->transformTime = ((double) (clock() - start) / (CLOCKS_PER_SEC/1000));
             cout << endl<<"Kmedians Converged in [" << i+1 << "] iterations and in time ["<< this->transformTime << "]"<<endl;
             break;
         }
@@ -519,7 +513,7 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
         start_median = clock();
         medianCentroidsUpdate(results);
         end_median = clock();
-        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / ((CLOCKS_PER_SEC/1000)/1000)) <<"]"<<endl;
+        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / (CLOCKS_PER_SEC/1000)) <<"]"<<endl;
 
         new_objectiveCost = getObjectiveCost(results);
         cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
@@ -530,7 +524,7 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
         objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
         prev_objectiveCost = new_objectiveCost;
         if (objectiveError < this->error || i >= this->maxIterations-1){
-            this->transformTime = ((double) (clock() - start) / ((CLOCKS_PER_SEC/1000)/1000));
+            this->transformTime = ((double) (clock() - start) / (CLOCKS_PER_SEC/1000));
             cout << endl<<"Kmedians Converged in [" << i+1 << "] iterations and in time ["<< this->transformTime << "]"<<endl;
             break;
         }
@@ -566,7 +560,7 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
         start_median = clock();
         medianCentroidsUpdate(results);
         end_median = clock();
-        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / ((CLOCKS_PER_SEC/1000)/1000)) <<"]"<<endl;
+        cout <<"MEDIAN TIME [" << ((double) (end_median - start_median) / (CLOCKS_PER_SEC/1000)) <<"]"<<endl;
 
         new_objectiveCost = getObjectiveCost(results);
         cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
@@ -577,7 +571,7 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
         objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
         prev_objectiveCost = new_objectiveCost;
         if (objectiveError < this->error || i >= this->maxIterations-1){
-            this->transformTime = ((double) (clock() - start) / ((CLOCKS_PER_SEC/1000)/1000));
+            this->transformTime = ((double) (clock() - start) / (CLOCKS_PER_SEC/1000));
             cout << endl<<"Kmedians Converged in [" << i+1 << "] iterations and in time ["<< this->transformTime << "]"<<endl;
             break;
         }
@@ -608,8 +602,8 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
 // //         inputData_->addVector(inputData->getVector(i), i);
 // //     }
 
-//     // kmeans.transform(LLOYDS_CLUSTERING);
-//     kmeans.transform(LSH_CLUSTERING);
+//     kmeans.transform(LLOYDS_CLUSTERING);
+// //     // kmeans.transform(LSH_CLUSTERING);
 
 //     // std::vector<Results*> res;
 //     // res = kmeans.getResults();

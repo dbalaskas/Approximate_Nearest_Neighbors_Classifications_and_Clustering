@@ -182,8 +182,10 @@ bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int>
         NumC<int>::print(centroids->getVector(i), output);
         output << "}" << endl; //!+++
     }
+    cout << endl;
     output << "  clustering_time: " << clusters[0]->executionTime << endl; //!+++
     output << "  Silhouette: [ ";
+    cout << endl;
     for (int i=0; i < centroids->getRows(); i++) {
         output << silhouette[i] << ", ";
     }
