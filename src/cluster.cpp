@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     }
     cout << "\033[0;36mRunning Cluster :)\033[0m" << endl << endl;
     // Read input file with PandaC.
-    NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile, 50);
+    NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile);
 
 //------------------------------------------------------------------------------------
 // Reading configuration file.

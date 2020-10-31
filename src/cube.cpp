@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     // Read query file with PandaC.
-    NumC<int> *queryData = PandaC<int>::fromMNIST(queryFile, 50);
+    NumC<int> *queryData = PandaC<int>::fromMNIST(queryFile);
 
 //------------------------------------------------------------------------------------
 // Making predictions.

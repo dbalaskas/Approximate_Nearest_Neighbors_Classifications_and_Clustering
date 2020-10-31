@@ -45,7 +45,6 @@ we created LSHashing, Hypercube and Kmedians classes for the classifiers and the
 clusterer. The last one uses the first two on reverse assignment. LSHashing and Hypercube 
 use HashTable class that hashes each vector with HashFuncion class based on enum 
 'HashType' parameter.
-
 </h4>
 
 <h3>How we run the executables</h3>
