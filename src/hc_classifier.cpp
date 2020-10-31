@@ -20,13 +20,12 @@ template <typename NumCDataType>
 void HyperCube<NumCDataType>::fit(NumC<NumCDataType>* _data, int k) {
     data = _data;
     if (k==-1) {
-        this->d = (int)HASH_SIZE;
+        d = (int)HASH_SIZE;
+    } else {
+        d = k;
     }
-    else{
-        this->d  = k;
-    }
-    hashTableSize = 1<< k;
-    hashTable = new HashTable<NumCDataType>(HC, hashTableSize, k, data->getCols(), w);
+    hashTableSize = 1<< d;
+    hashTable = new HashTable<NumCDataType>(HC, hashTableSize, d, data->getCols(), w);
 }
 
 template <typename NumCDataType>
@@ -46,10 +45,12 @@ void HyperCube<NumCDataType>::get_nearestHashes(unsigned int hashValue, int k, i
     // cout << changesLeft << " ";
     if (changesLeft == 0) {
         hashList->push_back(hashValue);
+        // cout << hashValue << endl;
         go++;
         return;
     }
     if (k<0) return;
+    // cout << k << endl;
     unsigned int mask = 1 << (k);
     // cout << "hashValue: " << hashValue << endl;
     // cout << "hashValue with mask: " << (hashValue^mask) << endl;
@@ -65,16 +66,10 @@ std::vector<unsigned int> HyperCube<NumCDataType>::getHashList(Vector<NumCDataTy
 
     std::vector<unsigned int> hashList;
     unsigned int hashValue = hashTable->hash(vector);
-    // cout << hashValue << endl;
     hashList.push_back(hashValue);
 
-    // cout << hashList.size() << endl;
-
-    for (int i=0; i<this->d-1; i++) {
-        // cout << i << " changes" << endl;
-        // get_nearestHashes(hashValue, (int)HASH_SIZE-1, i+1, &hashList, maxVertices);
-        get_nearestHashes(hashValue, this->d-1, i+1, &hashList, maxVertices);
-        // cout << hashList.size() << endl;
+    for (int i=0; i<d-1; i++) {
+        get_nearestHashes(hashValue, d-1, i+1, &hashList, maxVertices);
         if ((int) hashList.size() >= maxVertices)
             break;
     }
@@ -181,10 +176,6 @@ Results* HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r,
             break;
     }
     clock_t end = clock();
-    // for (int i = 0; i < hashTable->getNumOfBuckets(); i+=1){
-    //     cout << hashTable->getBucket(i).size() << " ";
-    //     if (i > 0 && i%20 == 0) cout << endl;
-    // }
 
     // results 
     Results* results = resultsComparator.getResults();
@@ -214,48 +205,15 @@ vector<Results*> HyperCube<NumCDataType>::predict_rs(NumC<NumCDataType>* testDat
 template <typename NumCDataType>
 Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroids, int maxPoints, int maxVertices) {
     if (maxVertices > hashTableSize) maxVertices = hashTableSize;
-    // // comparator to get best results distances
-    // ResultsComparator resultsComparator(0);
-    // std::vector<Node<NumCDataType>> bucket;
-    // std::vector<unsigned int> hashList = getHashList(vector,  maxVertices); 
-
-    // int pointsChecked = 0;
-    // double dist;
-
-    // for (int i = 0; i < (int) hashList.size(); i++){
-    //     bucket = hashTable->getBucket(hashList[i]);
-    //     // search and find the k with minimun distance
-    //     for (int j=0; j < (int) bucket.size(); j++) {
-    //         // add to results and the will figure out the best neighbors
-    //         dist = NumC<NumCDataType>::dist(bucket[j].sVector, vector, 1);
-    //         if (dist <= r){
-    //             resultsComparator.addResult(bucket[j].index, dist);
-    //         }
-    //         pointsChecked++;
-    //         // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
-    //     }
-    //     if(pointsChecked >= maxPoints)
-    //         break;
-    // }
-    // clock_t end = clock();
-    // // for (int i = 0; i < hashTable->getNumOfBuckets(); i+=1){
-    // //     cout << hashTable->getBucket(i).size() << " ";
-    // //     if (i > 0 && i%20 == 0) cout << endl;
-    // // }
     RA_ResultsComparator resultsComparator(this->data->getRows());
 
     NumCDistType dist;
-    // int clusteredPoints = 0;
     int prev_pointsChecked = resultsComparator.getResultsSize();
     int new_pointsChecked = 0;
-    // Results* queryResults;
-    // ResultsComparator resultsComparator(0);
     std::vector<Node<NumCDataType>> bucket;
     std::vector<unsigned int> hashList;
 
-    //* GOOD MORNING BUDDY
     // r-Computation
-    //  <3 <3 <3 <3 
     clock_t start = clock();
     NumCDistType r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
     for (int i = 0; i < centroids->getRows(); i++){
@@ -268,7 +226,6 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     }
     r /= 2;
     cout << r << endl;
-//     //* ^^^^^^^^^ NOT TESTED ^^^^^^^^^
     // while (clusteredPoints < data->getRows()) {
     do{
         prev_pointsChecked = resultsComparator.getResultsSize();

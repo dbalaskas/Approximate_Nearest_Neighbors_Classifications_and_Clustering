@@ -8,6 +8,8 @@
 
 #include "./numc.h"
 
+// Results for LSH/Hypercube
+
 typedef struct ResultIndex{
 
     ResultIndex() {};
@@ -30,30 +32,6 @@ typedef struct Results{
     NumC<NumCDistType> resultsDistArray;
     NumC<double> executionTimeArray;
     double executionTime;
-
-    // Results(){ 
-    //     resultsIndexArray = NumC<NumCIndexType>(); 
-    // }
-    // ~Results(){}
-    // Results(Results& other_results){ 
-
-    //     this->resultsIndexArray = other_results.resultsIndexArray;
-    //     this->resultsDistArray  = other_results.resultsDistArray;
-    //     this->executionTime     = other_results.executionTime;
-    // }
-    // Results& operator=(Results& other_results){
-    //     // delete current data
-    //     this->resultsIndexArray = other_results.resultsIndexArray;
-    //     this->resultsDistArray  = other_results.resultsDistArray;
-    //     this->executionTime     = other_results.executionTime;
-    //     return *this;
-    // }
-    // Results& operator=(Results&& other_results) noexcept{ // move assignment
-    //     this->resultsIndexArray = other_results.resultsIndexArray;
-    //     this->resultsDistArray  = other_results.resultsDistArray;
-    //     this->executionTime     = other_results.executionTime;
-    //     return *this;
-    // }
 
 } Results;
 
@@ -81,12 +59,13 @@ class ResultsComparator{
         int addResult(NumCIndexType index, NumCDistType dist);
 
         Results* getResults();
-        // std::vector<ResultIndex> getResultList();
         int getNumOfResults();
         
         void print();
 };
 
+// -----------------------------------------------------------------
+// Results for clustering
 
 typedef struct RA_ResultIndex {
     NumCIndexType first_cluster;
@@ -104,7 +83,6 @@ class RA_ResultsComparator{
     public:
         RA_ResultsComparator(int size): numOfBestResults{size} {};
         ~RA_ResultsComparator() {};
-        // static void print(Results* results, NumC<int>* labels);
         bool checkIndex(NumCIndexType index);
 
         int addResult(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
@@ -114,7 +92,6 @@ class RA_ResultsComparator{
         NumCIndexType getResultsSize();
 
         Results* getResults();
-        // std::vector<ResultIndex> getResultList();
         int getNumOfResults();
         
         void print();

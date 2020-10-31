@@ -252,13 +252,13 @@ vector<Results*> Kmedians<NumCDataType>::getResults(){
 template <typename NumCDataType> 
 NumCDistType Kmedians<NumCDataType>::calculateSilhouette(NumCDistType distA, NumCDistType distB){
 
-    if (distA < distB){
+    if (distA < distB ){
         return (1.0 - (distA / distB));
     }
     else if (distA == distB){
         return 0;
     }
-    else if (distA > distB){
+    else {
         return  ((distB / distA) - 1.0);
     }
 
@@ -318,7 +318,11 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
         // get the silhouette
         // meanA = std::accumulate(meanDistA.begin(), meanDistA.end(), 0.0) / (NumCDistType)meanDistA.size();
         // meanB = std::accumulate(meanDistB.begin(), meanDistB.end(), 0.0) / (NumCDistType)meanDistB.size();
-        meanA = meanA_ / sizeA;
+        if (sizeA > 0) {
+            meanA = meanA_ / sizeA;
+        } else {
+            meanA = 0;
+        }
         meanB = meanB_ / sizeB;
 
         // this->silhouette.push_back(calculateSilhouette( meanA, meanB));
@@ -623,7 +627,7 @@ int main(){
 //     }
 
     kmeans.transform(LLOYDS_CLUSTERING);
-    // kmeans.transform(LSH_CLUSTERING);
+//     // kmeans.transform(LSH_CLUSTERING);
 
     // std::vector<Results*> res;
     // res = kmeans.getResults();

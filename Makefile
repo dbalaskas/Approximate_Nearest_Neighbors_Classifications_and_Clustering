@@ -64,7 +64,7 @@ info:
 	@echo "============================================================================"
 
 $(ODIR)/%.o: $(SRCDIR)/%.$(CODETYPE)
-	@echo "Creating object" $(ODIR)/$@ "..."
+	@echo "Creating object" $@ "..."
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 %.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $(ODIR)/$@ "..."

@@ -55,8 +55,12 @@ class NumC {
         void appendVector(Vector<NumCDataType> vector);
         void fill(NumCDataType fillValue);
 
+<<<<<<< HEAD
         void print(std::ofstream& output);
         void print();
+=======
+        void print(std::ofstream& output=std::cout);
+>>>>>>> 4389726937bd0768010b4edc859f4c9c61f0db64
 
         NumC* median();
         NumCDataType max();
