@@ -11,6 +11,7 @@ template <typename NumCDataType>
 class HyperCube {
     private:
         int w;                                  // w for hashFunction
+        int d;                                  // d for hashFunction
         NumC<NumCDataType>* data;               // train data
         int hashTableSize;                      // size of HashTable
         HashTable<NumCDataType>* hashTable;     // HashTable

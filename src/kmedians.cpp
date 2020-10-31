@@ -261,8 +261,7 @@ vector<Results*> Kmedians<NumCDataType>::getResults(){
 template <typename NumCDataType> 
 NumCDistType Kmedians<NumCDataType>::calculateSilhouette(NumCDistType distA, NumCDistType distB){
 
-    if (distA == 0) return 1.0;
-    if (distA < distB){
+    if (distA < distB ){
         return (1.0 - (distA / distB));
     }
     else if (distA == distB){
@@ -327,7 +326,11 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
         // get the silhouette
         // meanA = std::accumulate(meanDistA.begin(), meanDistA.end(), 0.0) / (NumCDistType)meanDistA.size();
         // meanB = std::accumulate(meanDistB.begin(), meanDistB.end(), 0.0) / (NumCDistType)meanDistB.size();
-        meanA = meanA_ / sizeA;
+        if (sizeA > 0) {
+            meanA = meanA_ / sizeA;
+        } else {
+            meanA = 1;
+        }
         meanB = meanB_ / sizeB;
 
         // this->silhouette.push_back(calculateSilhouette( meanA, meanB));

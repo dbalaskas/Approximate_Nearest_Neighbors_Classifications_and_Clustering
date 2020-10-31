@@ -19,9 +19,13 @@ HyperCube<NumCDataType>::~HyperCube() {
 template <typename NumCDataType>
 void HyperCube<NumCDataType>::fit(NumC<NumCDataType>* _data, int k) {
     data = _data;
-    if (k==-1) k = (int)HASH_SIZE;
-    hashTableSize = 1<< k;
-    hashTable = new HashTable<NumCDataType>(HC, hashTableSize, k, data->getCols(), w);
+    if (k==-1) {
+        d = (int)HASH_SIZE;
+    } else {
+        d = k;
+    }
+    hashTableSize = 1<< d;
+    hashTable = new HashTable<NumCDataType>(HC, hashTableSize, d, data->getCols(), w);
 }
 
 template <typename NumCDataType>
@@ -41,10 +45,12 @@ void HyperCube<NumCDataType>::get_nearestHashes(unsigned int hashValue, int k, i
     // cout << changesLeft << " ";
     if (changesLeft == 0) {
         hashList->push_back(hashValue);
+        // cout << hashValue << endl;
         go++;
         return;
     }
     if (k<0) return;
+    // cout << k << endl;
     unsigned int mask = 1 << (k);
     // cout << "hashValue: " << hashValue << endl;
     // cout << "hashValue with mask: " << (hashValue^mask) << endl;
@@ -62,8 +68,8 @@ std::vector<unsigned int> HyperCube<NumCDataType>::getHashList(Vector<NumCDataTy
     unsigned int hashValue = hashTable->hash(vector);
     hashList.push_back(hashValue);
 
-    for (int i=0; i<(int)HASH_SIZE; i++) {
-        get_nearestHashes(hashValue, (int)HASH_SIZE-1, i+1, &hashList, maxVertices);
+    for (int i=0; i<d; i++) {
+        get_nearestHashes(hashValue, d-1, i+1, &hashList, maxVertices);
         if ((int) hashList.size() >= maxVertices)
             break;
     }
