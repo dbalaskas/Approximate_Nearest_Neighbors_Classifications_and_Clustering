@@ -319,7 +319,6 @@ void NumC<NumCDataType>::addArray(NumC<NumCDataType> array, NumCIndexType index)
 
 template <typename NumCDataType>
 void NumC<NumCDataType>::print(ofstream& output){
-<<<<<<< HEAD
 
     output << "Numc matrix of shape [" << this->numOfRows << "," << this->numOfCols << "]\n";
 
@@ -334,16 +333,14 @@ void NumC<NumCDataType>::print(ofstream& output){
 
 template <typename NumCDataType>
 void NumC<NumCDataType>::print(){
-=======
->>>>>>> 4389726937bd0768010b4edc859f4c9c61f0db64
 
-    output << "Numc matrix of shape [" << this->numOfRows << "," << this->numOfCols << "]\n";
+    cout << "Numc matrix of shape [" << this->numOfRows << "," << this->numOfCols << "]\n";
 
     for (NumCIndexType i = 0; i < this->numOfRows; i++){
         for (NumCIndexType j = 0; j < this->numOfCols; j++){
-            output << data[i*this->numOfCols + j] << ", ";
+            cout << data[i*this->numOfCols + j] << ", ";
         }
-        output << "\n";
+        cout << "\n";
     }
 
 }
@@ -363,7 +360,6 @@ void NumC<NumCDataType>::printSparse(Vector<NumCDataType> vector, ofstream& outp
 
 template <typename NumCDataType>
 void NumC<NumCDataType>::print(Vector<NumCDataType> vector, ofstream& output){
-<<<<<<< HEAD
 
     // output << "Numc vector of shape [" << 1 << "," << vector.size << "]\n";
 
@@ -372,16 +368,6 @@ void NumC<NumCDataType>::print(Vector<NumCDataType> vector, ofstream& output){
     // }
     // output << "\n";
 
-=======
-
-    // output << "Numc vector of shape [" << 1 << "," << vector.size << "]\n";
-
-    // for (NumCIndexType i = 0; i < vector.size; i++){
-    //     output << vector.vector[i] << ", ";
-    // }
-    // output << "\n";
-
->>>>>>> 4389726937bd0768010b4edc859f4c9c61f0db64
     output << "(";
     for (NumCIndexType i = 0; i < vector.size; i++){
         output << vector.vector[i];
