@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     // Read query file with PandaC.
-    NumC<int> *queryData = PandaC<int>::fromMNIST(queryFile, 50);
+    NumC<int> *queryData = PandaC<int>::fromMNIST(queryFile);
 
 //------------------------------------------------------------------------------------
 // Making predictions.
@@ -225,7 +225,7 @@ int main(int argc, char** argv) {
                     return 1;
                 }
                 // Read query file with PandaC.
-                queryData = PandaC<int>::fromMNIST(queryFile, 50);
+                queryData = PandaC<int>::fromMNIST(queryFile);
             } else {
                 if(access(queryFile, F_OK) == -1) {
                     perror("\033[0;31mError\033[0m: Unable to open query file");
@@ -233,7 +233,7 @@ int main(int argc, char** argv) {
                     return 1;
                 }
                 // Read query file with PandaC.
-                queryData = PandaC<int>::fromMNIST(queryFile, 50);
+                queryData = PandaC<int>::fromMNIST(queryFile);
             }
             cout << "\033[0;36mPlease enter ann output file (press Enter to use the old one): \033[0m";
     		fgets(line,sizeof(line),stdin);
