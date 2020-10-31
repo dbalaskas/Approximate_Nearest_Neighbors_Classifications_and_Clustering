@@ -19,7 +19,12 @@ HyperCube<NumCDataType>::~HyperCube() {
 template <typename NumCDataType>
 void HyperCube<NumCDataType>::fit(NumC<NumCDataType>* _data, int k) {
     data = _data;
-    if (k==-1) k = (int)HASH_SIZE;
+    if (k==-1) {
+        this->d = (int)HASH_SIZE;
+    }
+    else{
+        this->d  = k;
+    }
     hashTableSize = 1<< k;
     hashTable = new HashTable<NumCDataType>(HC, hashTableSize, k, data->getCols(), w);
 }
@@ -65,9 +70,10 @@ std::vector<unsigned int> HyperCube<NumCDataType>::getHashList(Vector<NumCDataTy
 
     // cout << hashList.size() << endl;
 
-    for (int i=0; i<(int)HASH_SIZE; i++) {
+    for (int i=0; i<this->d-1; i++) {
         // cout << i << " changes" << endl;
-        get_nearestHashes(hashValue, (int)HASH_SIZE-1, i+1, &hashList, maxVertices);
+        // get_nearestHashes(hashValue, (int)HASH_SIZE-1, i+1, &hashList, maxVertices);
+        get_nearestHashes(hashValue, this->d-1, i+1, &hashList, maxVertices);
         // cout << hashList.size() << endl;
         if ((int) hashList.size() >= maxVertices)
             break;
@@ -85,6 +91,10 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
     ResultsComparator resultsComparator(k);
     std::vector<Node<NumCDataType>> bucket;
     std::vector<unsigned int> hashList = getHashList(vector,  maxVertices); 
+    // for (size_t i = 0; i < hashList.size(); i++){
+    //             cout<< "list " <<hashList[i]<<endl;
+    //         }
+    // cout<<endl;
 
     clock_t start = clock();
     int pointsChecked = 0;
@@ -310,7 +320,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
         }
         r *= 2;
         new_pointsChecked = resultsComparator.getResultsSize();
-        cout << "NEW POINTS CHECKED [" << new_pointsChecked << "]" <<endl;
+        // cout << "NEW POINTS CHECKED [" << new_pointsChecked << "]" <<endl;
     }while (new_pointsChecked != prev_pointsChecked || new_pointsChecked == 0);
 
 
@@ -340,6 +350,22 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
             resultsComparator.addResultConflict(resultIndex, centroidIndex, dist);
             delete knnResults;
         }
+
+        // // find the seconde nearest neighbour to fix results for the silouette
+        // if (results->resultsIndexArray.getElement(resultIndex,1) == -1){
+        //     knnResults = knnEstimator->predict_knn(this->data->getVector(resultIndex));
+        //     // add its results (centroids) to the total results
+        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,0);
+        //     dist = knnResults->resultsDistArray.getElement(0,0);
+        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
+        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
+        //     // add second nearest centroid
+        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
+        //     dist = knnResults->resultsDistArray.getElement(0,1);
+        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
+        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
+        //     delete knnResults;
+        // }
     }
     // delete previous results and gat the new one
     delete results;

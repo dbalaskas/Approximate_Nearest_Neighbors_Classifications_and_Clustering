@@ -11,6 +11,7 @@ template <typename NumCDataType>
 class HyperCube {
     private:
         int w;
+        int d;
         NumC<NumCDataType>* data;
         int hashTableSize;
         HashTable<NumCDataType>* hashTable;
@@ -18,7 +19,7 @@ class HyperCube {
         void get_nearestHashes(unsigned int vector, int k, int changesLeft, std::vector<unsigned int>* hashList, int maxVertices=0);
         std::vector<unsigned int> getHashList(Vector<NumCDataType> vector, int maxVertices);
     public:
-        HyperCube(int _w=50000): w{_w}, data{NULL}, hashTableSize{0}, hashTable{NULL} {};
+        HyperCube(int _w=50000): w{_w}, d{-1}, data{NULL}, hashTableSize{0}, hashTable{NULL} {};
         ~HyperCube();
 
         void fit(NumC<NumCDataType>* _data, int k=-1);

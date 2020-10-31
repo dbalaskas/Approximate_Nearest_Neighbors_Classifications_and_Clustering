@@ -108,6 +108,7 @@ class RA_ResultsComparator{
         bool checkIndex(NumCIndexType index);
 
         int addResult(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
+        int addResultSecond(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
         int addResultConflict(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist);
         RA_ResultIndex getResult(NumCIndexType index);
         NumCIndexType getResultsSize();

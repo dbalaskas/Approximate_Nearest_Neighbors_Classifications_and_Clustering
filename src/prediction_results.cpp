@@ -197,6 +197,12 @@ int RA_ResultsComparator::addResult(NumCIndexType index, NumCIndexType cluster_i
     return 0;
 }
 
+int RA_ResultsComparator::addResultSecond(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist){
+    cluster_map[index].second_cluster = cluster_index;
+    cluster_map[index].second_dist = dist;
+    return 0;
+}
+
 int RA_ResultsComparator::addResultConflict(NumCIndexType index, NumCIndexType cluster_index, NumCDistType dist){
 
     if (dist < cluster_map[index].first_dist){

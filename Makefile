@@ -53,8 +53,11 @@ info:
 	@echo "At compilation we are adding the libraries: $(LDLIBS)."
 	@echo "README path: $(README)."
 	@echo "============================================================================"
-	@echo "make: compiles the executable."
+	@echo "make: compiles the executables."
 	@echo "make <filename>.o: compiles the object file of $(SRCDIR)/<filename>.$(CODETYPE) on $(ODIR)/<filename>.o."
+	@echo "make cube: compiles the cube's executable."
+	@echo "make lsh: compiles the lsh's executable."
+	@echo "make cluster: compiles the cluster's executable."
 	@echo "make clean: Clears the project from the executables and the object files."
 	@echo "make clean_cache: Clears the project from the output files."
 	@echo "make README: Prints the README file of the project."
@@ -66,26 +69,20 @@ $(ODIR)/%.o: $(SRCDIR)/%.$(CODETYPE)
 %.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $(ODIR)/$@ "..."
 	$(CXX) -c -o $(ODIR)/$@ $< $(CXXFLAGS)
-$(CUBE_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/hc_classifier.o
+$(CUBE_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/hc_classifier.o $(ODIR)/cube.o
 	@echo "============================================================================"
 	@echo "Creating $(CUBE_EXEC)..."
-	$(CXX) -c -o $(ODIR)/cube.o $(SRCDIR)/cube.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/cube $(ODIR)/cube.o $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/cube $^ $(LDLIBS) $(CXXFLAGS)
 
-$(LSH_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o
+$(LSH_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/lsh.o
 	@echo "============================================================================"
 	@echo "Creating $(LSH_EXEC)..."
-	$(CXX) -c -o $(ODIR)/lsh.o $(SRCDIR)/lsh.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/lsh $(ODIR)/lsh.o $^ $(LDLIBS) $(CXXFLAGS)
+	$(CXX) -o $(BDIR)/lsh $^ $(LDLIBS) $(CXXFLAGS)
 
-$(CLUSTER_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o
+$(CLUSTER_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/kmedians.o $(ODIR)/cluster.o
 	@echo "============================================================================"
 	@echo "Creating $(CLUSTER_EXEC)..."
-	$(CXX) -c -o $(ODIR)/cluster.o $(SRCDIR)/cluster.$(CODETYPE) $(CXXFLAGS)
-	$(CXX) -o $(BDIR)/cluster $(ODIR)/cluster.o $^ $(LDLIBS) $(CXXFLAGS)
-exec: $(CUBE_EXEC)
-	@echo "============================================================================"
-	@echo "Creating executables..."
+	$(CXX) -o $(BDIR)/cluster $^ $(LDLIBS) $(CXXFLAGS)
 clean:
 	@echo "============================================================================"
 	@echo "Cleaning up..."

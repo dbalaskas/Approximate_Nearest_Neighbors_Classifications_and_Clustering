@@ -1,7 +1,16 @@
+#include <numeric>
+#include <random>
+#include <queue>
+#include <limits>
+#include <stdio.h>
+#include <string.h>
+#include <cstdlib>
+#include <iostream>
+#include <algorithm>
 #include "../include/kmedians.h"
-
-
-
+#include "../include/exhaustive_knn.h"
+#include "../include/hc_classifier.h"
+#include "../include/lsh_classifier.h"
 
 using namespace std;
 
@@ -46,7 +55,6 @@ ConfigurationData readConfiguration(char* configurationFile) {
     }
 
     fclose(conf);
-    confData.print();
     return confData;
 }
 
@@ -62,6 +70,7 @@ Kmedians<NumCDataType>::Kmedians(int numOfClusters, int maxIterations, NumCDistT
     // this->overallSilhouette = 0.0;
     this->centroids = NULL;
     this->data = NULL;
+    this->lastResults = NULL;
     // this->objectiveCost = 0.0;
 }
 
@@ -82,6 +91,7 @@ Kmedians<NumCDataType>::Kmedians(ConfigurationData configurationData, int maxIte
 
     this->data = data;
     this->centroids = NULL;
+    this->lastResults = NULL;
     // this->silhouette.reserve(this->numOfClusters);
     // this->overallSilhouette = 0.0;
     // this->objectiveCost = 0.0;
@@ -98,6 +108,7 @@ Kmedians<NumCDataType>::Kmedians(NumC<NumCDataType>* data, int numOfClusters, in
 
     this->data = data;
     this->centroids = NULL;
+    this->lastResults = NULL;
     // this->silhouette.reserve(this->numOfClusters);
     // this->overallSilhouette = 0.0;
     // this->objectiveCost = 0.0;
@@ -113,6 +124,10 @@ Kmedians<NumCDataType>::~Kmedians(){
     if (this->centroids != NULL) {
         delete this->centroids;
         this->centroids = NULL;
+    }
+    if (this->lastResults != NULL){
+        delete this->lastResults;
+        this->lastResults = NULL;
     }
 
 
@@ -161,9 +176,7 @@ void Kmedians<NumCDataType>::kmeansInit(){
     NumCIndexType randomXindex;
     // pick a random cantroid to start with
     randomXindex = rand()%this->numOfPoints;
-    cout << "FIND--> " <<randomXindex <<endl;
     this->centroids->addVector(this->data->getVector(randomXindex), 0);
-    // this->centroids->print();
 
     // start kmeans++
     for (int centroidIndex = 1; centroidIndex < this->numOfClusters; centroidIndex++){
@@ -178,8 +191,6 @@ void Kmedians<NumCDataType>::kmeansInit(){
         results->resultsDistArray.normalize();
         results->resultsDistArray.cumulative();
 
-        cout <<endl<<"LAST-> " << results->resultsDistArray.getLast()<<endl;
-
         // get a random number between [0,P(n−t)]
         lastElement = results->resultsDistArray.getLast();
         std::uniform_real_distribution<NumCDistType> distribution(0,lastElement);
@@ -191,23 +202,10 @@ void Kmedians<NumCDataType>::kmeansInit(){
         // add to centroids this element of this index
         this->centroids->appendVector(this->data->getVector(randomXindex));
         
-        cout <<"ranosm-> " << randomX<<endl;
-        cout << "FIND--> " <<randomXindex <<endl;
         // results->resultsDistArray.print();
         delete results;
     }
-    
-    // for (int i = 0; i < 10; i++)
-    // {
-    //     for (int j = 0; j < 10; j++)
-    //     {
-    //         cout <<"INIT DIST " << NumC<NumCDataType>::dist(centroids->getVector(i), centroids->getVector(j), 1)<< "i "<<i<<" j "<<j<<endl;
-    //     }
-        
-    // }
-    
-
-    
+     
     delete initEstimator;
 }
 
@@ -227,9 +225,10 @@ vector<Results*> Kmedians<NumCDataType>::getResults(){
     vector<Results*> totalResults(this->numOfClusters); 
     ResultsComparator* resultsComparator;
 
-    ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(1);
-    knnEstimator->fit(this->centroids);
-    Results* resultsKnn = knnEstimator->predict_knn(this->data);
+    // ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(1);
+    // knnEstimator->fit(this->centroids);
+    // Results* resultsKnn = knnEstimator->predict_knn(this->data);
+    Results* resultsKnn = this->lastResults;
 
     for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
 
@@ -245,8 +244,8 @@ vector<Results*> Kmedians<NumCDataType>::getResults(){
         delete resultsComparator;
     }
 
-    delete resultsKnn;
-    delete knnEstimator;
+    // delete resultsKnn;
+    // delete knnEstimator;
     return totalResults;
 }
 
@@ -281,7 +280,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     NumCDistType meanB = 0;
     NumCIndexType AcentroidIndex;
     NumCIndexType BcentroidIndex;
-    NumCIndexType indexForDist;
+    // NumCIndexType indexForDist;
     NumCDistType meanA_ = 0;
     NumCDistType meanB_ = 0;
     NumCIndexType sizeA = 0;
@@ -329,6 +328,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     }
 
     for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
+        cout <<(NumCDistType)silhouettes[centroidIndex].size() <<endl;
         meanSilhouettes = std::accumulate(silhouettes[centroidIndex].begin(), silhouettes[centroidIndex].end(), 0.0) / (NumCDistType)silhouettes[centroidIndex].size(); 
         overallSilhouettes[centroidIndex] = meanSilhouettes;
     }
@@ -340,10 +340,10 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     clock_t end = clock();
     cout <<"SILHOUETTE TIME [" << ((double) (end - start) / CLOCKS_PER_SEC) <<"]"<<endl;
     cout << "SILHOUETTE: [" << overallSilhouettes[overallSilhouettes.size()-1] << "]"<<endl;
-    cout << "SILHOUETTE: [" << sumSi/60000.0 << "]"<<endl;
-    for (int i = 0; i < overallSilhouettes.size(); i++){
-        cout << overallSilhouettes[i] << ", ";
-    }
+    cout << "SILHOUETTE: [" << sumSi/this->numOfPoints << "]"<<endl;
+    // for (int i = 0; i < overallSilhouettes.size(); i++){
+    //     cout << overallSilhouettes[i] << ", ";
+    // }
     
     return overallSilhouettes;
 }
@@ -352,10 +352,37 @@ template <typename NumCDataType>
 vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(){
     ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
     knnEstimator->fit(this->centroids);
-    Results* results = knnEstimator->predict_knn(this->data);
+    // Results* results = knnEstimator->predict_knn(this->data);
+    Results* results = this->lastResults;
 
-    vector<NumCDistType> silouettes = getSilhouettes(results);
-    delete results;
+    // find the seconde nearest neighbour to fix results for the silouette
+    NumCIndexType centroidIndex;
+    NumCDistType  dist;
+    Results* knnResults;
+    for (int resultIndex = 0; resultIndex < results->resultsIndexArray.getRows(); resultIndex++){
+
+        if (results->resultsIndexArray.getElement(resultIndex,1) == -1){
+            knnResults = knnEstimator->predict_knn(this->data->getVector(resultIndex));
+            // add its results (centroids) to the total results
+            centroidIndex = knnResults->resultsIndexArray.getElement(0,0);
+            dist = knnResults->resultsDistArray.getElement(0,0);
+            if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) ){
+                results->resultsIndexArray.addElement(centroidIndex, resultIndex, 1);
+                results->resultsDistArray.addElement(dist, resultIndex, 1);
+            }
+            // add second nearest centroid
+            centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
+            dist = knnResults->resultsDistArray.getElement(0,1);
+            if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) ){
+                results->resultsIndexArray.addElement(centroidIndex, resultIndex, 1);
+                results->resultsDistArray.addElement(dist, resultIndex, 1);
+            }
+            delete knnResults;
+        }
+    }
+
+    vector <NumCDistType> silouettes = getSilhouettes(results);
+    // delete results;
     delete knnEstimator;
     return silouettes;
 }
@@ -371,13 +398,13 @@ NumCDistType Kmedians<NumCDataType>::getObjectiveCost(Results* results){
 
 template <typename NumCDataType> 
 NumCDistType Kmedians<NumCDataType>::getObjectiveCost(){
-    ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
-    knnEstimator->fit(this->centroids);
-    Results* results = knnEstimator->predict_knn(this->data);
-
+    // ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
+    // knnEstimator->fit(this->centroids);
+    // Results* results = knnEstimator->predict_knn(this->data);
+    Results* results = this->lastResults;
     NumCDistType cost = getObjectiveCost(results);
-    delete results;
-    delete knnEstimator;
+    // delete results;
+    // delete knnEstimator;
     return cost;
 }
 
@@ -443,15 +470,15 @@ void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
 
     // start clock for trasform
     clock_t start_median, end_median;
-    clock_t start = clock();
     // init centroids
     this->kmeansInit();
 
     ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
     knnEstimator->fit(this->centroids);
 
+    clock_t start = clock();
     for (int i = 0; i < this->maxIterations; i++){
-
+        
         results = knnEstimator->predict_knn(this->data);
         cout <<endl<<"KNN TIME [" << results->executionTime <<"]"<<endl; 
 
@@ -464,17 +491,17 @@ void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
         new_objectiveCost = getObjectiveCost(results);
         cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
 
-    // getSilhouettes(results);
-        delete results;
+        this->lastResults = results;
         // if prev = new then optimization has converged
         // by 0.1%
         objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
         prev_objectiveCost = new_objectiveCost;
-        if (objectiveError < this->error){
+        if (objectiveError < this->error || i >= this->maxIterations-1){
             this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
-            cout << endl<<"Kmedians Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
+            cout << endl<<"Kmedians Converged in [" << i+1 << "] iterations and in time ["<< this->transformTime << "]"<<endl;
             break;
         }
+        delete results;
     }
     delete knnEstimator;
     getSilhouettes();
@@ -490,13 +517,13 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
 
     // start clock for trasform
     clock_t start_median, end_median;
-    clock_t start = clock();
     // init centroids
     this->kmeansInit();
 
     HyperCube<NumCDataType>* hcEstimator = new HyperCube<NumCDataType>;
-    hcEstimator->fit_transform(this->data, this->k);
+    hcEstimator->fit_transform(this->data, this->d);
 
+    clock_t start = clock();
     for (int i = 0; i < this->maxIterations; i++){
 
         results = hcEstimator->reverse_assignment(this->centroids, this->M, this->probes);
@@ -511,16 +538,17 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
         new_objectiveCost = getObjectiveCost(results);
         cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
 
-        delete results;
+        this->lastResults = results;
         // if prev = new then optimization has converged
         // by 0.1%
         objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
         prev_objectiveCost = new_objectiveCost;
-        if (objectiveError < this->error){
+        if (objectiveError < this->error || i >= this->maxIterations-1){
             this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
-            cout << endl<<"Kmedians Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
+            cout << endl<<"Kmedians Converged in [" << i+1 << "] iterations and in time ["<< this->transformTime << "]"<<endl;
             break;
         }
+        delete results;
     }
     delete hcEstimator;
     getSilhouettes();
@@ -536,13 +564,13 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
 
     // start clock for trasform
     clock_t start_median, end_median;
-    clock_t start = clock();
     // init centroids
     this->kmeansInit();
 
     LSHashing<NumCDataType>* lshEstimator = new LSHashing<NumCDataType>(this->L, this->k);
     lshEstimator->fit_transform(this->data);
 
+    clock_t start = clock();
     for (int i = 0; i < this->maxIterations; i++){
 
         results = lshEstimator->reverse_assignment(this->centroids);
@@ -557,16 +585,17 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
         new_objectiveCost = getObjectiveCost(results);
         cout << "COST: [" << new_objectiveCost << "] ERROR: [" << objectiveError<<"]" <<endl;
 
-        delete results;
+        this->lastResults = results;
         // if prev = new then optimization has converged
         // by 0.1%
         objectiveError = abs(new_objectiveCost - prev_objectiveCost) / prev_objectiveCost;
         prev_objectiveCost = new_objectiveCost;
-        if (objectiveError < this->error){
+        if (objectiveError < this->error || i >= this->maxIterations-1){
             this->transformTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
-            cout << endl<<"Kmedians Converged in [" << i<< "] iterations and in time ["<< this->transformTime << "]"<<endl;
+            cout << endl<<"Kmedians Converged in [" << i+1 << "] iterations and in time ["<< this->transformTime << "]"<<endl;
             break;
         }
+        delete results;
     }
     delete lshEstimator;
     getSilhouettes();
@@ -578,46 +607,46 @@ int main(){
     Kmedians<int> kmeans(configurationData);
 
 
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 5000);
+    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60000);
     // NumC<int>::print(inputData->getVector(0));
     // NumC<int>::printSparse(inputData->getVector(1));
 
 
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 5000);
+    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60000);
 //     // NumC<int>::print(inputDatalabels->getVector(0));
 
     kmeans.fit(inputData);
 
-    NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
-    for (int i = 0; i < 10; i++){
-        inputData_->addVector(inputData->getVector(i), i);
-    }
+//     NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+//     for (int i = 0; i < 10; i++){
+//         inputData_->addVector(inputData->getVector(i), i);
+//     }
 
-    // kmeans.transform(LLOYDS_CLUSTERING);
-    kmeans.transform(LSH_CLUSTERING);
+    kmeans.transform(LLOYDS_CLUSTERING);
+    // kmeans.transform(LSH_CLUSTERING);
 
-    std::vector<Results*> res;
-    res = kmeans.getResults();
-    for (int i = 0; i < res.size(); i++){
-        // ResultsComparator::print(res[i], inputDatalabels);
-        delete res[i];
-    }
-    
-    // std::vector<int> ve;
-    // ve.reserve(10);
-    // ve.push_back(-1);
-    // ve.push_back(45);
-    // for (int i = 0; i < ve.size(); i++){
-    //     cout << ve[i] << endl;
+    // std::vector<Results*> res;
+    // res = kmeans.getResults();
+    // for (int i = 0; i < res.size(); i++){
+    //     ResultsComparator::print(res[i], inputDatalabels);
+    //     delete res[i];
     // }
     
-
-    // Results* results;
+//     // std::vector<int> ve;
+//     // ve.reserve(10);
+//     // ve.push_back(-1);
+//     // ve.push_back(45);
+//     // for (int i = 0; i < ve.size(); i++){
+//     //     cout << ve[i] << endl;
+//     // }
     
-    // ResultsComparator::print(results, inputDatalabels);
-    // delete results;
 
-    delete inputData_;
+//     // Results* results;
+    
+//     // ResultsComparator::print(results, inputDatalabels);
+//     // delete results;
+
+    // delete inputData_;
     delete inputData;
     delete inputDatalabels;
 

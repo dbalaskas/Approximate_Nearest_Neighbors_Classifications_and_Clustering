@@ -318,6 +318,20 @@ void NumC<NumCDataType>::addArray(NumC<NumCDataType> array, NumCIndexType index)
 }
 
 template <typename NumCDataType>
+void NumC<NumCDataType>::print(ofstream& output){
+
+    output << "Numc matrix of shape [" << this->numOfRows << "," << this->numOfCols << "]\n";
+
+    for (NumCIndexType i = 0; i < this->numOfRows; i++){
+        for (NumCIndexType j = 0; j < this->numOfCols; j++){
+            output << data[i*this->numOfCols + j] << ", ";
+        }
+        output << "\n";
+    }
+
+}
+
+template <typename NumCDataType>
 void NumC<NumCDataType>::print(){
 
     cout << "Numc matrix of shape [" << this->numOfRows << "," << this->numOfCols << "]\n";
@@ -332,26 +346,34 @@ void NumC<NumCDataType>::print(){
 }
 
 template <typename NumCDataType>
-void NumC<NumCDataType>::printSparse(Vector<NumCDataType> vector){
+void NumC<NumCDataType>::printSparse(Vector<NumCDataType> vector, ofstream& output){
 
-    cout << "Numc sparse vector of shape [" << 1 << "," << vector.size +1 << "]\n";
+    output << "Numc sparse vector of shape [" << 1 << "," << vector.size +1 << "]\n";
 
     for (NumCIndexType i = 0; i < vector.size+1; i++){
-        cout << vector.sparseData[i] << ", ";
+        output << vector.sparseData[i];
+        if (i+1 < vector.size+1) output << ", ";
     }
-    cout << "\n";
+    output << "\n";
 
 }
 
 template <typename NumCDataType>
-void NumC<NumCDataType>::print(Vector<NumCDataType> vector){
+void NumC<NumCDataType>::print(Vector<NumCDataType> vector, ofstream& output){
 
-    cout << "Numc vector of shape [" << 1 << "," << vector.size << "]\n";
+    // output << "Numc vector of shape [" << 1 << "," << vector.size << "]\n";
 
+    // for (NumCIndexType i = 0; i < vector.size; i++){
+    //     output << vector.vector[i] << ", ";
+    // }
+    // output << "\n";
+
+    output << "(";
     for (NumCIndexType i = 0; i < vector.size; i++){
-        cout << vector.vector[i] << ", ";
+        output << vector.vector[i];
+        if (i+1 < vector.size) output << ", ";
     }
-    cout << "\n";
+    output << ")";
 
 }
 
@@ -380,7 +402,6 @@ template <typename NumCDataType>
 NumCDistType NumC<NumCDataType>::distSparse(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d){
     // chech if both are sparse vectors
     if ((v1.isSparse_ == true) && (v2.isSparse_ == true)){
-
         NumCDistType dist = 0;
         NumCIndexType sparseElements1 = v1.sparseData[0];
         NumCIndexType sparseElements2 = v2.sparseData[0];

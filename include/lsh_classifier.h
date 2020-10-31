@@ -2,6 +2,8 @@
 #define LSH_H
 
 #include <vector>
+#include <stdio.h>
+#include <iostream>
 #include "./numc.h"
 #include "./hashtable.h"
 #include "./prediction_results.h"

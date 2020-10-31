@@ -254,13 +254,14 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
         }
         r *= 2;
         new_pointsChecked = resultsComparator.getResultsSize();
-        cout << "NEW POINTS CHECKED [" << new_pointsChecked << "]" <<endl;
+        // cout << "NEW POINTS CHECKED [" << new_pointsChecked << "]" <<endl;
     }while (new_pointsChecked != prev_pointsChecked || new_pointsChecked == 0);
 
 
 
     // results 
     Results* results = resultsComparator.getResults();
+    // results->resultsIndexArray.print();
     // do exhaustive search for the points that remained unassigned
     Results* knnResults;
     NumCIndexType centroidIndex;
@@ -283,6 +284,22 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
             resultsComparator.addResultConflict(resultIndex, centroidIndex, dist);
             delete knnResults;
         }
+
+        // // find the seconde nearest neighbour to fix results for the silouette
+        // if (results->resultsIndexArray.getElement(resultIndex,1) == -1){
+        //     knnResults = knnEstimator->predict_knn(this->data->getVector(resultIndex));
+        //     // add its results (centroids) to the total results
+        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,0);
+        //     dist = knnResults->resultsDistArray.getElement(0,0);
+        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
+        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
+        //     // add second nearest centroid
+        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
+        //     dist = knnResults->resultsDistArray.getElement(0,1);
+        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
+        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
+        //     delete knnResults;
+        // }
     }
     // delete previous results and gat the new one
     delete results;
@@ -291,6 +308,7 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     // set time to results
     results->executionTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
 
+    // results->resultsIndexArray.print();
     delete knnEstimator;
     return results;
 }
