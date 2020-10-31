@@ -113,7 +113,7 @@ Results* HyperCube<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int k
 
     // results 
     Results* results = resultsComparator.getResults();
-    results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    results->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
     return results;
 }
 
@@ -142,7 +142,7 @@ Results* HyperCube<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int 
     clock_t end = clock();
 
     // results 
-    totalResults->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    totalResults->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
     return totalResults;
 }
 
@@ -179,7 +179,7 @@ Results* HyperCube<NumCDataType>::predict_rs(Vector<NumCDataType> vector, int r,
 
     // results 
     Results* results = resultsComparator.getResults();
-    results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    results->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
     return results;
 }
 
@@ -283,7 +283,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
 
     // results 
     Results* results = resultsComparator.getResults();
-    // results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    // results->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
     // results->resultsDistArray.print();
     // do exhaustive search for the points that remained unassigned
     Results* knnResults;
@@ -329,7 +329,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     results = resultsComparator.getResults();
 
     // set time to results
-    results->executionTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+    results->executionTime = ((double) (clock() - start) / (CLOCKS_PER_SEC/1000));
 
     delete knnEstimator;
     return results;

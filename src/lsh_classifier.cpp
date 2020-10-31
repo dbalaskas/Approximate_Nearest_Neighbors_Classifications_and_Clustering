@@ -75,7 +75,7 @@ Results* LSHashing<NumCDataType>::predict_knn(Vector<NumCDataType> vector, int N
 
     Results* results = resultsComparator.getResults();
     // results 
-    results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    results->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
 
     return results;
 }
@@ -104,7 +104,7 @@ Results* LSHashing<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int 
     clock_t end = clock();
     
     // results 
-    totalResults->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    totalResults->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
 
     return totalResults;
 }
@@ -126,8 +126,8 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
     // }
     // clock_t end = clock();
 
-    // // result.setTime((double) (end - start) / CLOCKS_PER_SEC);
-    // // result.time = (double)(end - start) / CLOCKS_PER_SEC;
+    // // result.setTime((double) (end - start) / (CLOCKS_PER_SEC/1000));
+    // // result.time = (double)(end - start) / (CLOCKS_PER_SEC/1000);
     // return result;
 
     ResultsComparator resultsComparator(0);
@@ -156,7 +156,7 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
 
     Results* results = resultsComparator.getResults();
     // results 
-    results->executionTime = ((double) (end - start) / CLOCKS_PER_SEC);
+    results->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
 
     return results;
 }
@@ -306,7 +306,7 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     results = resultsComparator.getResults();
 
     // set time to results
-    results->executionTime = ((double) (clock() - start) / CLOCKS_PER_SEC);
+    results->executionTime = ((double) (clock() - start) / (CLOCKS_PER_SEC/1000));
 
     // results->resultsIndexArray.print();
     delete knnEstimator;

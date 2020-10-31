@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
 //------------------------------------------------------------------------------------
 // Call K-Medians and train it.
 
-    Kmedians<int> kMedians(conf.number_of_clusters);
+    Kmedians<int> kMedians(conf);
     if (!strcmp(method, (char*) "Classic")) {
         kMedians.fit_transform(inputData, LLOYDS_CLUSTERING);
     } else if (!strcmp(method, (char*) "LSH")) {
