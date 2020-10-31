@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
 //------------------------------------------------------------------------------------
 // Call K-Medians and train it.
 
-    Kmedians<int> kMedians(conf.number_of_clusters);
+    Kmedians<int> kMedians(conf);
     if (!strcmp(method, (char*) "Classic")) {
         kMedians.fit_transform(inputData, LLOYDS_CLUSTERING);
     } else if (!strcmp(method, (char*) "LSH")) {
@@ -182,8 +182,10 @@ bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int>
         NumC<int>::print(centroids->getVector(i), output);
         output << "}" << endl; //!+++
     }
+    cout << endl;
     output << "  clustering_time: " << clusters[0]->executionTime << endl; //!+++
     output << "  Silhouette: [ ";
+    cout << endl;
     for (int i=0; i < centroids->getRows(); i++) {
         output << silhouette[i] << ", ";
     }

@@ -605,53 +605,53 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
     getSilhouettes();
 }
 
-#include "../include/pandac.h"
-int main(){
-    ConfigurationData configurationData; 
-    Kmedians<int> kmeans(configurationData);
+// #include "../include/pandac.h"
+// int main(){
+//     ConfigurationData configurationData; 
+//     Kmedians<int> kmeans(configurationData);
 
 
-    NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60000);
-    // NumC<int>::print(inputData->getVector(0));
-    // NumC<int>::printSparse(inputData->getVector(1));
+//     NumC<int>* inputData = PandaC<int>::fromMNIST("./doc/input/train-images-idx3-ubyte", 60000);
+//     // NumC<int>::print(inputData->getVector(0));
+//     // NumC<int>::printSparse(inputData->getVector(1));
 
 
-    NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60000);
-//     // NumC<int>::print(inputDatalabels->getVector(0));
+//     NumC<int>* inputDatalabels = PandaC<int>::fromMNISTlabels("./doc/input/train-labels-idx1-ubyte", 60000);
+// //     // NumC<int>::print(inputDatalabels->getVector(0));
 
-    kmeans.fit(inputData);
+//     kmeans.fit(inputData);
 
-//     NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
-//     for (int i = 0; i < 10; i++){
-//         inputData_->addVector(inputData->getVector(i), i);
-//     }
+// //     NumC<int>* inputData_ = new NumC<int>(10, inputData->getCols(), true);
+// //     for (int i = 0; i < 10; i++){
+// //         inputData_->addVector(inputData->getVector(i), i);
+// //     }
 
-    kmeans.transform(LLOYDS_CLUSTERING);
-//     // kmeans.transform(LSH_CLUSTERING);
+//     kmeans.transform(LLOYDS_CLUSTERING);
+// //     // kmeans.transform(LSH_CLUSTERING);
 
-    // std::vector<Results*> res;
-    // res = kmeans.getResults();
-    // for (int i = 0; i < res.size(); i++){
-    //     ResultsComparator::print(res[i], inputDatalabels);
-    //     delete res[i];
-    // }
-    
-//     // std::vector<int> ve;
-//     // ve.reserve(10);
-//     // ve.push_back(-1);
-//     // ve.push_back(45);
-//     // for (int i = 0; i < ve.size(); i++){
-//     //     cout << ve[i] << endl;
+//     // std::vector<Results*> res;
+//     // res = kmeans.getResults();
+//     // for (int i = 0; i < res.size(); i++){
+//     //     ResultsComparator::print(res[i], inputDatalabels);
+//     //     delete res[i];
 //     // }
     
-
-//     // Results* results;
+// //     // std::vector<int> ve;
+// //     // ve.reserve(10);
+// //     // ve.push_back(-1);
+// //     // ve.push_back(45);
+// //     // for (int i = 0; i < ve.size(); i++){
+// //     //     cout << ve[i] << endl;
+// //     // }
     
-//     // ResultsComparator::print(results, inputDatalabels);
-//     // delete results;
 
-    // delete inputData_;
-    delete inputData;
-    delete inputDatalabels;
+// //     // Results* results;
+    
+// //     // ResultsComparator::print(results, inputDatalabels);
+// //     // delete results;
 
-}
+//     // delete inputData_;
+//     delete inputData;
+//     delete inputDatalabels;
+
+// }

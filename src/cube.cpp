@@ -290,7 +290,6 @@ bool extractResults(char* outputFile, Results* results, Results *true_results, v
     }
 
     // Printing Score of prediction.
-    cout << endl;
     cout << "Final Exhaustive vs Hypercube Score:" << endl;
     cout << "Average Hypercube distance: " << (double) sumDistanceHypercube/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;
     cout << "Average True distance: " << (double) sumDistanceTrue/(results->resultsIndexArray.getCols() * results->resultsIndexArray.getRows()) << endl;
