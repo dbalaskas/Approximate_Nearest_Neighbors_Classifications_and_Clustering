@@ -14,7 +14,8 @@
 using namespace std;
 
 // Extracts the results to output file.
-bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians);
+template <typename NumCDataType> 
+bool extractResults(char* outputFile, char* method, bool complete, Kmedians<NumCDataType> *kMedians);
 
 // Returns true if the string represents a non-negative number, eitherwise returns false.
 bool isNumber(char *word) {
@@ -103,7 +104,7 @@ int main(int argc, char** argv) {
     }
     cout << "\033[0;36mRunning Cluster :)\033[0m" << endl << endl;
     // Read input file with PandaC.
-    NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile, 50);
+    NumC<int>* inputData = PandaC<int>::fromMNIST(inputFile, 5000);
 
 //------------------------------------------------------------------------------------
 // Reading configuration file.
@@ -156,7 +157,8 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int> *kMedians) {
+template <typename NumCDataType> 
+bool extractResults(char* outputFile, char* method, bool complete, Kmedians<NumCDataType> *kMedians) {
 
     // Check that output file exists.
     ofstream output(outputFile, fstream::out);
@@ -174,12 +176,12 @@ bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int>
         output << "Range Search Hypercube" << endl;
     }
 
-    NumC<int>* centroids = kMedians->getCentroids();
+    NumC<NumCDataType>* centroids = kMedians->getCentroids();
     vector<Results*> clusters = kMedians->getResults();
     vector<NumCDistType> silhouette = kMedians->getSilhouettes();
     for (int i=0; i < centroids->getRows(); i++) {
         output << "  CLUSTER-" << i+1 << " {size: " << clusters[i]->resultsIndexArray.getCols() << ", centroid: ";
-        NumC<int>::print(centroids->getVector(i), output);
+        NumC<NumCDataType>::print(centroids->getVector(i), output);
         output << "}" << endl; //!+++
     }
     cout << endl;
@@ -193,7 +195,7 @@ bool extractResults(char* outputFile, char* method, bool complete, Kmedians<int>
     if (complete == true) {
         for (int i=0; i < centroids->getRows(); i++) {
             output << "  CLUSTER-" << i+1 << " {centroid: ";
-            NumC<int>::print(centroids->getVector(i), output);
+            NumC<NumCDataType>::print(centroids->getVector(i), output);
             output << ", "; //!+++
             for (int j=0; j < clusters[i]->resultsIndexArray.getCols(); j++) {
                 output << clusters[i]->resultsIndexArray.getElement(0, j);

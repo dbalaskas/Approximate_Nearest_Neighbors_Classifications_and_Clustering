@@ -260,9 +260,9 @@ bool extractResults(char* outputFile, Results* results, Results *true_results, v
         for (int j=0; j < results->resultsIndexArray.getCols(); j++) {
             output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << endl;
             // output << "  Nearest neighbor-" << j+1 << ": " << results->resultsIndexArray.getElement(i, j) << " label: " << inputDatalabels->getElement(results->resultsIndexArray.getElement(i, j) ,0) << " true label: " << inputDatalabels->getElement(true_results->resultsIndexArray.getElement(i, j) ,0)<<endl;
-            output << "  distanceLSH: " << results->resultsDistArray.getElement(i, j) << endl;
+            output << "   distanceLSH:  " << results->resultsDistArray.getElement(i, j) << endl;
             sumDistanceLSH += results->resultsDistArray.getElement(i, j);
-            output << "  distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
+            output << "   distanceTrue: " << true_results->resultsDistArray.getElement(i, j) << endl;
             sumDistanceTrue += true_results->resultsDistArray.getElement(i, j);
         }
         output << "  tLSH: " << results->executionTimeArray.getElement(i, 0) << endl;
@@ -274,6 +274,7 @@ bool extractResults(char* outputFile, Results* results, Results *true_results, v
             output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << endl;
             // output << "    " << r_results[i]->resultsIndexArray.getElement(0, j) << " label: " << inputDatalabels->getElement(r_results[i]->resultsIndexArray.getElement(0, j) ,0)<<endl;
         }
+        output << endl;
     }
 
     // Printing Score of prediction.

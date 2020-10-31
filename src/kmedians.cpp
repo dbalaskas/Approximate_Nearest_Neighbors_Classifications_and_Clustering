@@ -219,9 +219,6 @@ vector<Results*> Kmedians<NumCDataType>::getResults(){
     vector<Results*> totalResults(this->numOfClusters); 
     ResultsComparator* resultsComparator;
 
-    // ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(1);
-    // knnEstimator->fit(this->centroids);
-    // Results* resultsKnn = knnEstimator->predict_knn(this->data);
     Results* resultsKnn = this->lastResults;
 
     for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
@@ -238,8 +235,6 @@ vector<Results*> Kmedians<NumCDataType>::getResults(){
         delete resultsComparator;
     }
 
-    // delete resultsKnn;
-    // delete knnEstimator;
     return totalResults;
 }
 
@@ -278,6 +273,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
     NumCIndexType sizeB = 0;
 
     clock_t start = clock();
+    // search every point
     for (int point = 0; point < this->numOfPoints; point++){
         AcentroidIndex = results->resultsIndexArray.getElement(point, 0);
         BcentroidIndex = results->resultsIndexArray.getElement(point, 1);
@@ -286,17 +282,17 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
         meanB_ = 0;
         sizeA = 0;
         sizeB = 0;
+        // check the distance from every point in its 1st and second custer
+        // except the distance from it self
         for (int resultsIndex = 0; resultsIndex < results->resultsIndexArray.getRows(); resultsIndex++){
 
             if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  AcentroidIndex && resultsIndex != point){
                 distA = NumC<NumCDataType>::dist(this->data->getVector(resultsIndex), this->data->getVector(point), 1);
-                // meanDistA.push_back(distA);
                 meanA_ += distA;
                 sizeA++;
             }
             else if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  BcentroidIndex && resultsIndex != point){
                 distB = NumC<NumCDataType>::dist(this->data->getVector(resultsIndex), this->data->getVector(point), 1);
-                // meanDistB.push_back(distB);
                 meanB_ += distB;
                 sizeB++;
             }
@@ -312,6 +308,7 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(Results* results){
         silhouettes[AcentroidIndex].push_back(calculateSilhouette( meanA, meanB));
     }
 
+    // get the silouette per centroids
     for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
         meanSilhouettes = std::accumulate(silhouettes[centroidIndex].begin(), silhouettes[centroidIndex].end(), 0.0) / (NumCDistType)silhouettes[centroidIndex].size(); 
         overallSilhouettes[centroidIndex] = meanSilhouettes;
@@ -332,7 +329,6 @@ template <typename NumCDataType>
 vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(){
     ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
     knnEstimator->fit(this->centroids);
-    // Results* results = knnEstimator->predict_knn(this->data);
     Results* results = this->lastResults;
 
     // find the seconde nearest neighbour to fix results for the silouette
@@ -362,7 +358,6 @@ vector<NumCDistType> Kmedians<NumCDataType>::getSilhouettes(){
     }
 
     vector <NumCDistType> silouettes = getSilhouettes(results);
-    // delete results;
     delete knnEstimator;
     return silouettes;
 }
@@ -378,13 +373,8 @@ NumCDistType Kmedians<NumCDataType>::getObjectiveCost(Results* results){
 
 template <typename NumCDataType> 
 NumCDistType Kmedians<NumCDataType>::getObjectiveCost(){
-    // ExhaustiveKnn<NumCDataType>* knnEstimator = new ExhaustiveKnn<NumCDataType>(2);
-    // knnEstimator->fit(this->centroids);
-    // Results* results = knnEstimator->predict_knn(this->data);
     Results* results = this->lastResults;
     NumCDistType cost = getObjectiveCost(results);
-    // delete results;
-    // delete knnEstimator;
     return cost;
 }
 
@@ -396,11 +386,12 @@ void Kmedians<NumCDataType>::medianCentroidsUpdate(Results* results){
     NumCDataType medianElement = 0;
     NumCDataType median = 0;
     int size = 0;
-
+    
+    // for ever centroid
     for (int centroidIndex = 0; centroidIndex < this->numOfClusters; centroidIndex++){
-
+        // and every dimension
         for (int dimension = 0; dimension < this->numOfDimensions; dimension++){  
-
+            // get the values of its elements
             medianVector.clear();
             for (int resultsIndex = 0; resultsIndex < results->resultsIndexArray.getRows(); resultsIndex++){
                 if ( results->resultsIndexArray.getElement(resultsIndex, 0) ==  centroidIndex){
@@ -408,7 +399,7 @@ void Kmedians<NumCDataType>::medianCentroidsUpdate(Results* results){
                     medianVector.push_back(medianElement);
                 }
             }
-            // calculate median for that dimension
+            // and calculate median for that dimension
             size = medianVector.size();
             if (size != 0){
                 // get the upper boud of the index (index start at 0)
@@ -484,7 +475,6 @@ void Kmedians<NumCDataType>::transform_LLOYDS_CLUSTERING(){
         delete results;
     }
     delete knnEstimator;
-    // getSilhouettes();
 }
 
 template <typename NumCDataType> 
@@ -531,7 +521,6 @@ void Kmedians<NumCDataType>::transform_HC_CLUSTERING(){
         delete results;
     }
     delete hcEstimator;
-    // getSilhouettes();
 }
 
 template <typename NumCDataType> 
@@ -578,7 +567,6 @@ void Kmedians<NumCDataType>::transform_LSH_CLUSTERING(){
         delete results;
     }
     delete lshEstimator;
-    // getSilhouettes();
 }
 
 // #include "../include/pandac.h"

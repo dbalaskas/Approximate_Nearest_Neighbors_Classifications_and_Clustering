@@ -111,28 +111,9 @@ Results* LSHashing<NumCDataType>::predict_knn(NumC<NumCDataType>* testData, int 
 
 template <typename NumCDataType>
 Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double r) {
-    // Results result = Results();
-    // double dist;
-    
-    // clock_t start = clock();
-    // for (int i=0; i < L; i++) {
-    //     Bucket bucket = hashTableList[i].getBucket(vector);
-    //     for (int j=0; j < bucket.size(); j++) {
-    //         dist = NumC<NumCDataType>::dist(vector, bucket[j], 1);
-    //         if (dist <= r) {
-    //             // results.add(index, dist);
-    //         }
-    //     }
-    // }
-    // clock_t end = clock();
-
-    // // result.setTime((double) (end - start) / (CLOCKS_PER_SEC/1000));
-    // // result.time = (double)(end - start) / (CLOCKS_PER_SEC/1000);
-    // return result;
 
     ResultsComparator resultsComparator(0);
     // ResultIndex result;
-    // std::vector<ResultIndex> results;
     unsigned int hashValue;
     std::vector< Node<NumCDataType> > bucket;
     double dist;
@@ -150,7 +131,6 @@ Results* LSHashing<NumCDataType>::predict_rs(Vector<NumCDataType> vector, double
                 }
             }
         }
-        // results.add(index, dist);
     }
     clock_t end = clock();
 
@@ -192,6 +172,7 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     int new_pointsChecked = 0;
 
     clock_t start = clock();
+    // find the min/2 r between all centroids
     NumCDistType r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
     for (int i = 0; i < centroids->getRows(); i++){
         for (int j=i+1; j < centroids->getRows(); j++) {
@@ -202,25 +183,7 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
         }
     }
     r /= 2;
-    cout << r << endl;
 
-    // for (int i=0; i < L; i++) {
-    //     // get bucket
-    //     hashValue = hashTableList[i]->hash(vector);
-    //     bucket = hashTableList[i]->getBucket(hashValue%HASHTABLE_SIZE);
-
-    //     for (int j=0; j < (int) bucket.size(); j++) {
-    //         if (hashValue == bucket[j].hashValue) {
-
-    //             dist = NumC<NumCDataType>::dist(vector, bucket[j].sVector, 1);
-    //             if (dist <= r){
-    //                 resultsComparator.addResult(bucket[j].index, dist);
-    //             }
-
-    //         }
-    //     }
-    //     // results.add(index, dist);
-    // }
     do{
         prev_pointsChecked = resultsComparator.getResultsSize();
 
@@ -232,9 +195,11 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
                 bucket = hashTableList[i]->getBucket(centroids->getVector(centroidIndex));
 
                 for (int j=0; j < (int) bucket.size(); j++) {
-                // cout << "bucket size " <<bucket.size() <<" " <<bucket[j].hashValue << " "<< hashValue<<endl;
+
                     if (hashValue == bucket[j].hashValue) {
                         
+                        // check if point exist in results
+                        // if exists then add conflict
                         if (resultsComparator.checkIndex(bucket[j].index) && resultsComparator.getResult(bucket[j].index).first_cluster != centroidIndex) {
 
                             dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
@@ -242,6 +207,7 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
                                 resultsComparator.addResultConflict(bucket[j].index, centroidIndex, dist);
                             }
                         } else {
+                            // else add result
                             dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
                             if (dist <= r){
                                 resultsComparator.addResult(bucket[j].index, centroidIndex, dist);
@@ -261,7 +227,6 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
 
     // results 
     Results* results = resultsComparator.getResults();
-    // results->resultsIndexArray.print();
     // do exhaustive search for the points that remained unassigned
     Results* knnResults;
     NumCIndexType centroidIndex;
@@ -285,21 +250,7 @@ Results* LSHashing<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
             delete knnResults;
         }
 
-        // // find the seconde nearest neighbour to fix results for the silouette
-        // if (results->resultsIndexArray.getElement(resultIndex,1) == -1){
-        //     knnResults = knnEstimator->predict_knn(this->data->getVector(resultIndex));
-        //     // add its results (centroids) to the total results
-        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,0);
-        //     dist = knnResults->resultsDistArray.getElement(0,0);
-        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
-        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
-        //     // add second nearest centroid
-        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
-        //     dist = knnResults->resultsDistArray.getElement(0,1);
-        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
-        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
-        //     delete knnResults;
-        // }
+
     }
     // delete previous results and gat the new one
     delete results;

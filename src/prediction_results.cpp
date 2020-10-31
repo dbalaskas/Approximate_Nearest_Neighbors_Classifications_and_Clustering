@@ -20,25 +20,7 @@ ResultsComparator::ResultsComparator(int size){
 ResultsComparator::~ResultsComparator(){
 }
 
-// Results& Results::operator=(Results other_results){
-    
-//     this->numOfBestResults  = other_results.getNumOfResults();
-//     this->executionTime     = other_results.executionTime;
-//     this->resultsIndexArray = other_results.resultsIndexArray;
-//     this->resultsDistArray  = other_results.resultsDistArray;
 
-//     return *this;
-// }
-
-// void ResultsComparator::print(){
-
-//     cout << "Best Results [" << this->numOfBestResults << "]  Time [" << this->executionTime << "]:\n";
-//     for (int i = 0; i < this->numOfBestResults; i++){
-//         cout << "Index: " << this->resultsIndexArray.getElement(0,i) << setw(15) 
-//              << " Distance: " << this->resultsDistArray.getElement(0,i) <<endl;
-//     }
-
-// }
 
 void ResultsComparator::print(Results* results, NumC<int>* labels){
 
@@ -63,33 +45,10 @@ void ResultsComparator::print(Results* results, NumC<int>* labels){
 }
 
 
-// std::vector<ResultIndex> Results::getResultList(){
-//     return resultList;
-// }
-
-// double ResultsComparator::getTime(){
-//     return this->executionTime;
-// }
-
 int ResultsComparator::getNumOfResults(){
     return this->numOfBestResults;
 }
 
-// void Results::result_swap(ResultIndex* res1, ResultIndex* res2){
-
-//     // cout << res1-dist << " " << res2.dist <<"SWAP\n";
-//     ResultIndex temp(res1->index, res1->dist);
-//     res1->index = res2->index;
-//     res1->dist  = res2->dist; 
-//     res2->index = temp.index;
-//     res2->dist  = temp.dist;
-//     // cout << res1.dist << " " << res2.dist <<"SWAP\n";
-
-// }
-
-// void ResultsComparator::setTime(double time){
-//     this->executionTime = time;
-// }
 
 int ResultsComparator::addResult(NumCIndexType index, NumCDistType dist){
 
@@ -99,45 +58,6 @@ int ResultsComparator::addResult(NumCIndexType index, NumCDistType dist){
         priorityQueue.push(result);
     }
     return 0;
-    // ResultIndex point(index, dist);
-    // // add and keep the best num of results elements
-    // if (this->numOfResults > 0){
-
-    //     int last_result = numOfResults-1;
-
-    //     // if result list is full then check if the last element of the list is greater then the result we
-    //     // want to insert
-    //     if (this->numOfResults == this->numOfBestResults){
-    //         // if it is grater then swap it
-    //         if (this->resultList[last_result].dist > point.dist){
-    //             result_swap(&(this->resultList[last_result]), &(point));
-    //         }
-    //         else{
-    //             return 0;
-    //         }
-
-    //     }
-    //     else{
-    //         this->resultList.push_back(point);
-    //         this->numOfResults++;
-    //         last_result = numOfResults-1;
-    //     }
-    //     // iterate and swap the smaller elements to the top of the list
-    //     while(last_result > 0){
-    //         if (this->resultList[last_result-1].dist > this->resultList[last_result].dist){
-    //             // cout << this->resultList[last_result-1].dist << " " << this->resultList[last_result].dist  <<"SWAP\n";
-    //             result_swap(&(this->resultList[last_result-1]), &(this->resultList[last_result]));
-    //             last_result--;
-    //         }
-    //         else{
-    //             return 0;
-    //         }
-    //     }
-    // }
-    // else{
-    //     this->resultList.push_back(point);
-    //     this->numOfResults++;
-    // }
 
 }
 
@@ -154,8 +74,6 @@ Results* ResultsComparator::getResults(){
     results->resultsIndexArray = NumC<NumCIndexType>(1, this->numOfBestResults);
     results->resultsDistArray  = NumC<NumCDistType>(1, this->numOfBestResults);
     results->executionTime = 0.0;
-    // results->executionTimeArray  = NumC<double>(this->numOfBestResults, 1);
-    // NumC<NumCIndexType> resultsDistArray(1, this->numOfBestResults);
 
     int resultsFilled = 0;
 
@@ -233,7 +151,6 @@ Results* RA_ResultsComparator::getResults(){
     results->resultsDistArray.fill(-1);
     for (std::map<int, RA_ResultIndex>::iterator iterator = cluster_map.begin(); iterator != cluster_map.end(); iterator++){
 
-        // std::cout << iterator->first << " => " << iterator->second.first_cluster << '\n';
         // fill the results arrays
         results->resultsIndexArray.addElement( iterator->second.first_cluster, iterator->first, 0);
         results->resultsIndexArray.addElement( iterator->second.second_cluster, iterator->first, 1);

@@ -214,6 +214,7 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
     std::vector<unsigned int> hashList;
 
     // r-Computation
+    // find the min/2 r between all centroids
     clock_t start = clock();
     NumCDistType r = NumC<NumCDataType>::dist(centroids->getVector(0), centroids->getVector(1), 1);
     for (int i = 0; i < centroids->getRows(); i++){
@@ -225,35 +226,20 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
         }
     }
     r /= 2;
-    cout << r << endl;
-    // while (clusteredPoints < data->getRows()) {
+
     do{
         prev_pointsChecked = resultsComparator.getResultsSize();
 
         for (int centroidIndex=0; centroidIndex < centroids->getRows(); centroidIndex++) {
-            //return points in distance r
-            // queryResults = this->predict_rs(centroids->getVector(cetroidIndex), r, maxPoints, maxVertices);
             hashList = getHashList(centroids->getVector(centroidIndex),  maxVertices);
-            // for (size_t i = 0; i < hashList.size(); i++){
-            //     cout<< "list " <<hashList[i]<<endl;
-            // }
             
-            // pointsChecked = 0;
             for (int i = 0; i < maxVertices; i++){
                 bucket = hashTable->getBucket(hashList[i]);
-                // cout << "b size "<<bucket.size()<<endl;
                 // search and find the k with minimun distance
                 for (int j=0; j < (int) bucket.size(); j++) {
                     // add to results and the will figure out the best neighbors
-                    // cout << "Index: [" << bucket[j].index << "]" << endl;
                     if (resultsComparator.checkIndex(bucket[j].index) && resultsComparator.getResult(bucket[j].index).first_cluster != centroidIndex) {
-                        // // check if confliict
-                        // if (map[bucket[j].index] != cetroidIndex) {
-                        //     if (dist < =map[bucket[j].index].distance) {
-                        //         //custom insert in map
-                        //         clusteredPoints++;
-                        //     }
-                        // } // else continue
+                        // check if conflict then add conflict to results and there will happen the sorting
                         dist = NumC<NumCDataType>::dist(bucket[j].sVector, centroids->getVector(centroidIndex), 1);
                         // cout << "Conflict centroid "<< centroidIndex << " vector " << bucket[j].index <<endl; 
                         if (dist <= r){
@@ -264,12 +250,8 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
                         if (dist <= r){
                             resultsComparator.addResult(bucket[j].index, centroidIndex, dist);
 
-                            //custom insert in map
-                            // clusteredPoints++;
                         }
                     }
-                    // pointsChecked++;
-                    // cout << "ckeced " << pointsChecked  << " size " << bucket.size() << " i "<< i<<endl; 
                 }
                 if(resultsComparator.getResultsSize() >= maxPoints)
                     break;
@@ -283,8 +265,6 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
 
     // results 
     Results* results = resultsComparator.getResults();
-    // results->executionTime = ((double) (end - start) / (CLOCKS_PER_SEC/1000));
-    // results->resultsDistArray.print();
     // do exhaustive search for the points that remained unassigned
     Results* knnResults;
     NumCIndexType centroidIndex;
@@ -308,21 +288,6 @@ Results* HyperCube<NumCDataType>::reverse_assignment(NumC<NumCDataType>* centroi
             delete knnResults;
         }
 
-        // // find the seconde nearest neighbour to fix results for the silouette
-        // if (results->resultsIndexArray.getElement(resultIndex,1) == -1){
-        //     knnResults = knnEstimator->predict_knn(this->data->getVector(resultIndex));
-        //     // add its results (centroids) to the total results
-        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,0);
-        //     dist = knnResults->resultsDistArray.getElement(0,0);
-        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
-        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
-        //     // add second nearest centroid
-        //     centroidIndex = knnResults->resultsIndexArray.getElement(0,1);
-        //     dist = knnResults->resultsDistArray.getElement(0,1);
-        //     if ( centroidIndex != results->resultsIndexArray.getElement(resultIndex,0) )
-        //         resultsComparator.addResultSecond(resultIndex, centroidIndex, dist);
-        //     delete knnResults;
-        // }
     }
     // delete previous results and gat the new one
     delete results;

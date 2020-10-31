@@ -398,6 +398,8 @@ NumCDistType NumC<NumCDataType>::dist(Vector<NumCDataType> v1, Vector<NumCDataTy
 
 }
 
+// sparse distance!!
+// compute only the non zero elements
 template <typename NumCDataType>
 NumCDistType NumC<NumCDataType>::distSparse(Vector<NumCDataType> v1, Vector<NumCDataType> v2, NumCIndexType d){
     // chech if both are sparse vectors
@@ -410,15 +412,7 @@ NumCDistType NumC<NumCDataType>::distSparse(Vector<NumCDataType> v1, Vector<NumC
         // NumCIndexType index  = 1;
         // calculate manhattan distance if dimension = 1
         if (d == 1){
-            // for (NumCIndexType i = 1; i < sparseElements1; i++){
-            //     index = v1.sparseData[i];
-            //     dist += std::abs( v1.vector[index] - v2.vector[index] ); 
-            // }
-            // for (NumCIndexType i = 1; i < sparseElements2; i++){
-            //     index = v2.sparseData[i];
-            //     dist += std::abs( v1.vector[index] - v2.vector[index] ); 
-            // }
-            // return dist;    
+   
             while( (index1 <= sparseElements1 )|| (index2 <= sparseElements2)){
                 if ( v1.sparseData[index1] < v2.sparseData[index2]){
                     dist += std::abs( v1.vector[v1.sparseData[index1]] - v2.vector[v1.sparseData[index1]] );
