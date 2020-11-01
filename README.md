@@ -35,6 +35,20 @@ We tried to test all possible scenarios, with many different parameters. We chec
 memory leak with valgrind.
 </h4>
 
+<h3>Test and research of W parameter</h3>
+<h4>
+The following is a brief search on the values of the hyperparameter W. W is the division factor for finding ai in the hash function. This factor determines how similar or not the images will be after their random linear transformation. If we have a large W then the operation (pixel - si) / w will be very likely -1 because si has values from 0 to W. Therefore if the images after their transformation have similar values ​​then more images will fill the same bucket as after their transformation they will be almost the same. If we have more images in a bucket then the search will be almost exhaustive and then we will have a better approximation of the real cost. But this is in contrast to time, as the search tends to be exhausting then time will tend to be much longer.
+Otherwise we have a small value W then the images after their transformation will not be the same and will be better distributed in a bucket. So during the search there will be less data which will mean better time but with less accuracy.  
+    
+The following is a graph of the approximate cost to real ratio as well as the approximate time to real for LSH
+
+<img src="./doc/images/LSH_ratio.png" alt="UOA">
+</h4>
+<h4>
+From the graph we observe exactly what we mentioned above. The higher the W, the lower the cost but the greater the time. Therefore for W close to 20000 to 40000 we can have a good exchange between cost and time, so that the algorithm achieves the best possible result in this dataset
+</h4>
+ 
+
 <h3>Project Directories and Files organization</h3>
 <h4>
 We tried to organize our project files by type.
@@ -128,13 +142,4 @@ In addition, a retrospective algorithm is implemented to find the buckets that h
 
 </h4>
   
-
-
-
-
-<h3>What more our program does</h3>
-<h4>
-...
-</h4>
-
 
