@@ -172,7 +172,7 @@ int main(int argc, char** argv) {
     //------------------------------------------------------------------------------------
     // Call HyperCube classifier and train it.
 
-        HyperCube<int> cube(50000);
+        HyperCube<int> cube(40000);
         cube.fit_transform(inputData, k);
 
     //------------------------------------------------------------------------------------

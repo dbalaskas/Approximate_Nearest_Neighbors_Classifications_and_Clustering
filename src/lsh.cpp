@@ -158,7 +158,7 @@ vector<Results*> r_results;
     //------------------------------------------------------------------------------------
     // Call LSHashing classifier and train it.
 
-        LSHashing<int> lsh(L, k, 50000);
+        LSHashing<int> lsh(L, k, 40000);
         lsh.fit_transform(inputData);
 
     //------------------------------------------------------------------------------------
