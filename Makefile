@@ -65,23 +65,28 @@ info:
 
 $(ODIR)/%.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $@ "..."
+	mkdir $(ODIR) -p
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 %.o: $(SRCDIR)/%.$(CODETYPE)
 	@echo "Creating object" $(ODIR)/$@ "..."
+	mkdir $(ODIR) -p
 	$(CXX) -c -o $(ODIR)/$@ $< $(CXXFLAGS)
 $(CUBE_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/hc_classifier.o $(ODIR)/cube.o
 	@echo "============================================================================"
 	@echo "Creating $(CUBE_EXEC)..."
+	mkdir $(BDIR) -p
 	$(CXX) -o $(BDIR)/cube $^ $(LDLIBS) $(CXXFLAGS)
 
 $(LSH_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/lsh.o
 	@echo "============================================================================"
 	@echo "Creating $(LSH_EXEC)..."
+	mkdir $(BDIR) -p
 	$(CXX) -o $(BDIR)/lsh $^ $(LDLIBS) $(CXXFLAGS)
 
 $(CLUSTER_EXEC): $(DEMANDED_OBJECTS) $(ODIR)/lsh_classifier.o $(ODIR)/hc_classifier.o $(ODIR)/kmedians.o $(ODIR)/cluster.o
 	@echo "============================================================================"
 	@echo "Creating $(CLUSTER_EXEC)..."
+	mkdir $(BDIR) -p
 	$(CXX) -o $(BDIR)/cluster $^ $(LDLIBS) $(CXXFLAGS)
 clean:
 	@echo "============================================================================"
@@ -96,4 +101,3 @@ README:
 	@echo "============================================================================"
 	@cat $(README)
 	@echo "============================================================================"
-
