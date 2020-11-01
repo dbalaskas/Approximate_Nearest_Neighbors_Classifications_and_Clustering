@@ -26,11 +26,17 @@ It's important that we wanted to create a more approachable and easy user experi
 <h4>
 We tried to organize our project files by type.
 Our project is organized with:
+    
 1. bin: the directory where the executables are saved.
+
 2. build: the directory where the objective files are.
+
 3. include: contains the '.h' files.
+
 4. src: contains the '.cpp' files.
+
 5. doc: contains data files like input/query/output/configuration.
+
 In main directory there are makefile, README.md and some '.sh' scripts that we used to 
 test our executables.
 </h4>
